@@ -30,3 +30,9 @@
 *.exe
 *.out
 *.app
+
+# Point cloud data
+data/*.bpc
+
+# Build folder contents
+build/*
