@@ -303,4 +303,4 @@ TSWLatexianTemp*
 *.sta
 
 # exclude built pdfs
-paper/*.pdf
+thesis/*.pdf
