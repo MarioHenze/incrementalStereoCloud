@@ -24,8 +24,38 @@
 \matno{4039602}
 \betreuer{Dr. B. Russig}
 \bibfiles{literature-example}
-\problem{Write down your task...}
-\copyrighterklaerung{If the author used ressources from third parties (texts, images, code) he or she should state the consents of the copyright owners here or cite the given general conditions (e.g. CC/(L)GPL/BSD copyright notices)}
+\problem{
+VR environments become more and more important in visualization and engineering
+applications. In order to provide a comfortable experience without risk of
+motion sickness a rendering framerate of 90fps needs to be ensured. Framerate is
+even more important than image quality. The goal of this thesis is the
+development of an incremental rendering approach for large point cloud data that
+can guarantee the necessary framerate by rendering only a subset of the points
+per frame and by accumulation information over several frames.
+
+The specific tasks are:
+\begin{itemize}
+\item Literature research on point cloud rendering and incremental rendering
+	approaches
+\item Justified selection of an incremental rendering approach for basic point
+	cloud rendering that guarantees a user-defined framerate and converges
+	to a good approximation of a non-incremental rendering without framerate
+	limitations.
+\item Implementation of the selected approach in a plugin to the CGV framework
+\item Evaluation of the achieved image quality for stereoscopic rendering at
+	90fps with a suitable image quality metric for several point clouds of
+	different sizes in comparison to a non-incremental rendering approach.
+\end{itemize}
+
+Optional Tasks:
+\begin{itemize}
+\item Optimization of the rendering approach for stereoscopic render
+\item Implementation of an advanced hole-free point cloud rendering approach
+\end{itemize}
+}
+\copyrighterklaerung{If the author used ressources from third parties (texts,
+images, code) he or she should state the consents of the copyright owners here
+or cite the given general conditions (e.g. CC/(L)GPL/BSD copyright notices)}
 \acknowledgments{I'd like to thank...}
 \abstracten{abstract text english}
 \abstractde{ abstract text german}

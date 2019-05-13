@@ -301,3 +301,6 @@ TSWLatexianTemp*
 
 # standalone packages
 *.sta
+
+# exclude built pdfs
+paper/*.pdf
