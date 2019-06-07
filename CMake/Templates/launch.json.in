@@ -9,7 +9,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "@VIEWER_DEBUG_EXE@",
-            "args": ["plugin:cg_fltk_d", "type(shader_config):shader_path='@CGV_DIR@/libs/cgv_gl/glsl;@CGV_DIR@/libs/point_cloud/glsl;@CMAKE_SOURCE_DIR@/src'", "plugin:cg_icons_d", "plugin:cmi_io", "plugin:crg_stereo_view_d", "plugin:@PROJECT_NAME@_d", "config:@CMAKE_SOURCE_DIR@/src/config.def"],
+            "args": ["plugin:cg_fltk_d", "type(shader_config):shader_path='@CGV_DIR@/libs/cgv_gl/glsl;@CGV_DIR@/libs/point_cloud/glsl;@CMAKE_SOURCE_DIR@/src'", "plugin:cg_icons_d", "plugin:cmi_io", "plugin:cg_ext_d", "plugin:crg_grid_d", "plugin:crg_light_d", "plugin:crg_stereo_view_d", "plugin:@PROJECT_NAME@_d", "config:@CMAKE_SOURCE_DIR@/src/config.def"],
             "stopAtEntry": false,
             "cwd": "@CMAKE_SOURCE_DIR@",
             "environment": [],
