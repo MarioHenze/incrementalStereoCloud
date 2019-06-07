@@ -29,8 +29,8 @@ protected:
 
 	float relative_distance_threshold;
 
-	std::size_t show_point_start;
-	std::size_t show_point_count;
+	long long show_point_start;
+	long long show_point_count;
 	unsigned interact_point_step;
 	double interact_delay;
 	cgv::gui::trigger interact_trigger;
