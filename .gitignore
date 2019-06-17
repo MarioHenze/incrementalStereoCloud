@@ -1,6 +1,9 @@
 # User specific configuration
 *.user
 
+# Sublime user related project file
+*.sublime-workspace
+
 # C++ specific files
 # Prerequisites
 *.d

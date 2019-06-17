@@ -71,6 +71,68 @@ der finalen Fassung nicht vorkommen.
 	\item[\cite{rusinkiewicz2000qsplat}]
 	\item[\cite{goswami2010high}]
 	\item[\cite{wimmer2006instant}]
+	\item[\cite{shum2000review}]
+	\item[\cite{mark1997post}]
+	\item[\cite{mcmillan1995head}]
+	\item[\cite{chang1999ldi}]
+	\item[\cite{he1998layered}]
 \end{description}
+
+\section{Einleitung}
+\label{sec:einleitung}
+
+Der Prozess der Punktwolkenakquisition ist durch technologische Fortschritte
+mittlerweile für eine große Anzahl an Problemstellungen machbar und
+kostengünstig. So sind bereits Geräte wie die Xbox Kinect oder Intel
+Realsense, die selbst für Privatpersonen erschwinglich sind, in der Lage,
+Tiefeninformationen zu erfassen und letztendlich Punktwolken zu generieren. Mit
+dem Aufkommen von Head Mounted Displays wie der Oculus Rift oder HTC Vive
+existieren nun auch Darstellungsmöglichkeiten, die die gewonnen
+Tiefeninformationen der menschlichen Wahrnehmung direkter und intuitiver
+zugänglich machen.
+
+Die Bildsynthese und Wiedergabe in solchen HMD Systemen stellt jedoch besondere
+Vorgaben in Hinblick auf Benutzbarkeit. So muss jederzeit sichergestellt werden,
+dass die Immersion dieser Virtual Reality Umgebung erhalten bleibt. Das bedeutet
+es herschen harte Schranken für Eingabeverzögerung und Bildwiederholfrequenz und
+deren Übertretung hat den Verlust von Interaktivität und im schlimmsten Fall
+physiologische Probleme wie Motion Sickness zur Folge.
+
+In dieser Arbeit soll ein Verfahren zur interaktiven Darstellung von Punktwolken
+entwickelt werden, welches in Hinblick auf die genannten Probleme optimiert ist.
+So besteht das Ziel darin, selbst größte Datensätze noch in interaktiver Weise
+darzustellen. Dazu werden zunächst Ansätze zur klassischen Punktwolken
+Darstellung und zum inkrementellen Rendering vorgestellt und deren
+Kombinationsmöglichkeiten untersucht. In einem weiteren Schritt soll, das so
+entwickelte Verfahren als C++ Plugin für das cgv-Framework des Lehrstuhls
+umgesetzt werden.
+
+\section{Verwandte Arbeiten}
+\label{sec:verwandte_arbeiten}
+
+Im Bereich des Image-based Rendering kann die Arbeit \cite{shum2000review} als
+Überblick gesehen werden. Heung-Yeung und Sing Bing arbeiten hierbei die
+unterschiedliche Verwendung von geometrischen Information bei verschiedenen
+Bildsyntheseverfahren heraus. So wird zunächst eine plenoptische Funktion
+definiert, welche als Grundlage der geometrielosen Verfahren genutzt wird. In
+der Mitte des Spektrums sind Methoden mit impliziter Geometrieinformation
+aufgeführt. In diese Kategorie fallen View-morphing und Transfermethoden, welche
+die geometrische Redundanz zweier aufeinanderfolgender Bilder ausnutzen. Zuletzt
+werden auch die klassischen Verfahren der Bildsynthese, welche auf explizite
+Geometrie wie Dreiecksnetze aufsetzen, eingeordnet.
+
+In \cite{chang1999ldi} stellen Chun-Fa et al. basierend auf \cite{he1998layered}
+eine Datenstruktur vor, welche zur Organisation von Referenzbildern mit
+variierender Tiefenauflösung genutzt werden können. So werden Bilder aus
+verschieden Perspektiven in einen sog. Layered Depth Tree eingfügt. Da bei
+gleicher Auflösung Referenzbilder aus einer näheren Perspektive
+Tiefeninformationen höher abtasten als entferntere, können diese in einen Octree
+eingeordnet werden und es entsteht eine Art Ordnungsrelation. Mithilfe dieser
+Datenstruktur ist es nun möglich, die Referenzbilder auswählen, deren
+Tiefenauflösung in etwa dem zu synthetisierenden Bildausschnitts entspricht. In
+der praktischen Umsetzung zeigen Chun-Fa et al. auf, dass der Speicherverbrauch
+nicht wesentlich höher als die direkte Speicherung aller Referenzbilder ist und
+auch die Rechenzeit im schlimmsten Fall gleich dem direkten Rendern aller
+Referenzbilder ist.
 
 \end{document}

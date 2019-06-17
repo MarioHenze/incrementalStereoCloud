@@ -11,7 +11,7 @@
 % Load packages
 
 %Umlaute zulassen
-\RequirePackage[latin1]{inputenc}
+\RequirePackage[utf8]{inputenc}
 \RequirePackage[T1]{fontenc}
 
 
