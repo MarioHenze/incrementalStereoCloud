@@ -1,13 +1,10 @@
 {
-	"folders":
-	[
-		{
-			"path": "."
-		}
-	],
-
-	"settings": {
+	"settings":
+	{
 		"TEXroot": "thesis.tex",
-		"additional_bibliography_file": ["literature.bib"]
+		"additional_bibliography_file":
+		[
+			"literature.bib"
+		]
 	}
 }

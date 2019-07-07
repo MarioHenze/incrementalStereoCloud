@@ -76,6 +76,7 @@ der finalen Fassung nicht vorkommen.
 	\item[\cite{mcmillan1995head}]
 	\item[\cite{chang1999ldi}]
 	\item[\cite{he1998layered}]
+	\item[\cite{mcmillan2009image}]
 \end{description}
 
 \section{Einleitung}
@@ -134,5 +135,31 @@ der praktischen Umsetzung zeigen Chun-Fa et al. auf, dass der Speicherverbrauch
 nicht wesentlich höher als die direkte Speicherung aller Referenzbilder ist und
 auch die Rechenzeit im schlimmsten Fall gleich dem direkten Rendern aller
 Referenzbilder ist.
+
+\section{Layered Depth Image}
+
+\begin{itemize}
+\item Von kamera position
+\item x- und y-Auflösung als raytracing
+\item layered depth pixel ist Farbwert mit Tiefeninformation in Abhängigkeit der
+Kameraposition
+\item neuer Viewport über Matrixtransformation
+\end{itemize}
+
+\section{Systemablauf}
+
+\begin{itemize}
+\item Eingabe von Punktwolke
+\item räumliche Unterteilung der Punktwolke (Octree)
+\item Raytracing durch Octree
+\item ergibt alle depth Pixel auf einem strahl
+\item Kriterium für optimalen Abstand und Anzahl von Tiefenebenen von Framerateziel
+\item Detail Culling und Viewport Culling
+\item eigentliches Rendern geschieht nur durch rendern/morphen des LDI
+\item bei bewegen des Viewport sollte möglichst schnell der LDI als Bild zur Verfügung stehen
+\item Parallel dazu wird neuer optimaler LDI generiert aus Kombination von altem LDI und der Punktwolke
+\item Stellen im alten gemorphten LDI finden, die undersampled sind und mit informationen aus Punktwolke auffüllen?
+\item wieder detail culling an oversampled Stellen
+\end{itemize}
 
 \end{document}
