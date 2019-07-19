@@ -28,14 +28,25 @@ private:
      */
     struct point_t
     {
-        cgv::render::render_types::rgb color;
-        float Z;
+        rgb color;
+        float depth;
         size_t splat_index;
     };
 
-    using layer_t = std::vector<point_t>;
+    /**
+     * On every ray, there are a some colored points with different depths
+     */
+    using ray_t = std::vector<point_t>;
 
-    std::vector<layer_t> m_layered_points;
+    /**
+     * @brief m_layered_points stores all rays going from the center of
+     * projection through every pixel
+     */
+    std::vector<ray_t> m_layered_points;
+
+    /**
+     * @brief m_camera holds configuration of projection details of the LDI
+     */
     PinholeCameraModel m_camera;
 };
 

@@ -1,13 +1,20 @@
 #ifndef FASTPOINTCLOUDRENDERER_H
 #define FASTPOINTCLOUDRENDERER_H
 
+#include <cgv/base/node.h>
+#include <cgv/gui/provider.h>
 #include <cgv/render/context.h>
 #include <cgv/render/drawable.h>
 #include <point_cloud/point_cloud.h>
 
 class FastPointCloudRenderer:
+        public cgv::base::node,
+        public cgv::gui::provider,
         public cgv::render::drawable
 {
+protected:
+    std::string m_filename;
+
 public:
     FastPointCloudRenderer();
 
@@ -30,6 +37,8 @@ public:
     virtual void after_finish(cgv::render::context&) override;
     /// clear all objects living in the context like textures or display lists
     virtual void clear(cgv::render::context&) override;
+
+    virtual void create_gui() override;
 
 private:
 

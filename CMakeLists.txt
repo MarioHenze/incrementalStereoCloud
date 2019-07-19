@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 2.6)
 set(PROJECT_NAME "incremental_pc_view")
 project(${PROJECT_NAME})
 
-
 # Add CGV framework
 # - configure
 option(BUILD_EXAMPLE_PLUGIN "Build the example plugin" FALSE)
@@ -31,12 +30,6 @@ cgv_find_package(cgv_gl)
 cgv_find_package(crg_stereo_view)
 cgv_get_viewer_locations(VIEWER_EXE VIEWER_DEBUG_EXE)
 get_filename_component(FINAL_BUILD_BIN_DIR ${VIEWER_EXE} DIRECTORY)
-
-# Link Boost as dependency
-find_package(Boost REQUIRED)
-if(Boost_FOUND)
-    include_directories(${Boost_INCLUDE_DIRS})
-endif()
 
 # Add project
 add_subdirectory(src)

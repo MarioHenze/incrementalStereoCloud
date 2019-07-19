@@ -32,6 +32,11 @@ public:
      */
     vec3 get_ray_direction(size_t u, size_t v) const;
 
+    /**
+     * @brief is_valid checks, wether the supplied configuration yields a valid
+     * transformation
+     * @return true if configuration is not degenerate, false otherwise
+     */
     bool is_valid() const;
 };
 

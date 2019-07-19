@@ -15,8 +15,8 @@ PinholeCameraModel::PinholeCameraModel(mat4 projection_center,
 vec3 PinholeCameraModel::get_ray_direction(size_t u, size_t v) const
 {
     assert(is_valid());
-    assert(u < resolution.first());
-    assert(v < resolution.second());
+    assert(u < resolution.first);
+    assert(v < resolution.second);
     return mapping_matrix * vec3(u,v,1);
 }
 
