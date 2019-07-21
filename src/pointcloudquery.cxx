@@ -3,10 +3,11 @@
 #include <assert.h>
 #include <atomic>
 #include <chrono>
+#include <iostream>
 #include <mutex>
 
-PointCloudQuery::PointCloudQuery(std::atomic_bool const & completed) :
-    m_completed(completed)
+PointCloudQuery::PointCloudQuery() :
+    m_completed(false)
 {
 
 }
@@ -14,6 +15,17 @@ PointCloudQuery::PointCloudQuery(std::atomic_bool const & completed) :
 bool PointCloudQuery::is_complete() const
 {
     return m_completed;
+}
+
+void PointCloudQuery::trigger_completion()
+{
+    if (m_completed)
+        std::cerr << __FILE__
+                  << __func__
+                  << __LINE__
+                  << ": Query is already marked as completed!";
+
+    m_completed = true;
 }
 
 void PointCloudQuery::consume_points(

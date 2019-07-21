@@ -12,10 +12,10 @@ private:
     std::timed_mutex m_colors_mutex;
     std::forward_list<float> m_colors;
 
-    std::atomic_bool const & m_completed;
+    std::atomic_bool m_completed;
 
 public:
-    PointCloudQuery(std::atomic_bool const & completed);
+    PointCloudQuery();
 
     /**
      * @brief is_complete retrieves the status of the query
@@ -23,6 +23,14 @@ public:
      * possible points for a given request have been provided, false otherwise.
      */
     bool is_complete() const;
+
+    /**
+     * @brief trigger_completion marks this query as completed.
+     * A completed query will no longer be supplied by the point cloud source.
+     * When set by the point source the query is fulfilled entirely. If set by
+     * the query side, it marks an early abortion of the query.
+     */
+    void trigger_completion();
 
     /**
      * @brief consume_points moves all currently available points of the query

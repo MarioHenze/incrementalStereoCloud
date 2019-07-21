@@ -11,7 +11,12 @@ using vec3 = cgv::render::render_types::vec3;
 class PinholeCameraModel
 {
 public:
+    /**
+     * @brief projection_center contains a transformation from global
+     * coordinates into the clip space of the LDI
+     */
     mat4 projection_center;
+
     /**
      * @brief mapping_matrix Maps a given image plane coordinate into a ray
      * direction from center of projection

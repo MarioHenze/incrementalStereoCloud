@@ -1,11 +1,15 @@
 #ifndef FASTPOINTCLOUDRENDERER_H
 #define FASTPOINTCLOUDRENDERER_H
 
+#include <memory>
+
 #include <cgv/base/node.h>
 #include <cgv/gui/provider.h>
 #include <cgv/render/context.h>
 #include <cgv/render/drawable.h>
-#include <point_cloud/point_cloud.h>
+
+#include "pointcloudsource.h"
+#include "layereddepthimage.h"
 
 class FastPointCloudRenderer:
         public cgv::base::node,
@@ -20,28 +24,33 @@ public:
 
     /// this method is called after creation or recreation of the context,
     /// return whether all necessary functionality is supported
-    virtual bool init(cgv::render::context&) override;
+    bool init(cgv::render::context&) override;
     /// callback to anounce resizing of the output window
-    virtual void resize(unsigned int w, unsigned int h) override;
+    void resize(unsigned int w, unsigned int h) override;
     /// this method is called in one pass over all drawables before the draw
     /// method
-    virtual void init_frame(cgv::render::context&) override;
+    void init_frame(cgv::render::context&) override;
     /// overload to draw the content of this drawable
-    virtual void draw(cgv::render::context&) override;
+    void draw(cgv::render::context&) override;
     /// this method is called when the current drawable is left in a tree
     /// traversal that calls the draw method
-    virtual void finish_draw(cgv::render::context&) override;
+    void finish_draw(cgv::render::context&) override;
     /// this method is called in one pass over all drawables after drawing
-    virtual void finish_frame(cgv::render::context&) override;
+    void finish_frame(cgv::render::context&) override;
     /// this method is called in one pass over all drawables after finish frame
-    virtual void after_finish(cgv::render::context&) override;
+    void after_finish(cgv::render::context&) override;
     /// clear all objects living in the context like textures or display lists
-    virtual void clear(cgv::render::context&) override;
+    void clear(cgv::render::context&) override;
 
-    virtual void create_gui() override;
+    void create_gui() override;
+
+    void on_set(void* member_ptr) override;
 
 private:
+    LayeredDepthImage m_ldi;
+    std::shared_ptr<PointCloudSource> m_point_source;
 
+    void open_point_data(std::string const & filename);
 };
 
 #endif // FASTPOINTCLOUDRENDERER_H
