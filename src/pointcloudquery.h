@@ -12,10 +12,10 @@ private:
     std::timed_mutex m_colors_mutex;
     std::forward_list<float> m_colors;
 
-    std::atomic_bool m_completed;
+    std::atomic_bool m_completed{false};
 
 public:
-    PointCloudQuery();
+    PointCloudQuery() = default;
 
     /**
      * @brief is_complete retrieves the status of the query

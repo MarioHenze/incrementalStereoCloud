@@ -6,12 +6,6 @@
 #include <iostream>
 #include <mutex>
 
-PointCloudQuery::PointCloudQuery() :
-    m_completed(false)
-{
-
-}
-
 bool PointCloudQuery::is_complete() const
 {
     return m_completed;
