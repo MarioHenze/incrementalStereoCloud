@@ -91,6 +91,12 @@ void LayeredDepthImage::add_global_points(const std::vector<float> &points,
     }
 }
 
+bool LayeredDepthImage::is_valid() const
+{
+    // TODO can the data also be validated?
+    return m_camera.is_valid();
+}
+
 size_t LayeredDepthImage::to_index(size_t x, size_t y) const
 {
     const size_t index = y * m_camera.resolution.first + x;

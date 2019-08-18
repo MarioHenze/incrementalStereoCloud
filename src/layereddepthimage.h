@@ -27,7 +27,10 @@ class LayeredDepthImage {
 public:
   LayeredDepthImage() = default;
 
-  LayeredDepthImage(PinholeCameraModel pcm);
+  // TODO Reflect behavoir, when new LDI is resized
+  LayeredDepthImage(LayeredDepthImage const & other) = default;
+
+  explicit LayeredDepthImage(PinholeCameraModel pcm);
 
   void warp_reference_into(PinholeCameraModel pcm, std::vector<rgb> color,
                            std::vector<float> depth);
@@ -55,6 +58,12 @@ public:
    * from front to back
    */
   std::vector<float> interleave_data() const;
+
+  /**
+   * @brief is_valid checks if the LDI configuration and data is valid
+   * @return true if the LDI can be considered in working state, false otherwise
+   */
+  bool is_valid() const;
 
 private:
   /**

@@ -23,7 +23,7 @@ public:
   mat3 mapping_matrix;
   std::pair<size_t, size_t> resolution;
 
-  PinholeCameraModel();
+  PinholeCameraModel() = default;
 
   PinholeCameraModel(mat4 projection_center, mat3 mapping_matrix,
                      std::pair<size_t, size_t> resolution);

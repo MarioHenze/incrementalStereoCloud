@@ -8,7 +8,11 @@
 
 FastPointCloudRenderer::FastPointCloudRenderer() {
   set_name("fast point cloud renderer");
+}
+
+bool FastPointCloudRenderer::init(cgv::render::context &ctx) {
   cgv::render::view *view = find_view_as_node();
+  assert(view);
 
   // Build the PinholeCamera from the parameters of the view
   auto const eye = view->get_eye();
@@ -25,18 +29,17 @@ FastPointCloudRenderer::FastPointCloudRenderer() {
   // TODO: compute mapping matrix
   mat3 mapping_matrix;
 
-  // TODO find resolution
-  std::pair<size_t, size_t> resolution(30, 30);
+  std::pair<size_t, size_t> resolution(ctx.get_width(), ctx.get_height());
   PinholeCameraModel view_pcm(projection_center, mapping_matrix, resolution);
 
   m_ldi = LayeredDepthImage(view_pcm);
+
+  return m_ldi.is_valid();
 }
 
-bool FastPointCloudRenderer::init(cgv::render::context &ctx) {}
-
 void FastPointCloudRenderer::resize(unsigned int w, unsigned int h) {
-  static int i{0};
-  std::cout << "Resize" << i++;
+    std::pair<size_t, size_t> resolution(w, h);
+
 }
 
 void FastPointCloudRenderer::init_frame(cgv::render::context &) {}

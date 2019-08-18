@@ -496,10 +496,10 @@ void point_cloud_viewer::create_gui()
 #include <cgv/base/register.h>
 
 /// register a newly created cube with the name "cube1" as constructor argument
-extern cgv::base::object_registration<point_cloud_viewer> point_cloud_viewer_reg("");
+//extern cgv::base::object_registration<point_cloud_viewer> point_cloud_viewer_reg("");
 
 #ifdef CGV_FORCE_STATIC
-extern cgv::base::registration_order_definition dro("stereo_view_interactor;point_cloud_viewer");
+//extern cgv::base::registration_order_definition dro("stereo_view_interactor;point_cloud_viewer");
 #endif
 
 
