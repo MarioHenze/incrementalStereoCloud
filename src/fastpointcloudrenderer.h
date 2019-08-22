@@ -7,6 +7,7 @@
 #include <cgv/gui/provider.h>
 #include <cgv/render/context.h>
 #include <cgv/render/drawable.h>
+#include <cgv/render/shader_program.h>
 
 #include "pointcloudsource.h"
 #include "layereddepthimage.h"
@@ -49,6 +50,9 @@ public:
 private:
     LayeredDepthImage m_ldi;
     std::shared_ptr<PointCloudSource> m_point_source;
+
+    //! The shader program to render the LDI
+    cgv::render::shader_program & m_ldi_shader;
 
     void open_point_data(std::string const & filename);
 };
