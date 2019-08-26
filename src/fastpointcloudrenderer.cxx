@@ -13,44 +13,60 @@ FastPointCloudRenderer::FastPointCloudRenderer()
 
 bool FastPointCloudRenderer::init(cgv::render::context &ctx)
 {
-    cgv::render::view *view = find_view_as_node();
-    assert(view);
-
-    // Build the PinholeCamera from the parameters of the view
-    auto const eye = view->get_eye();
-    auto const direction = view->get_view_dir();
-    auto const direction_up = view->get_view_up_dir();
-    auto const direction_ortho = cgv::math::cross(direction, direction_up);
-
-    mat4 projection_center;
-    projection_center.set_col(0, direction.lift());
-    projection_center.set_col(1, direction_up.lift());
-    projection_center.set_col(2, direction_ortho.lift());
-    projection_center.set_col(3, eye.lift());
+    mat4 const MVP = compute_mvp();
 
     // TODO: compute mapping matrix
     mat3 mapping_matrix;
 
     std::pair<size_t, size_t> resolution(ctx.get_width(), ctx.get_height());
-    PinholeCameraModel view_pcm(projection_center, mapping_matrix, resolution);
+    PinholeCameraModel view_pcm(MVP, mapping_matrix, resolution);
 
     m_ldi = LayeredDepthImage(view_pcm);
 
-    return m_ldi.is_valid();
-
     {// Create the LDI shader
-        m_ldi_shader.
+        m_ldi_shader.build_dir(ctx, "ldi");
+        assert(m_ldi_shader.is_linked());
     }
+
+    {// Collect drawing state into VAO
+        assert(m_vao.is_created());
+
+        m_vbo_positions.create(ctx);
+        m_vbo_color.create(ctx);
+    }
+
+    return m_ldi.is_valid();
 }
 
 void FastPointCloudRenderer::resize(unsigned int w, unsigned int h)
 {
     std::pair<size_t, size_t> resolution(w, h);
+
+    // TODO resize ldi;
 }
 
 void FastPointCloudRenderer::init_frame(cgv::render::context &) {}
 
-void FastPointCloudRenderer::draw(cgv::render::context &) {}
+void FastPointCloudRenderer::draw(cgv::render::context & ctx) {
+    assert(m_ldi_shader.is_linked());
+    m_ldi_shader.enable(ctx);
+
+    m_ldi_shader.set_uniform(ctx,
+                             "LDI_INVERSE_MVP",
+                             cgv::math::inv(m_ldi.get_camera().get_mvp()),
+                             true);
+    m_ldi_shader.set_uniform(ctx,
+                             "LDI_INVERSE_MAPPING",
+                             cgv::math::inv(m_ldi.get_camera().get_mapping()),
+                             true);
+    m_ldi_shader.set_uniform(ctx,
+                             "LDI_TARGET_VIEWPORT",
+                             compute_mvp(),
+                             true);
+
+
+    m_ldi_shader.disable(ctx);
+}
 
 void FastPointCloudRenderer::finish_draw(cgv::render::context &) {}
 
@@ -79,6 +95,26 @@ void FastPointCloudRenderer::on_set(void *member_ptr)
     if (member_ptr == &m_filename) {
         open_point_data(m_filename);
     }
+}
+
+cgv::render::render_types::mat4 FastPointCloudRenderer::compute_mvp() const
+{
+    cgv::render::view *view = find_view_as_node();
+    assert(view);
+
+    // Build the PinholeCamera from the parameters of the view
+    auto const eye = view->get_eye();
+    auto const direction = view->get_view_dir();
+    auto const direction_up = view->get_view_up_dir();
+    auto const direction_ortho = cgv::math::cross(direction, direction_up);
+
+    mat4 MVP;
+    MVP.set_col(0, direction.lift());
+    MVP.set_col(1, direction_up.lift());
+    MVP.set_col(2, direction_ortho.lift());
+    MVP.set_col(3, eye.lift());
+
+    return MVP;
 }
 
 void FastPointCloudRenderer::open_point_data(const std::string &filename)

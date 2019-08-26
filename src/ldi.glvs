@@ -1,4 +1,4 @@
-#version 330 core
+#version 130
 // The supplied positions will be in relation to the LDI. Therefore the supplied
 // vector gives x,y position and depth along the ray from the pinhole center
 // through the pixels of the LDI plane.

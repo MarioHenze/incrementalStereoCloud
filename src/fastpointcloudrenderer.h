@@ -5,9 +5,11 @@
 
 #include <cgv/base/node.h>
 #include <cgv/gui/provider.h>
+#include <cgv/render/attribute_array_binding.h>
 #include <cgv/render/context.h>
 #include <cgv/render/drawable.h>
 #include <cgv/render/shader_program.h>
+#include <cgv/render/vertex_buffer.h>
 
 #include "pointcloudsource.h"
 #include "layereddepthimage.h"
@@ -32,7 +34,7 @@ public:
     /// method
     void init_frame(cgv::render::context&) override;
     /// overload to draw the content of this drawable
-    void draw(cgv::render::context&) override;
+    void draw(cgv::render::context&ctx) override;
     /// this method is called when the current drawable is left in a tree
     /// traversal that calls the draw method
     void finish_draw(cgv::render::context&) override;
@@ -48,11 +50,30 @@ public:
     void on_set(void* member_ptr) override;
 
 private:
+    /**
+     * @brief compute_mvp computes a MVP transformation for the current cgv view
+     * @return a MVP transformation
+     */
+    mat4 compute_mvp() const;
+
+    //! The LDI with possibly a representative subset of all points
     LayeredDepthImage m_ldi;
+
+    //! The Point source, which will be used to fill areas in the LDI with
+    //! insufficient density of points
     std::shared_ptr<PointCloudSource> m_point_source;
 
     //! The shader program to render the LDI
-    cgv::render::shader_program & m_ldi_shader;
+    cgv::render::shader_program m_ldi_shader;
+
+    //! The VAO bundling the render state for the LDI
+    cgv::render::attribute_array_binding_base m_vao;
+
+    //! The VBO containing all point positions of the LDI
+    cgv::render::vertex_buffer m_vbo_positions;
+
+    //! The VBO containing the colors of the points in the LDI
+    cgv::render::vertex_buffer m_vbo_color;
 
     void open_point_data(std::string const & filename);
 };

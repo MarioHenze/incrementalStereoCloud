@@ -1,5 +1,7 @@
 #include "layereddepthimage.h"
 
+#include <algorithm>
+
 #include <pmmintrin.h>
 
 #include <boost/align/is_aligned.hpp>
@@ -7,7 +9,7 @@
 #include <cgv/math/inv.h>
 
 LayeredDepthImage::LayeredDepthImage(PinholeCameraModel pcm):
-    m_layered_points(pcm.resolution.first * pcm.resolution.second),
+    m_layered_points(pcm.get_resolution().first * pcm.get_resolution().second),
     m_camera(pcm)
 {
 
@@ -18,16 +20,15 @@ void LayeredDepthImage::warp_reference_into(PinholeCameraModel pcm,
                                             std::vector<float> depth)
 {
     {
-        size_t pixel_count = pcm.resolution.first * pcm.resolution.second;
+        size_t pixel_count =
+            pcm.get_resolution().first * pcm.get_resolution().second;
         assert(pcm.is_valid());
         assert(color.size() == pixel_count);
         assert(depth.size() == pixel_count);
     }
 
     const mat4 transfer_matrix =
-            pcm.projection_center *
-            cgv::math::inv(m_camera.projection_center);
-
+        pcm.get_mvp() * cgv::math::inv(m_camera.get_mvp());
 }
 
 void LayeredDepthImage::add_global_points(const std::vector<float> &points,
@@ -65,7 +66,7 @@ void LayeredDepthImage::add_global_points(const std::vector<float> &points,
     for (size_t i = 0; i < points.size(); i++) {
         // the given points are in global space and need to be transformed into
         // the clip space of the LDI camera
-        vec4 point = m_camera.projection_center *
+        vec4 point = m_camera.get_mvp() *
                 vec4(4,points.data() + i * 4);
         // TODO clip points outside of view frustum
         vec3 p(3, point / point.w());
@@ -89,6 +90,10 @@ void LayeredDepthImage::add_global_points(const std::vector<float> &points,
 
         ray.insert(first_greater_depth, new_point);
     }
+
+    // After we've ensured, that the supplied containers are valid and the data
+    // was copied over, we can update the point count of the LDI
+    m_point_count += points.size() / 4;
 }
 
 bool LayeredDepthImage::is_valid() const
@@ -97,9 +102,32 @@ bool LayeredDepthImage::is_valid() const
     return m_camera.is_valid();
 }
 
+PinholeCameraModel LayeredDepthImage::get_camera() const
+{
+    return m_camera;
+}
+
+size_t LayeredDepthImage::point_count() const
+{
+    return m_point_count;
+}
+
 size_t LayeredDepthImage::to_index(size_t x, size_t y) const
 {
-    const size_t index = y * m_camera.resolution.first + x;
-    assert(m_camera.resolution.first * m_camera.resolution.second >= index);
+    const size_t index = y * m_camera.get_resolution().first + x;
+    assert(
+        m_camera.get_resolution().first *
+        m_camera.get_resolution().second >= index);
     return index;
+}
+
+size_t LayeredDepthImage::count_points() const
+{
+    size_t count{0};
+
+    for (auto const & ray : m_layered_points) {
+        count += ray.size();
+    }
+
+    return count;
 }
