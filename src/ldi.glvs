@@ -2,8 +2,8 @@
 // The supplied positions will be in relation to the LDI. Therefore the supplied
 // vector gives x,y position and depth along the ray from the pinhole center
 // through the pixels of the LDI plane.
-layout(location = 0) in vec3 position;
-layout(location = 1) in vec3 color;
+in vec3 position;
+in vec3 color;
 
 // This transformation maps from LDI local position to global position
 uniform mat4 LDI_INVERSE_MVP;
