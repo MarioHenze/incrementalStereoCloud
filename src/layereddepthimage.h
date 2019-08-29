@@ -8,21 +8,11 @@
 #include <cgv/render/render_types.h>
 
 #include "pinholecameramodel.h"
+#include "ray.h"
 
 using vec4 = cgv::render::render_types::vec4;
 using mat4 = cgv::render::render_types::mat4;
 using rgb = cgv::render::render_types::rgb;
-
-/**
- * Borrowing from the LDI concept define depth pixel as a point with color
- * and depth.
- */
-struct point_t
-{
-    rgb color;
-    float depth;
-    size_t splat_index;
-};
 
 class LayeredDepthImage
 {
@@ -81,6 +71,13 @@ public:
      */
     size_t point_count() const;
 
+    /**
+     * @brief bytes_per_point retrieves the count of bytes necessary to store
+     * all data of a single point
+     * @return byte count of one point
+     */
+    size_t bytes_per_point() const;
+
 private:
     /**
      * @brief to_index returns the index for a given 2D position
@@ -88,7 +85,14 @@ private:
      * @param y vertical position
      * @return linear index
      */
-    size_t to_index(size_t x, size_t y) const;
+    size_t to_index(size_t const x, size_t const y) const;
+
+    /**
+     * @brief to_coord retrieves the two dimensional position of a given index
+     * @param index of the ray
+     * @return the x and y position of the ray
+     */
+    std::pair<size_t, size_t> to_coord(size_t const index) const;
 
     /**
      * @brief count_points counts all points along all rays in the LDI
@@ -100,15 +104,10 @@ private:
     size_t count_points() const;
 
     /**
-     * On every ray, there are a some colored points with different depths
-     */
-    using ray_t = std::vector<point_t>;
-
-    /**
      * @brief m_layered_points stores all rays going from the center of
      * projection through every pixel
      */
-    std::vector<ray_t> m_layered_points;
+    std::vector<Ray> m_layered_points;
 
     //! The amount of points in the LDI(-subset) of the point source
     size_t m_point_count{0};

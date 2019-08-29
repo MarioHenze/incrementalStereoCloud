@@ -75,9 +75,9 @@ void LayeredDepthImage::add_global_points(const std::vector<float> &points,
         auto & ray = m_layered_points.at(to_index(p.x(), p.y()));
         // ensure depth monotonicity by sorted insertion
         auto const first_greater_depth = std::find_if(
-                    ray.cbegin(),
-                    ray.cend(),
-                    [p](point_t const point){
+            ray.container().cbegin(),
+            ray.container().cend(),
+            [p](point_t const point){
             return point.depth > p.z();
         });
 
@@ -88,12 +88,26 @@ void LayeredDepthImage::add_global_points(const std::vector<float> &points,
         new_point.depth = p.z();
         new_point.splat_index = 1;
 
-        ray.insert(first_greater_depth, new_point);
+        ray.container().insert(first_greater_depth, new_point);
     }
 
     // After we've ensured, that the supplied containers are valid and the data
     // was copied over, we can update the point count of the LDI
     m_point_count += points.size() / 4;
+}
+
+std::vector<float> LayeredDepthImage::interleave_data() const
+{
+    assert(is_valid());
+
+    size_t max_size{0};
+    std::vector<float> data;
+
+    for(auto const & ray : m_layered_points)
+    {
+        max_size = std::max(max_size, ray.container().size());
+        data.push_back(ray.front().)
+    }
 }
 
 bool LayeredDepthImage::is_valid() const
@@ -112,13 +126,30 @@ size_t LayeredDepthImage::point_count() const
     return m_point_count;
 }
 
-size_t LayeredDepthImage::to_index(size_t x, size_t y) const
+size_t LayeredDepthImage::bytes_per_point() const
+{
+    // vec3 for position and vec3 for color => 3 + 3
+    static_assert(std::is_same<)
+    static_assert(std::is_same<decltype(point_t::depth), float>::value);
+    return vec3::size() * 2 * sizeof (float);
+}
+
+size_t LayeredDepthImage::to_index(const size_t x, const size_t y) const
 {
     const size_t index = y * m_camera.get_resolution().first + x;
     assert(
         m_camera.get_resolution().first *
         m_camera.get_resolution().second >= index);
     return index;
+}
+
+std::pair<size_t, size_t> LayeredDepthImage::to_coord(const size_t index) const
+{
+    assert(index <=
+           m_camera.get_resolution().first *
+           m_camera.get_resolution().second);
+    return {index % m_camera.get_resolution().first,
+            index / m_camera.get_resolution().second};
 }
 
 size_t LayeredDepthImage::count_points() const

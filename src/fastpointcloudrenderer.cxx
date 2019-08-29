@@ -31,8 +31,8 @@ bool FastPointCloudRenderer::init(cgv::render::context &ctx)
     {// Collect drawing state into VAO
         assert(m_vao.is_created());
 
-        m_vbo_positions.create(ctx);
-        m_vbo_color.create(ctx);
+        m_vbo_ldi_data.create(ctx,
+                              m_ldi.point_count() * m_ldi.bytes_per_point());
     }
 
     return m_ldi.is_valid();

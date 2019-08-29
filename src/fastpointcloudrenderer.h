@@ -69,11 +69,8 @@ private:
     //! The VAO bundling the render state for the LDI
     cgv::render::attribute_array_binding_base m_vao;
 
-    //! The VBO containing all point positions of the LDI
-    cgv::render::vertex_buffer m_vbo_positions;
-
-    //! The VBO containing the colors of the points in the LDI
-    cgv::render::vertex_buffer m_vbo_color;
+    //! The VBO containing all point positions and colors of the LDI
+    cgv::render::vertex_buffer m_vbo_ldi_data;
 
     void open_point_data(std::string const & filename);
 };
