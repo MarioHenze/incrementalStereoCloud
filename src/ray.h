@@ -18,28 +18,52 @@ struct point_t
     rgb color;
     float depth;
     size_t splat_index;
+
+    /**
+     * @brief to_buffer transforms the point compound into a float buffer
+     * @return a buffer containing depth and then RGB color
+     */
+    std::vector<float> to_buffer() const;
+
+    bool operator>(point_t const other) const;
 };
 
 class Ray
 {
 public:
-    Ray(size_t const x, size_t const y);
+    Ray() = default;
 
     /**
-     * @brief container grants access to all points on the ray as vector
-     * @return a reference to the underlying vector
+     * @brief get_location retrieves the location of the ray on the image plane
+     * @return a pair of floats, consisting of the x and y coordinate
      */
-    std::vector<point_t>& container();
+    std::pair<float, float> get_location() const;
 
     /**
-     * @brief container grants access to all points on the ray as const vector
-     * @return a const reference to the underlying vector
+     * @brief point_count retrieves how many points are on the ray
+     * @return the count of points on the ray
      */
-    std::vector<point_t> const & container() const;
+    size_t point_count() const;
+
+    /**
+     * @brief to_buffer retrieves a buffer friendly version of the ray
+     * @return a vector with location/depth and color interleaved
+     *
+     * This function is provided for quick OpenGL friendly buffer creation. As
+     * all rays of an LDI contain a variable amount of points, this function in
+     * combination with stl algorithms can transform the set of all rays into
+     * the desired representation
+     */
+    std::vector<float> to_buffer() const;
+
+    /**
+     * @brief insert will place a colored point at the specified depth
+     * @param depth at which the point lays on the ray
+     * @param color of the point
+     */
+    void insert(const point_t point);
+
 private:
-    //! The location of the ray on the LDI plane
-    std::pair<size_t, size_t> const m_location;
-
     //! All the points along the ray
     std::vector<point_t> m_points;
 };

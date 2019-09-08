@@ -68,27 +68,17 @@ void LayeredDepthImage::add_global_points(const std::vector<float> &points,
         // the clip space of the LDI camera
         vec4 point = m_camera.get_mvp() *
                 vec4(4,points.data() + i * 4);
+
         // TODO clip points outside of view frustum
-        vec3 p(3, point / point.w());
-
-        // insert the corresponding color at the calculated z value
-        auto & ray = m_layered_points.at(to_index(p.x(), p.y()));
-        // ensure depth monotonicity by sorted insertion
-        auto const first_greater_depth = std::find_if(
-            ray.container().cbegin(),
-            ray.container().cend(),
-            [p](point_t const point){
-            return point.depth > p.z();
-        });
-
+        vec3 const p(3, point / point.w());
+        rgb const c = rgb(colors.at(3 * i),
+                          colors.at(3 * i + 1),
+                          colors.at(3 * i + 2));
         point_t new_point;
-        new_point.color = rgb(colors.at(i*3),
-                              colors.at(i*3+1),
-                              colors.at(i*3+2));
         new_point.depth = p.z();
-        new_point.splat_index = 1;
+        new_point.color = c;
 
-        ray.container().insert(first_greater_depth, new_point);
+        m_layered_points.at(to_index(p.x(), p.y())).insert(new_point);
     }
 
     // After we've ensured, that the supplied containers are valid and the data
@@ -100,14 +90,16 @@ std::vector<float> LayeredDepthImage::interleave_data() const
 {
     assert(is_valid());
 
-    size_t max_size{0};
+    // This will contain all the point data in an position/color interleaved
+    // fashion.
     std::vector<float> data;
 
-    for(auto const & ray : m_layered_points)
-    {
-        max_size = std::max(max_size, ray.container().size());
-        data.push_back(ray.front().)
+    for(auto const & ray: m_layered_points) {
+        auto const buffer = ray.to_buffer();
+        std::move(buffer.cbegin(), buffer.cend(), std::back_inserter(data));
     }
+
+    return data;
 }
 
 bool LayeredDepthImage::is_valid() const
@@ -128,10 +120,12 @@ size_t LayeredDepthImage::point_count() const
 
 size_t LayeredDepthImage::bytes_per_point() const
 {
-    // vec3 for position and vec3 for color => 3 + 3
-    static_assert(std::is_same<)
+    // The functions assumption are based on the following types
+    static_assert(std::is_same<decltype(point_t::color), rgb>::value);
     static_assert(std::is_same<decltype(point_t::depth), float>::value);
-    return vec3::size() * 2 * sizeof (float);
+
+    // vec3 for position and vec3 for color => 3 + 3
+    return vec3::size() * 2 * sizeof(float);
 }
 
 size_t LayeredDepthImage::to_index(const size_t x, const size_t y) const
@@ -156,8 +150,8 @@ size_t LayeredDepthImage::count_points() const
 {
     size_t count{0};
 
-    for (auto const & ray : m_layered_points) {
-        count += ray.size();
+    for (auto const &ray : m_layered_points) {
+        count += ray.point_count();
     }
 
     return count;

@@ -47,8 +47,7 @@ public:
      * @return the interleaved position & color data
      *
      * The returned buffer contains at first a 3 component position vector and
-     * then a 3 component color vector. Furthermore the positions will be sorted
-     * from front to back
+     * then a 3 component color vector.
      */
     std::vector<float> interleave_data() const;
 
