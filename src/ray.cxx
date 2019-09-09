@@ -20,11 +20,11 @@ size_t Ray::point_count() const
     return m_points.size();
 }
 
-std::vector<float> Ray::to_buffer(std::pair<float,float> location) const
+std::vector<float> Ray::to_buffer(std::pair<float, float> location) const
 {
     std::vector<float> buffer(m_points.size());
 
-    for(auto const & p: m_points) {
+    for (auto const &p : m_points) {
         buffer.push_back(location.first);
         buffer.push_back(location.second);
 
@@ -37,11 +37,14 @@ std::vector<float> Ray::to_buffer(std::pair<float,float> location) const
 
 void Ray::insert(const point_t point)
 {
+    auto const predicate = std::bind(std::greater<>(),
+                                     std::placeholders::_1,
+                                     point);
+
     // ensure depth monotonicity by sorted insertion
-    auto const first_greater_depth
-        = std::find_if(m_points.cbegin(),
-                       m_points.cend(),
-                       std::bind2nd(std::greater<point_t>(), point));
+    auto const first_greater_depth = std::find_if(m_points.cbegin(),
+                                                  m_points.cend(),
+                                                  predicate);
 
     m_points.insert(first_greater_depth, point);
 }

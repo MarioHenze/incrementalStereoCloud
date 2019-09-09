@@ -2,12 +2,14 @@
 
 #include <cgv/math/det.h>
 
+#include <utility>
+
 PinholeCameraModel::PinholeCameraModel(mat4 projection_center,
                                        mat3 mapping_matrix,
-                                       std::pair<size_t, size_t> resolution) :
-    m_projection_center(projection_center),
-    m_mapping_matrix(mapping_matrix),
-    m_resolution(resolution)
+                                       std::pair<size_t, size_t> resolution)
+    : m_projection_center(std::move(projection_center)),
+      m_mapping_matrix(std::move(mapping_matrix)),
+      m_resolution(std::move(resolution))
 {
 
 }

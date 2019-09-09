@@ -9,20 +9,21 @@
 
 #include <cgv/math/inv.h>
 
-LayeredDepthImage::LayeredDepthImage(PinholeCameraModel pcm):
-    m_layered_points(pcm.get_resolution().first * pcm.get_resolution().second),
-    m_camera(pcm)
+LayeredDepthImage::LayeredDepthImage(const PinholeCameraModel &pcm)
+    : m_layered_points(pcm.get_resolution().first *
+                       pcm.get_resolution().second),
+      m_camera(pcm)
 {
 
 }
 
 void LayeredDepthImage::warp_reference_into(PinholeCameraModel const &pcm,
-                                            std::vector<rgb> color,
-                                            std::vector<float> depth)
+                                            const std::vector<rgb> &color,
+                                            const std::vector<float>& depth)
 {
     {
-        size_t pixel_count =
-            pcm.get_resolution().first * pcm.get_resolution().second;
+        size_t pixel_count = pcm.get_resolution().first
+                             * pcm.get_resolution().second;
         assert(pcm.is_valid());
         assert(color.size() == pixel_count);
         assert(depth.size() == pixel_count);

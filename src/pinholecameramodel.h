@@ -24,34 +24,34 @@ public:
      * @param v coordinate of pixel in image plane
      * @return the ray direction
      */
-    vec3 get_ray_direction(size_t u, size_t v) const;
+    [[nodiscard]] vec3 get_ray_direction(size_t u, size_t v) const;
 
     /**
      * @brief get_mvp returns a transformation from global to LDI local
      * coordinate system
      * @return the transformation
      */
-    mat4 get_mvp() const;
+    [[nodiscard]] mat4 get_mvp() const;
 
     /**
      * @brief get_mapping returns a transformation from x,y + depth on ray to
      * LDI local coordinates
      * @return the mapping transformation
      */
-    mat3 get_mapping() const;
+    [[nodiscard]] mat3 get_mapping() const;
 
     /**
      * @brief get_resolution returns the width and height of the LDI
      * @return a pair with width and height
      */
-    std::pair<size_t, size_t> get_resolution() const;
+    [[nodiscard]] std::pair<size_t, size_t> get_resolution() const;
 
     /**
      * @brief is_valid checks, wether the supplied configuration yields a valid
      * transformation
      * @return true if configuration is not degenerate, false otherwise
      */
-    bool is_valid() const;
+    [[nodiscard]] bool is_valid() const;
 
 private:
     /**

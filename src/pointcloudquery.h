@@ -22,7 +22,7 @@ public:
      * @return true if the supplying point cloud source has determined that all
      * possible points for a given request have been provided, false otherwise.
      */
-    bool is_complete() const;
+    [[nodiscard]] bool is_complete() const;
 
     /**
      * @brief trigger_completion marks this query as completed.

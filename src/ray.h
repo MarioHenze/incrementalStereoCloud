@@ -23,7 +23,7 @@ struct point_t
      * @brief to_buffer transforms the point compound into a float buffer
      * @return a buffer containing depth and then RGB color
      */
-    std::vector<float> to_buffer() const;
+    [[nodiscard]] std::vector<float> to_buffer() const;
 
     bool operator>(point_t const other) const;
 };
@@ -37,7 +37,7 @@ public:
      * @brief point_count retrieves how many points are on the ray
      * @return the count of points on the ray
      */
-    size_t point_count() const;
+    [[nodiscard]] size_t point_count() const;
 
     /**
      * @brief to_buffer retrieves a buffer friendly version of the ray
@@ -49,7 +49,8 @@ public:
      * combination with stl algorithms can transform the set of all rays into
      * the desired representation
      */
-    std::vector<float> to_buffer(std::pair<float, float> location) const;
+    [[nodiscard]] std::vector<float> to_buffer(
+        std::pair<float, float> location) const;
 
     /**
      * @brief insert will place a colored point at the specified depth

@@ -22,11 +22,11 @@ public:
     // TODO Reflect behavoir, when new LDI is resized
     LayeredDepthImage(LayeredDepthImage const &other) = default;
 
-    explicit LayeredDepthImage(PinholeCameraModel pcm);
+    explicit LayeredDepthImage(const PinholeCameraModel& pcm);
 
-    void warp_reference_into(const PinholeCameraModel& pcm,
-                             std::vector<rgb> color,
-                             std::vector<float> depth);
+    void warp_reference_into(const PinholeCameraModel &pcm,
+                             const std::vector<rgb> &color,
+                             const std::vector<float>& depth);
 
     /**
      * @brief add_global_points inserts the given points into the LDI
@@ -49,33 +49,33 @@ public:
      * The returned buffer contains at first a 3 component position vector and
      * then a 3 component color vector.
      */
-    std::vector<float> interleave_data() const;
+    [[nodiscard]] std::vector<float> interleave_data() const;
 
     /**
      * @brief is_valid checks if the LDI configuration and data is valid
      * @return true if the LDI can be considered in working state, false
      * otherwise
      */
-    bool is_valid() const;
+    [[nodiscard]] bool is_valid() const;
 
     /**
      * @brief get_camera retrieves the MVP transformation of the pinhole camera
      * @return the MVP transformation
      */
-    PinholeCameraModel get_camera() const;
+    [[nodiscard]] PinholeCameraModel get_camera() const;
 
     /**
      * @brief point_count retrieves the current amount of points in the LDI
      * @return the amount of points
      */
-    size_t point_count() const;
+    [[nodiscard]] size_t point_count() const;
 
     /**
      * @brief bytes_per_point retrieves the count of bytes necessary to store
      * all data of a single point
      * @return byte count of one point
      */
-    size_t bytes_per_point() const;
+    [[nodiscard]] size_t bytes_per_point() const;
 
 private:
     /**
@@ -84,14 +84,14 @@ private:
      * @param y vertical position
      * @return linear index
      */
-    size_t to_index(size_t const x, size_t const y) const;
+    [[nodiscard]] size_t to_index(size_t const x, size_t const y) const;
 
     /**
      * @brief to_coord retrieves the two dimensional position of a given index
      * @param index of the ray
      * @return the x and y position of the ray
      */
-    std::pair<size_t, size_t> to_coord(size_t const index) const;
+    [[nodiscard]] std::pair<size_t, size_t> to_coord(size_t const index) const;
 
     /**
      * @brief count_points counts all points along all rays in the LDI
@@ -100,7 +100,7 @@ private:
      * This function can be used as an expensive check to see, if the adhoc
      * point count differs from the actual point count in the LDI.
      */
-    size_t count_points() const;
+    [[nodiscard]] size_t count_points() const;
 
     /**
      * @brief m_layered_points stores all rays going from the center of

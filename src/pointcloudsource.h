@@ -24,12 +24,12 @@ private:
 
     std::list<std::shared_ptr<PointCloudQuery>> m_active_queries;
 
-    void update_query(std::shared_ptr<PointCloudQuery> & pcq);
+    void update_query(std::shared_ptr<PointCloudQuery> &pcq);
 
 public:
-    PointCloudSource(std::string const & filepath);
+    PointCloudSource(std::string const &filepath);
 
     std::shared_ptr<PointCloudQuery> queryPoints(
-            std::chrono::microseconds const time_budget =
-                std::chrono::microseconds(1000));
+        std::chrono::microseconds const time_budget = std::chrono::microseconds(
+            1000));
 };
