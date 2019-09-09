@@ -27,7 +27,7 @@ public:
     /**
      * @brief trigger_completion marks this query as completed.
      * A completed query will no longer be supplied by the point cloud source.
-     * When set by the point source the query is fulfilled entirely. If set by
+     * When set by the point source the query is fullfilled entirely. If set by
      * the query side, it marks an early abortion of the query.
      */
     void trigger_completion();

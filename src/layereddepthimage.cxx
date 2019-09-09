@@ -65,17 +65,24 @@ void LayeredDepthImage::add_global_points(const std::vector<float> &points,
         __m128 xyzw = _mm_hadd_ps(ab, cd);
     }*/
 
+    // Boolean predicate if a vector component lies in the unit cube
+    auto const is_unit = [](float const &f) {
+        return (-1 <= f) && (1 >= f);
+    };
+
     for (size_t i = 0; i < points.size(); i++) {
         // the given points are in global space and need to be transformed into
         // the clip space of the LDI camera
-        vec4 point = m_camera.get_mvp() *
-                vec4(4,points.data() + i * 4);
+        vec4 point = m_camera.get_mvp() * vec4(4, points.data() + i * 4);
 
-        // TODO clip points outside of view frustum
+        // Clip points outside of view frustum
+        if (is_unit(point.x()) && is_unit(point.y()) && is_unit(point.z()))
+            continue;
+
         vec3 const p(3, point / point.w());
-        rgb const c = rgb(colors.at(3 * i),
-                          colors.at(3 * i + 1),
-                          colors.at(3 * i + 2));
+        rgb const c(colors.at(3 * i),
+                    colors.at(3 * i + 1),
+                    colors.at(3 * i + 2));
         point_t new_point;
         new_point.depth = p.z();
         new_point.color = c;

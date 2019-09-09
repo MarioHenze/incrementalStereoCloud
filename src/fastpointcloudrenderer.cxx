@@ -4,6 +4,8 @@
 
 #include <cgv/render/attribute_array_binding.h>
 
+#include <cgv_gl/gl/gl.h>
+
 #include "pinholecameramodel.h"
 
 FastPointCloudRenderer::FastPointCloudRenderer()
@@ -35,6 +37,9 @@ bool FastPointCloudRenderer::init(cgv::render::context &ctx)
                               m_ldi.point_count() * m_ldi.bytes_per_point());
     }
 
+    // Point cloud density will be accumulated in a second buffer
+    // TODO ctx.attach?buffer?
+
     return m_ldi.is_valid();
 }
 
@@ -63,12 +68,29 @@ void FastPointCloudRenderer::draw(cgv::render::context & ctx) {
                              "LDI_TARGET_VIEWPORT",
                              compute_mvp(),
                              true);
+    m_vao_manager.enable(ctx);
 
+    auto const point_count = m_ldi.point_count();
+    assert(std::numeric_limits<GLsizei>::max() >= point_count);
+    glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(point_count));
 
+    m_vao_manager.disable(ctx);
     m_ldi_shader.disable(ctx);
 }
 
-void FastPointCloudRenderer::finish_draw(cgv::render::context &) {}
+void FastPointCloudRenderer::finish_draw(cgv::render::context &) {
+    {// Insert queried point data
+        std::vector<float> positions;
+        std::vector<float> colors;
+
+        m_current_query->consume_points(positions,colors);
+        m_ldi.add_global_points(positions, colors);
+    }
+
+    // TODO scan over point density image and determine new query
+
+    // TODO if a predicate is met, abort current query and generate new one
+}
 
 void FastPointCloudRenderer::finish_frame(cgv::render::context &) {}
 
@@ -120,6 +142,8 @@ cgv::render::render_types::mat4 FastPointCloudRenderer::compute_mvp() const
 void FastPointCloudRenderer::open_point_data(const std::string &filename)
 {
     m_point_source = std::make_shared<PointCloudSource>(filename);
+
+    m_current_query = m_point_source->queryPoints();
 }
 
 extern cgv::base::object_registration<FastPointCloudRenderer> fpcr("");

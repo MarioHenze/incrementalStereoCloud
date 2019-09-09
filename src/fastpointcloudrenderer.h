@@ -11,6 +11,8 @@
 #include <cgv/render/shader_program.h>
 #include <cgv/render/vertex_buffer.h>
 
+#include <cgv_gl/renderer.h>
+
 #include "pointcloudsource.h"
 #include "layereddepthimage.h"
 
@@ -71,6 +73,12 @@ private:
 
     //! The VBO containing all point positions and colors of the LDI
     cgv::render::vertex_buffer m_vbo_ldi_data;
+
+    //! The VAO will be used through this manager
+    cgv::render::attribute_array_manager m_vao_manager;
+
+    //! Represent the current query on the point cloud source
+    std::shared_ptr<PointCloudQuery> m_current_query;
 
     void open_point_data(std::string const & filename);
 };
