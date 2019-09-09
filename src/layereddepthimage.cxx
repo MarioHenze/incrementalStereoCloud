@@ -1,6 +1,7 @@
 #include "layereddepthimage.h"
 
 #include <algorithm>
+#include <limits>
 
 #include <pmmintrin.h>
 
@@ -15,7 +16,7 @@ LayeredDepthImage::LayeredDepthImage(PinholeCameraModel pcm):
 
 }
 
-void LayeredDepthImage::warp_reference_into(PinholeCameraModel pcm,
+void LayeredDepthImage::warp_reference_into(PinholeCameraModel const &pcm,
                                             std::vector<rgb> color,
                                             std::vector<float> depth)
 {
@@ -94,8 +95,20 @@ std::vector<float> LayeredDepthImage::interleave_data() const
     // fashion.
     std::vector<float> data;
 
-    for(auto const & ray: m_layered_points) {
-        auto const buffer = ray.to_buffer();
+    for(size_t i = 0; i < m_layered_points.size(); ++i) {
+        auto const ray = m_layered_points.at(i);
+
+        // Retrieve the location of the ray on the LDI image plane
+        auto const integer_location = to_coord(i);
+
+        assert(std::numeric_limits<float>::max() >= location.first);
+        assert(std::numeric_limits<float>::max() >= location.second);
+
+        auto const location
+            = std::make_pair(static_cast<float>(integer_location.first),
+                             static_cast<float>(integer_location.second));
+
+        auto const buffer = ray.to_buffer(location);
         std::move(buffer.cbegin(), buffer.cend(), std::back_inserter(data));
     }
 

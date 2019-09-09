@@ -20,11 +20,9 @@ size_t Ray::point_count() const
     return m_points.size();
 }
 
-std::vector<float> Ray::to_buffer() const
+std::vector<float> Ray::to_buffer(std::pair<float,float> location) const
 {
     std::vector<float> buffer(m_points.size());
-    // The location of the ray on the image plane of the pinhole camera
-    auto const location = get_location();
 
     for(auto const & p: m_points) {
         buffer.push_back(location.first);

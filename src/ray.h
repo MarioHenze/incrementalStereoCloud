@@ -34,12 +34,6 @@ public:
     Ray() = default;
 
     /**
-     * @brief get_location retrieves the location of the ray on the image plane
-     * @return a pair of floats, consisting of the x and y coordinate
-     */
-    std::pair<float, float> get_location() const;
-
-    /**
      * @brief point_count retrieves how many points are on the ray
      * @return the count of points on the ray
      */
@@ -47,6 +41,7 @@ public:
 
     /**
      * @brief to_buffer retrieves a buffer friendly version of the ray
+     * @param location the x and y location of the ray on the LDI image plane
      * @return a vector with location/depth and color interleaved
      *
      * This function is provided for quick OpenGL friendly buffer creation. As
@@ -54,7 +49,7 @@ public:
      * combination with stl algorithms can transform the set of all rays into
      * the desired representation
      */
-    std::vector<float> to_buffer() const;
+    std::vector<float> to_buffer(std::pair<float, float> location) const;
 
     /**
      * @brief insert will place a colored point at the specified depth

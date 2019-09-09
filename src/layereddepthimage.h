@@ -24,7 +24,7 @@ public:
 
     explicit LayeredDepthImage(PinholeCameraModel pcm);
 
-    void warp_reference_into(PinholeCameraModel pcm,
+    void warp_reference_into(const PinholeCameraModel& pcm,
                              std::vector<rgb> color,
                              std::vector<float> depth);
 
