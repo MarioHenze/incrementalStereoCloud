@@ -1,6 +1,6 @@
 #include "pointcloudquery.h"
 
-#include <assert.h>
+#include <cassert>
 #include <atomic>
 #include <chrono>
 #include <iostream>
@@ -50,7 +50,7 @@ void PointCloudQuery::supply_points(std::vector<float> const & points,
     assert(!m_completed);
     assert(points.size() == colors.size());
 
-    std::scoped_lock(m_points_mutex, m_colors_mutex);
+    std::scoped_lock lock(m_points_mutex, m_colors_mutex);
     m_points.insert_after(m_points.end(), points.cbegin(), points.cend());
     m_colors.insert_after(m_colors.end(), colors.cbegin(), colors.cend());
 }
