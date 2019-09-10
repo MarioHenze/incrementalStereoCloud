@@ -4,13 +4,14 @@
 #include <forward_list>
 #include <mutex>
 #include <vector>
+#include <queue>
 
 class PointCloudQuery {
 private:
     std::timed_mutex m_points_mutex;
-    std::forward_list<float> m_points;
+    std::queue<float> m_points;
     std::timed_mutex m_colors_mutex;
-    std::forward_list<float> m_colors;
+    std::queue<float> m_colors;
 
     std::atomic_bool m_completed{false};
 

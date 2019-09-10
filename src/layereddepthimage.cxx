@@ -109,8 +109,8 @@ std::vector<float> LayeredDepthImage::interleave_data() const
         // Retrieve the location of the ray on the LDI image plane
         auto const integer_location = to_coord(i);
 
-        assert(std::numeric_limits<float>::max() >= location.first);
-        assert(std::numeric_limits<float>::max() >= location.second);
+        assert(std::numeric_limits<float>::max() >= integer_location.first);
+        assert(std::numeric_limits<float>::max() >= integer_location.second);
 
         auto const location
             = std::make_pair(static_cast<float>(integer_location.first),
