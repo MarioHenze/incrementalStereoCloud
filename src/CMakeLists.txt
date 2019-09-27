@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Warn on missing definitions
-set(CMAKE_CXX_FLAGS_DEBUG "-Wl,--no-undefined")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wl,--no-undefined")
 
 # Link Boost as dependency
 find_package(Boost REQUIRED)
