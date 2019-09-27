@@ -1,0 +1,64 @@
+= Zeitplan
+
+== Implementation
+
+|===
+|Item |Time
+
+|Modificaion of morphing equation| 1d
+|Check upload to gpu| < 1d
+|Point fragment shader| < 1d
+|===
+
+|===
+|Check threading at Query| 1-2d
+|Implement subquery | 1-2d
+|Profiling? | < 1d
+|Lock-contention? | < 1d
+|===
+
+|===
+|Implement reduce operation on LDI rays| <1d
+|Implement densitity estimation | 2-3d
+|by kernel integration on LDI | 1-2d
+|xor image filtering | 2d
+|Solve Problem of too many too similar queries| 2d+
+|overlapping, merging of queries | 1d
+|caching? | 1d
+|===
+
+|===
+|Splatting shader?| 2d
+|===
+
+|===
+|Performance evaluation| < 1d
+|Profiling| 0-2d
+|+Refactoring|0-2d
+|More threading??| 1d
+|SIMD???|2d
+|===
+
+|===
+|Find difficult views of data| < 0.5d
+|Image quality comparision + video/gif?| 0.5 d
+|===
+
+== Thesis
+
+|===
+|Item| Time
+|Plenoptische Funktion| 0.5d
+|Überleitung zu LDI| 0.5d
+|Morphing Equation| 0.5d
+|Impl Struktur| 0.5d
+|Cloud -> Query| 0.5d
+|Query -> LDI| 0.5d
+|LDI -> Render + Shader| 0.5d
+|LDI Reduction/Subsetting | 0.5d
+|Performance Evaluation | 1d
+|+Parameter Study?| <1d
+|Image comparision| 1d
+|Ausblick/Optimierung| <1d
+|Fazit| 0.5d
+|===
