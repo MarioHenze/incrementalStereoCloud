@@ -21,6 +21,9 @@
 |Implement reduce operation on LDI rays| <1d
 |Implement densitity estimation | 2-3d
 |by kernel integration on LDI | 1-2d
+|beschleunigungsstruktur|
+|frustum culling|
+|ähnlichkeit der querys als normalen der frustum planes|
 |xor image filtering | 2d
 |Solve Problem of too many too similar queries| 2d+
 |overlapping, merging of queries | 1d
@@ -48,6 +51,7 @@
 
 |===
 |Item| Time
+|verwandte arbeiten| 0.5d
 |Plenoptische Funktion| 0.5d
 |Überleitung zu LDI| 0.5d
 |Morphing Equation| 0.5d
