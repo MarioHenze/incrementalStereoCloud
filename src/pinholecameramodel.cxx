@@ -4,34 +4,30 @@
 
 #include <utility>
 
-PinholeCameraModel::PinholeCameraModel(mat4 projection_center,
-                                       mat3 mapping_matrix,
+PinholeCameraModel::PinholeCameraModel(mat4 view,
+                                       mat4 projection,
                                        std::pair<size_t, size_t> resolution)
-    : m_projection_center(std::move(projection_center)),
-      m_mapping_matrix(std::move(mapping_matrix)),
-      m_resolution(std::move(resolution))
+    : m_view(view),
+      m_projection(projection),
+      m_resolution(resolution)
 {
 
 }
 
-vec3 PinholeCameraModel::get_ray_direction(size_t u, size_t v) const
+mat4 PinholeCameraModel::get_view() const
 {
-    assert(is_valid());
-    assert(u < m_resolution.first);
-    assert(v < m_resolution.second);
-    return m_mapping_matrix * vec3(u,v,1);
+    return m_view;
 }
 
-mat4 PinholeCameraModel::get_mvp() const
+mat4 PinholeCameraModel::get_vp() const
 {
-    assert(is_valid());
-    return m_projection_center;
+    // TODO is this correct? Application order is model -> view -> projection
+    return  m_projection * m_view;
 }
 
-mat3 PinholeCameraModel::get_mapping() const
+mat4 PinholeCameraModel::get_projection() const
 {
-    assert(is_valid());
-    return m_mapping_matrix;
+    return m_projection;
 }
 
 std::pair<size_t, size_t> PinholeCameraModel::get_resolution() const
@@ -42,10 +38,5 @@ std::pair<size_t, size_t> PinholeCameraModel::get_resolution() const
 
 bool PinholeCameraModel::is_valid() const
 {
-    return m_resolution.first > 0 &&
-            m_resolution.second > 0 &&
-            m_mapping_matrix.col(0).length() > 0 &&
-            m_mapping_matrix.col(1).length() > 0 &&
-            m_mapping_matrix.col(2).length() > 0;
-            // TODO Test for rank(mapping_matrix) != 3
+    return m_resolution.first > 0 && m_resolution.second > 0;
 }

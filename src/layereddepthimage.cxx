@@ -29,8 +29,8 @@ void LayeredDepthImage::warp_reference_into(PinholeCameraModel const &pcm,
         assert(depth.size() == pixel_count);
     }
 
-    const mat4 transfer_matrix =
-        pcm.get_mvp() * cgv::math::inv(m_camera.get_mvp());
+
+    // TODO McMillan morph
 }
 
 void LayeredDepthImage::add_global_points(const std::vector<float> &points,
@@ -73,7 +73,7 @@ void LayeredDepthImage::add_global_points(const std::vector<float> &points,
     for (size_t i = 0; i < points.size(); i++) {
         // the given points are in global space and need to be transformed into
         // the clip space of the LDI camera
-        vec4 point = m_camera.get_mvp() * vec4(4, points.data() + i * 4);
+        vec4 point = m_camera.get_vp() * vec4(4, points.data() + i * 4);
 
         // Clip points outside of view frustum
         if (is_unit(point.x()) && is_unit(point.y()) && is_unit(point.z()))

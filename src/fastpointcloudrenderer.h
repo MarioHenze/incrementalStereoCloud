@@ -16,6 +16,8 @@
 #include "pointcloudsource.h"
 #include "layereddepthimage.h"
 
+using cgv::render::render_types;
+
 class FastPointCloudRenderer:
         public cgv::base::node,
         public cgv::gui::provider,
@@ -53,10 +55,18 @@ public:
 
 private:
     /**
-     * @brief compute_mvp computes a MVP transformation for the current cgv view
-     * @return a MVP transformation
+     * @brief compute_model_view computes a model view transformation for the
+     * current view
+     * @return a model view transformation
      */
-    mat4 compute_mvp() const;
+    [[nodiscard]] mat4 compute_view() const;
+
+    /**
+     * @brief compute_projection retrieves the projection matrix of the current
+     * view
+     * @return a projection matrix
+     */
+    [[nodiscard]] mat4 compute_projection(const float aspect) const;
 
     //! The LDI with possibly a representative subset of all points
     LayeredDepthImage m_ldi;

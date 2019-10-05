@@ -7,38 +7,47 @@
 using mat3 = cgv::render::render_types::mat3;
 using mat4 = cgv::render::render_types::mat4;
 using vec3 = cgv::render::render_types::vec3;
+using vec4 = cgv::render::render_types::vec4;
 
 class PinholeCameraModel
 {
 public:
     PinholeCameraModel() = default;
 
-    PinholeCameraModel(mat4 m_projection_center,
-                       mat3 m_mapping_matrix,
+    PinholeCameraModel(mat4 model_view,
+                       mat4 projection,
                        std::pair<size_t, size_t> m_resolution);
 
     /**
-     * @brief get_ray_direction computes the ray direction from center of
-     * projection through the pixel
-     * @param u coordinate of pixel in image plane
-     * @param v coordinate of pixel in image plane
-     * @return the ray direction
+     * @brief get_projection retrieves the projective transformation of the
+     * camera
+     * @return a matrix which transforms to the perspective of the pinhole
+     * camera
+     *
+     * This function gives the mapping matrix used in the process of morphing
+     * points from one LDI to another.
      */
-    [[nodiscard]] vec3 get_ray_direction(size_t u, size_t v) const;
+    [[nodiscard]] mat4 get_projection() const;
 
     /**
-     * @brief get_mvp returns a transformation from global to LDI local
-     * coordinate system
-     * @return the transformation
+     * @brief get_model_view retrieves the model and view transformation for
+     * the camera
+     * @return a matrix which transforms to the camera space
      */
-    [[nodiscard]] mat4 get_mvp() const;
+    [[nodiscard]] mat4 get_view() const;
 
     /**
-     * @brief get_mapping returns a transformation from x,y + depth on ray to
-     * LDI local coordinates
-     * @return the mapping transformation
+     * @brief get_projective_origin retrieves the world location of the cameras
+     * projective center
+     * @return the location of the camera
      */
-    [[nodiscard]] mat3 get_mapping() const;
+    [[nodiscard]] vec3 get_projective_origin() const;
+
+    /**
+     * @brief get_vp retrieves the view projection matrix of the camera
+     * @return a concatenated view projection transformation
+     */
+    [[nodiscard]] mat4 get_vp() const;
 
     /**
      * @brief get_resolution returns the width and height of the LDI
@@ -55,16 +64,19 @@ public:
 
 private:
     /**
-     * @brief m_projection_center contains a transformation from global
-     * coordinates into the clip space of the LDI
-    */
-    mat4 m_projection_center;
+     * @brief m_view contains the view transformation of the camera
+     */
+    mat4 m_view;
 
     /**
-     * @brief m_mapping_matrix Maps a given image plane coordinate into a ray
-     * direction from center of projection
+     * @brief m_projection contains the projection part of the camera
      */
-    mat3 m_mapping_matrix;
+    mat4 m_projection;
+
+    /**
+     * @brief m_resolution contains the horizontal and vertical resolution of
+     * the pinhole camera model
+     */
     std::pair<size_t, size_t> m_resolution;
 };
 
