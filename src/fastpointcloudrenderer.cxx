@@ -16,11 +16,20 @@ FastPointCloudRenderer::FastPointCloudRenderer()
     set_name("fast point cloud renderer");
 }
 
+FastPointCloudRenderer::~FastPointCloudRenderer()
+{
+    if (m_query_worker.joinable())
+        m_query_worker.join();
+    if (m_hole_finder.joinable())
+        m_hole_finder.join();
+}
+
 bool FastPointCloudRenderer::init(cgv::render::context &ctx)
 {
     // Define what the query worker and hole finder threads will do
     m_query_worker = std::thread([this] {
-        while (true) {
+        // TODO know when to stop
+        while (this->is_visible()) {
             if (!m_point_source)
                 continue;
             m_point_source->compute_queries();
@@ -190,7 +199,7 @@ render_types::mat4 FastPointCloudRenderer::compute_projection(
 void FastPointCloudRenderer::open_point_data(const std::string &filename)
 {
     m_point_source = std::make_shared<PointCloudSource>(filename);
-    assert(nullptr == m_point_source.get());
+    assert(m_point_source);
 
     m_current_query = m_point_source->queryPoints();
 }

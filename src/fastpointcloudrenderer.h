@@ -30,6 +30,17 @@ protected:
 
 public:
     FastPointCloudRenderer();
+    /// There are threads as members for which copy construction won't work
+    FastPointCloudRenderer(FastPointCloudRenderer const &other) = delete;
+    /// All members are still trivially movable, therefore force default
+    FastPointCloudRenderer(FastPointCloudRenderer &&other) = default;
+    ~FastPointCloudRenderer() override;
+
+    /// Member threads are not copyable
+    FastPointCloudRenderer &operator=(const FastPointCloudRenderer &other)
+        = delete;
+    /// Members are trivially moveable
+    FastPointCloudRenderer &operator=(FastPointCloudRenderer &&other) = default;
 
     /// this method is called after creation or recreation of the context,
     /// return whether all necessary functionality is supported
