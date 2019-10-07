@@ -14,6 +14,20 @@ using vec4 = cgv::render::render_types::vec4;
 using mat4 = cgv::render::render_types::mat4;
 using rgb = cgv::render::render_types::rgb;
 
+/**
+ * @brief morphing_equation morphs a given point from one LDI to another
+ * @param perspective_source the perspective transformation of the source LDI
+ * @param perspective_target the perspective transformation of the target LDI
+ * @param to_target_center is the vector from the target center of projection to
+ * the source center of projection
+ * @param source_position the point position in the source LDI
+ * @return the point position in the new LDI
+ */
+vec3 morphing_equation(mat4 const perspective_source,
+                       mat4 const perspective_target,
+                       vec3 const to_source_center,
+                       vec3 const source_position);
+
 class LayeredDepthImage
 {
 public:

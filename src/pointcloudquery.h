@@ -50,7 +50,6 @@ public:
      * @param points the container storing all positions
      * @param colors the container storing all colors
      */
-    void supply_points(
-            const std::vector<float> &points,
+    void supply_points(const std::vector<float> &points,
             const std::vector<float> &colors);
 };

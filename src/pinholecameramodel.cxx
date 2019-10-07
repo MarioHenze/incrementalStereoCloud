@@ -19,6 +19,13 @@ mat4 PinholeCameraModel::get_view() const
     return m_view;
 }
 
+vec3 PinholeCameraModel::get_projective_origin() const
+{
+    auto const translation = get_projection().col(3);
+    const_cast<vec4 &>(translation) /= translation.w();
+    return vec3(translation.x(), translation.y(), translation.z());
+}
+
 mat4 PinholeCameraModel::get_vp() const
 {
     // TODO is this correct? Application order is model -> view -> projection

@@ -14,15 +14,15 @@ uniform mat4 INV_TARGET_LDI_P;
 // The distance between both centers of projection from the corresponding LDIs
 uniform vec3 CENTER_DISTANCE;
 
-// The generalized disparity
-uniform float DELTA;
-
 out vec3 vertex_color;
 
 void main()
 {
+	// The generalized disparity
+	float delta = length(SOURCE_LDI_P * vec4(position, 1.)) / position.z;
+
 	gl_Position = 
-		DELTA * INV_TARGET_LDI_P * vec4(CENTER_DISTANCE, 1.)
+		delta * INV_TARGET_LDI_P * vec4(CENTER_DISTANCE, 1.)
 		+ INV_TARGET_LDI_P * SOURCE_LDI_P * vec4(position, 1.);
 	vertex_color = color;
 }

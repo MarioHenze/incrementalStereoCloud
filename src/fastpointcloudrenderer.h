@@ -2,6 +2,7 @@
 #define FASTPOINTCLOUDRENDERER_H
 
 #include <memory>
+#include <thread>
 
 #include <cgv/base/node.h>
 #include <cgv/gui/provider.h>
@@ -12,6 +13,7 @@
 #include <cgv/render/vertex_buffer.h>
 
 #include <cgv_gl/renderer.h>
+#include <cgv_gl/gl/gl.h>
 
 #include "pointcloudsource.h"
 #include "layereddepthimage.h"
@@ -78,17 +80,22 @@ private:
     //! The shader program to render the LDI
     cgv::render::shader_program m_ldi_shader;
 
-    //! The VAO bundling the render state for the LDI
-    cgv::render::attribute_array_binding_base m_vao;
-
     //! The VBO containing all point positions and colors of the LDI
     cgv::render::vertex_buffer m_vbo_ldi_data;
 
-    //! The VAO will be used through this manager
-    cgv::render::attribute_array_manager m_vao_manager;
-
     //! Represent the current query on the point cloud source
     std::shared_ptr<PointCloudQuery> m_current_query;
+
+    /**
+     * @brief m_query_worker resolves all pending queries
+     */
+    std::thread m_query_worker;
+
+    /**
+     * @brief m_hole_finder generates queries for regions with insufficient
+     * point density in the LDI
+     */
+    std::thread m_hole_finder;
 
     void open_point_data(std::string const & filename);
 };

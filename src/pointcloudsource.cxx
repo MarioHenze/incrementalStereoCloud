@@ -9,6 +9,43 @@ PointCloudSource::PointCloudSource(const std::string &filepath) :
 
 }
 
+void PointCloudSource::compute_queries()
+{
+    std::unique_lock queue_lock(m_pending_queries_mutex);
+
+    // Wait for new queries and guard against spurious wakeups
+    m_queries_present.wait(queue_lock,
+                           [this] { return !m_pending_queries.empty(); });
+
+    /*
+     * At this point we have aquired the lock for all pending queries and know
+     * that new ones are present for processing
+     */
+
+    assert(m_point_cloud.has_colors());
+
+    auto const point_count = m_point_cloud.get_nr_points();
+    std::vector<float> points(point_count * 3);
+    std::vector<float> colors(point_count * 3);
+
+    for (size_t i = 0; i < point_count; ++i) {
+        auto const point = m_point_cloud.pnt(i);
+        // TODO w divide??
+        points.push_back(point.x());
+        points.push_back(point.y());
+        points.push_back(point.z());
+    }
+
+    for (size_t i = 0; i < point_count; ++i) {
+        auto const color = m_point_cloud.clr(i);
+        points.push_back(color.R());
+        points.push_back(color.G());
+        points.push_back(color.B());
+    }
+
+    m_pending_queries.front()->supply_points(points, colors);
+}
+
 std::shared_ptr<PointCloudQuery> PointCloudSource::queryPoints(
         const std::chrono::microseconds time_budget)
 {

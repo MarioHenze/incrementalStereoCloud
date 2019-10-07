@@ -18,6 +18,17 @@ FastPointCloudRenderer::FastPointCloudRenderer()
 
 bool FastPointCloudRenderer::init(cgv::render::context &ctx)
 {
+    // Define what the query worker and hole finder threads will do
+    m_query_worker = std::thread([this] {
+        while (true) {
+            if (!m_point_source)
+                continue;
+            m_point_source->compute_queries();
+        }
+    });
+
+    //m_hole_finder = std::thread([] {});
+
     const auto aspect = static_cast<float>(ctx.get_width()) / ctx.get_height();
 
     mat4 const MV = compute_view();
@@ -29,19 +40,9 @@ bool FastPointCloudRenderer::init(cgv::render::context &ctx)
     m_ldi = LayeredDepthImage(view_pcm);
 
     {// Create the LDI shader
-        m_ldi_shader.build_dir(ctx, "ldi");
+        m_ldi_shader.build_dir(ctx, ".");
         assert(m_ldi_shader.is_linked());
     }
-
-    {// Collect drawing state into VAO
-        assert(m_vao.is_created());
-
-        m_vbo_ldi_data.create(ctx,
-                              m_ldi.point_count() * m_ldi.bytes_per_point());
-    }
-
-    // Point cloud density will be accumulated in a second buffer
-    // TODO ctx.attach?buffer?
 
     return m_ldi.is_valid();
 }
@@ -59,30 +60,52 @@ void FastPointCloudRenderer::draw(cgv::render::context & ctx) {
     assert(m_ldi_shader.is_linked());
     m_ldi_shader.enable(ctx);
 
-    m_ldi_shader.set_uniform(ctx,
-                             "LDI_INVERSE_MVP",
-                             cgv::math::inv(m_ldi.get_camera().get_view()),
-                             true);
-    m_ldi_shader.set_uniform(ctx,
-                             "LDI_INVERSE_MAPPING",
-                             cgv::math::inv(m_ldi.get_camera().get_projection()),
-                             true);
-    m_ldi_shader.set_uniform(ctx,
-                             "LDI_TARGET_VIEWPORT",
-                             compute_view(),
-                             true);
-    m_vao_manager.enable(ctx);
+    // Compute aspect ratio
+    auto const aspect = static_cast<float>(ctx.get_width()) / ctx.get_height();
+    vec3 const center_distance;
+    {
+        auto _ = compute_view().col(3);
+        _ /= _.w();
+        vec3 const target_center(_.x(), _.y(), _.z());
 
-    auto const point_count = m_ldi.point_count();
-    assert(std::numeric_limits<GLsizei>::max() >= point_count);
-    glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(point_count));
+        const_cast<vec3 &>(center_distance)
+            = m_ldi.get_camera().get_projective_origin() - target_center;
+    }
 
-    m_vao_manager.disable(ctx);
+    m_ldi_shader.set_uniform(ctx,
+                             "SOURCE_LDI_P",
+                             m_ldi.get_camera().get_projection(),
+                             true);
+    m_ldi_shader.set_uniform(ctx,
+                             "INV_TARGET_LDI_P",
+                             cgv::math::inv(compute_projection(aspect)),
+                             true);
+    m_ldi_shader.set_uniform(ctx,
+                             "CENTER_DISTANCE",
+                             center_distance,
+                             true);
+
+    // Draw only if data is present
+    if (m_vbo_ldi_data.is_created()) {
+        glBindBuffer(GL_ARRAY_BUFFER,
+                     *static_cast<GLuint *>(m_vbo_ldi_data.handle));
+
+        auto const point_count = m_ldi.point_count();
+        assert(std::numeric_limits<GLsizei>::max() >= point_count);
+        glBufferData(GL_ARRAY_BUFFER,
+                     point_count * 6,
+                     m_ldi.interleave_data().data(),
+                     GL_STREAM_DRAW);
+
+        glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(point_count));
+    }
+
     m_ldi_shader.disable(ctx);
 }
 
 void FastPointCloudRenderer::finish_draw(cgv::render::context &) {
-    {// Insert queried point data
+    if (m_current_query) {
+        // Insert queried point data
         std::vector<float> positions;
         std::vector<float> colors;
 

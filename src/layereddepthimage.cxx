@@ -177,3 +177,28 @@ size_t LayeredDepthImage::count_points() const
 
     return count;
 }
+
+vec3 morphing_equation(const mat4 perspective_source,
+                       const mat4 perspective_target,
+                       const vec3 to_source_center,
+                       const vec3 source_position)
+{
+    // depth == r in morphing equation
+    auto const r = source_position.z();
+    // the generalized disparity therefore is
+    // TODO what happens with w?
+    auto delta = (perspective_source * source_position.lift()).length() / r;
+
+    auto const target_per_inv = cgv::math::inv(perspective_target);
+
+    auto morphed_position = delta * target_per_inv * to_source_center.lift()
+                            + target_per_inv * perspective_source
+                                  * source_position.lift();
+
+    // perspective divide
+    morphed_position /= morphed_position.w();
+
+    return vec3(morphed_position.x(),
+                morphed_position.y(),
+                morphed_position.z());
+}

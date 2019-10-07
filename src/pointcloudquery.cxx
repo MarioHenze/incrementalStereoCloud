@@ -68,8 +68,8 @@ void PointCloudQuery::consume_points(
     assert(points.size() == colors.size());
 }
 
-void PointCloudQuery::supply_points(std::vector<float> const & points,
-                                    std::vector<float> const & colors)
+void PointCloudQuery::supply_points(std::vector<float> const &points,
+                                    std::vector<float> const &colors)
 {
     assert(!m_completed);
     assert(points.size() % 3 == 0);
