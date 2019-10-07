@@ -5,6 +5,7 @@
 #include <list>
 #include <memory>
 #include <mutex>
+#include <optional>
 #include <string>
 #include <queue>
 
@@ -15,12 +16,17 @@
 class PointCloudSource
 {
 private:
+    /**
+     * @brief m_point_cloud holds an cgv point cloud
+     *
+     * This object is used to load points from an anbitrary point cloud file
+     */
     point_cloud m_point_cloud;
 
     /**
      * @brief m_pending_queries Holds all queries which were made
      */
-    std::queue<std::shared_ptr<PointCloudQuery>> m_pending_queries;
+    std::list<std::shared_ptr<PointCloudQuery>> m_pending_queries;
 
     /**
      * @brief m_pending_queries_mutex protects the query queue against
@@ -34,7 +40,12 @@ private:
      */
     std::condition_variable_any m_queries_present;
 
-    void update_query(std::shared_ptr<PointCloudQuery> &pcq);
+    /**
+     * @brief unprocessed_present determines if unprocessed queries are in the
+     * list of all queries.
+     * @param query the query
+     */
+    [[nodiscard]] bool unprocessed_present() const;
 
 public:
     PointCloudSource(std::string const &filepath);
@@ -47,7 +58,14 @@ public:
      */
     void compute_queries();
 
-    std::shared_ptr<PointCloudQuery> queryPoints(
+    /**
+     * @brief get_finished_query return a finised point cloud query if there is
+     * one
+     * @return a resolved point cloud query
+     */
+    std::optional<std::shared_ptr<PointCloudQuery>> get_finished_query();
+
+    void queryPoints(
         std::chrono::microseconds const time_budget = std::chrono::microseconds(
             1000));
 };

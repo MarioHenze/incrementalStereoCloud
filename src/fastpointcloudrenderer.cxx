@@ -1,6 +1,7 @@
 #include "fastpointcloudrenderer.h"
 
 #include <cassert>
+#include <optional>
 
 #include <utility>
 
@@ -113,6 +114,8 @@ void FastPointCloudRenderer::draw(cgv::render::context & ctx) {
 }
 
 void FastPointCloudRenderer::finish_draw(cgv::render::context &) {
+
+
     if (m_current_query) {
         // Insert queried point data
         std::vector<float> positions;
@@ -201,7 +204,7 @@ void FastPointCloudRenderer::open_point_data(const std::string &filename)
     m_point_source = std::make_shared<PointCloudSource>(filename);
     assert(m_point_source);
 
-    m_current_query = m_point_source->queryPoints();
+    m_point_source->queryPoints();
 }
 
 extern cgv::base::object_registration<FastPointCloudRenderer> fpcr("");
