@@ -16,8 +16,8 @@ using rgb = cgv::render::render_types::rgb;
 struct point_t
 {
     rgb color;
-    float depth;
-    size_t splat_index;
+    float depth{};
+    size_t splat_index{};
 
     /**
      * @brief to_buffer transforms the point compound into a float buffer

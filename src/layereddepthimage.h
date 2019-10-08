@@ -23,10 +23,10 @@ using rgb = cgv::render::render_types::rgb;
  * @param source_position the point position in the source LDI
  * @return the point position in the new LDI
  */
-vec3 morphing_equation(mat4 const perspective_source,
-                       mat4 const perspective_target,
-                       vec3 const to_source_center,
-                       vec3 const source_position);
+vec3 morphing_equation(const mat4 &perspective_source,
+                       const mat4 &perspective_target,
+                       const vec3 &to_source_center,
+                       const vec3 &source_position);
 
 class LayeredDepthImage
 {

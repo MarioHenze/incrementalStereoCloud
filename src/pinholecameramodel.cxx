@@ -7,9 +7,9 @@
 PinholeCameraModel::PinholeCameraModel(mat4 view,
                                        mat4 projection,
                                        std::pair<size_t, size_t> resolution)
-    : m_view(view),
-      m_projection(projection),
-      m_resolution(resolution)
+    : m_view(std::move(view)),
+      m_projection(std::move(projection)),
+      m_resolution(std::move(resolution))
 {
 
 }
@@ -21,7 +21,7 @@ mat4 PinholeCameraModel::get_view() const
 
 mat4 PinholeCameraModel::get_device() const
 {
-    // TODO translate -> scale 0.5 -> scale with width & height
+    // TODO translate -> scale 0.5 -> scale with width & height?
     return {};
 }
 

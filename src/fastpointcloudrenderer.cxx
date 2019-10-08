@@ -120,7 +120,7 @@ void FastPointCloudRenderer::finish_draw(cgv::render::context &)
                                : decltype(
                                    m_point_source->get_finished_query())();
     if (opt_query.has_value()) {
-        auto finished_query = opt_query.value();
+        const auto &finished_query = opt_query.value();
         assert(finished_query);
 
         std::vector<float> positions;
@@ -197,8 +197,8 @@ render_types::mat4 FastPointCloudRenderer::compute_projection(
     mat4 P = cgv::math::perspective4(static_cast<float>(
                                          view->get_y_view_angle()),
                                      aspect,
-                                     1.f,
-                                     100.f);
+                                     1.F,
+                                     100.F);
 
     return P;
 }

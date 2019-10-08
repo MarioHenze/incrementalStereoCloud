@@ -178,10 +178,10 @@ size_t LayeredDepthImage::count_points() const
     return count;
 }
 
-vec3 morphing_equation(const mat4 perspective_source,
-                       const mat4 perspective_target,
-                       const vec3 to_source_center,
-                       const vec3 source_position)
+vec3 morphing_equation(const mat4 &perspective_source,
+                       const mat4 &perspective_target,
+                       const vec3 &to_source_center,
+                       const vec3 &source_position)
 {
     // depth == r in morphing equation
     auto const r = source_position.z();

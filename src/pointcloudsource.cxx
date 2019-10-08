@@ -11,7 +11,7 @@ bool PointCloudSource::unprocessed_present() const
     auto const first_uncomplete
         = std::find_if(m_pending_queries.cbegin(),
                        m_pending_queries.cend(),
-                       [](decltype(m_pending_queries)::value_type const query) {
+                       [](decltype(m_pending_queries)::value_type const &query) {
                            return query->is_complete();
                        });
     return (first_uncomplete == m_pending_queries.cend());
@@ -41,7 +41,7 @@ void PointCloudSource::compute_queries()
     std::vector<float> colors
         = m_point_cloud.has_colors()
               ? std::vector<float>()
-              : std::vector<float>(m_point_cloud.get_nr_points() * 3, 1.f);
+              : std::vector<float>(m_point_cloud.get_nr_points() * 3, 1.F);
 
     //TODO get a narrow pinhole camera for query and get points
     assert(std::numeric_limits<int>::max() >= m_point_cloud.get_nr_points());
@@ -78,7 +78,7 @@ PointCloudSource::get_finished_query()
     auto const first_complete
         = std::find_if(m_pending_queries.cbegin(),
                        m_pending_queries.cend(),
-                       [](decltype(m_pending_queries)::value_type query) {
+                       [](const decltype(m_pending_queries)::value_type& query) {
                            return query->is_complete();
                        });
     return first_complete == m_pending_queries.cend()
