@@ -89,7 +89,7 @@ private:
     std::shared_ptr<PointCloudSource> m_point_source;
 
     //! The shader program to render the LDI
-    cgv::render::shader_program m_ldi_shader;
+    cgv::render::shader_program m_ldi_shader{true};
 
     //! The VBO containing all point positions and colors of the LDI
     cgv::render::vertex_buffer m_vbo_ldi_data;

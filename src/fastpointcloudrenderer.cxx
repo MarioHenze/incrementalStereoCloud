@@ -50,7 +50,7 @@ bool FastPointCloudRenderer::init(cgv::render::context &ctx)
     m_ldi = LayeredDepthImage(view_pcm);
 
     {// Create the LDI shader
-        m_ldi_shader.build_dir(ctx, ".");
+        m_ldi_shader.build_dir(ctx, "./src");
         assert(m_ldi_shader.is_linked());
     }
 
@@ -113,15 +113,19 @@ void FastPointCloudRenderer::draw(cgv::render::context & ctx) {
     m_ldi_shader.disable(ctx);
 }
 
-void FastPointCloudRenderer::finish_draw(cgv::render::context &) {
+void FastPointCloudRenderer::finish_draw(cgv::render::context &)
+{
+    auto const opt_query = m_point_source
+                               ? m_point_source->get_finished_query()
+                               : decltype(
+                                   m_point_source->get_finished_query())();
+    if (opt_query.has_value()) {
+        auto finished_query = opt_query.value();
+        assert(finished_query);
 
-
-    if (m_current_query) {
-        // Insert queried point data
         std::vector<float> positions;
         std::vector<float> colors;
-
-        m_current_query->consume_points(positions,colors);
+        finished_query->consume_points(positions, colors);
         m_ldi.add_global_points(positions, colors);
     }
 

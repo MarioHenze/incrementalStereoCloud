@@ -36,8 +36,8 @@ void LayeredDepthImage::warp_reference_into(PinholeCameraModel const &pcm,
 void LayeredDepthImage::add_global_points(const std::vector<float> &points,
                                           const std::vector<float> &colors)
 {
-    // the supplied points should be 4 component vectors with w = 1
-    assert(!(points.size() % 4));
+    // the supplied points should be 3 component vectors
+    assert(!(points.size() % 3));
     // the supplied colors should be rgb vectors
     assert(!(colors.size() % 3));
 
@@ -75,11 +75,11 @@ void LayeredDepthImage::add_global_points(const std::vector<float> &points,
         // the clip space of the LDI camera
         vec4 point = m_camera.get_vp() * vec4(4, points.data() + i * 4);
 
+        vec3 const p(3, point / point.w());
         // Clip points outside of view frustum
-        if (is_unit(point.x()) && is_unit(point.y()) && is_unit(point.z()))
+        if (!is_unit(p.x()) || !is_unit(p.y()) || !is_unit(p.z()))
             continue;
 
-        vec3 const p(3, point / point.w());
         rgb const c(colors.at(3 * i),
                     colors.at(3 * i + 1),
                     colors.at(3 * i + 2));
@@ -149,7 +149,7 @@ size_t LayeredDepthImage::bytes_per_point() const
     return vec3::size() * 2 * sizeof(float);
 }
 
-size_t LayeredDepthImage::to_index(const size_t x, const size_t y) const
+size_t LayeredDepthImage::to_index(const int x, const int y) const
 {
     const size_t index = y * m_camera.get_resolution().first + x;
     assert(

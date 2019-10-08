@@ -19,6 +19,12 @@ mat4 PinholeCameraModel::get_view() const
     return m_view;
 }
 
+mat4 PinholeCameraModel::get_device() const
+{
+    // TODO translate -> scale 0.5 -> scale with width & height
+    return {};
+}
+
 vec3 PinholeCameraModel::get_projective_origin() const
 {
     auto const translation = get_projection().col(3);

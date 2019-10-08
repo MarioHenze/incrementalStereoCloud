@@ -30,11 +30,16 @@ public:
     [[nodiscard]] mat4 get_projection() const;
 
     /**
-     * @brief get_model_view retrieves the model and view transformation for
-     * the camera
+     * @brief get_model_view retrieves the view transformation for the camera
      * @return a matrix which transforms to the camera space
      */
     [[nodiscard]] mat4 get_view() const;
+
+    /**
+     * @brief get_device retrieves the device transformation
+     * @return a matrix which transforms into the rasterized camera space
+     */
+    [[nodiscard]] mat4 get_device() const;
 
     /**
      * @brief get_projective_origin retrieves the world location of the cameras

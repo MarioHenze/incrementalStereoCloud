@@ -98,7 +98,7 @@ private:
      * @param y vertical position
      * @return linear index
      */
-    [[nodiscard]] size_t to_index(size_t const x, size_t const y) const;
+    [[nodiscard]] size_t to_index(const int x, const int y) const;
 
     /**
      * @brief to_coord retrieves the two dimensional position of a given index
