@@ -23,14 +23,6 @@ PointCloudSource::PointCloudSource(const std::string &filepath) :
 
 }
 
-PointCloudSource::~PointCloudSource()
-{
-    m_destructor_called = true;
-
-    // Wake threads which are still waiting on new queries
-    m_queries_present.notify_all();
-}
-
 void PointCloudSource::compute_queries()
 {
     std::unique_lock queue_lock(m_pending_queries_mutex);
