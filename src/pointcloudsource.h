@@ -41,6 +41,11 @@ private:
     std::condition_variable_any m_queries_present;
 
     /**
+     * @brief m_destructor_called signals that threads should abort operations
+     */
+    std::atomic<bool> m_destructor_called {false};
+
+    /**
      * @brief unprocessed_present determines if unprocessed queries are in the
      * list of all queries.
      * @param query the query
@@ -49,6 +54,7 @@ private:
 
 public:
     PointCloudSource(std::string const &filepath);
+    ~PointCloudSource();
 
     /**
      * @brief compute_queries resolves all pending queries

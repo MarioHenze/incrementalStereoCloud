@@ -23,13 +23,27 @@ PointCloudSource::PointCloudSource(const std::string &filepath) :
 
 }
 
+PointCloudSource::~PointCloudSource()
+{
+    m_destructor_called = true;
+
+    // Wake threads which are still waiting on new queries
+    m_queries_present.notify_all();
+}
+
 void PointCloudSource::compute_queries()
 {
     std::unique_lock queue_lock(m_pending_queries_mutex);
 
     // Wait for new queries and guard against spurious wakeups
-    m_queries_present.wait(queue_lock,
-                           [this] { return unprocessed_present(); });
+    auto const was_in_time
+        = m_queries_present.wait_for(queue_lock,
+                                     std::chrono::seconds(1),
+                                     [this] { return unprocessed_present(); });
+
+    if (!was_in_time)
+        // We have timed out while waiting
+        return;
 
     /*
      * At this point we have aquired the lock for all pending queries and know

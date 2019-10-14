@@ -47,9 +47,11 @@ void PointCloudQuery::consume_points(
         return;
 
     assert(m_points.size() == m_colors.size());
-    auto const has_points = !m_points.empty() && !m_colors.empty()
-                            && m_points.size() >= 3 && m_colors.size() >= 3;
-    while (has_points) {
+    std::function<bool()> const has_points = [this] {
+        return !m_points.empty() && !m_colors.empty() && m_points.size() >= 3
+               && m_colors.size() >= 3;
+    };
+    while (has_points()) {
         // As positions and colors are 3 component vectors copy float data in
         // chunks
         for (size_t i = 0; i < 3; ++i) {
