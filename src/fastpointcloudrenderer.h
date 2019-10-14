@@ -23,7 +23,8 @@ using cgv::render::render_types;
 class FastPointCloudRenderer:
         public cgv::base::node,
         public cgv::gui::provider,
-        public cgv::render::drawable
+        public cgv::render::drawable,
+    public
 {
 protected:
     std::string m_filename;
@@ -65,6 +66,8 @@ public:
     void create_gui() override;
 
     void on_set(void* member_ptr) override;
+
+    bool self_reflect(cgv::reflect::reflection_handler& srh) override;
 
 private:
     /**

@@ -19,6 +19,7 @@ FastPointCloudRenderer::FastPointCloudRenderer()
 
 FastPointCloudRenderer::~FastPointCloudRenderer()
 {
+    // TODO bool should close
     if (m_query_worker.joinable())
         m_query_worker.join();
     if (m_hole_finder.joinable())
@@ -159,6 +160,11 @@ void FastPointCloudRenderer::on_set(void *member_ptr)
     if (member_ptr == &m_filename) {
         open_point_data(m_filename);
     }
+}
+
+bool FastPointCloudRenderer::self_reflect(cgv::reflect::reflection_handler &srh)
+{
+    // TODO reflect filename
 }
 
 mat4 FastPointCloudRenderer::compute_view() const
