@@ -36,6 +36,7 @@ void LayeredDepthImage::warp_reference_into(PinholeCameraModel const &pcm,
 void LayeredDepthImage::add_global_points(const std::vector<float> &points,
                                           const std::vector<float> &colors)
 {
+    assert(colors.size() == points.size());
     // the supplied points should be 3 component vectors
     assert(!(points.size() % 3));
     // the supplied colors should be rgb vectors
@@ -70,10 +71,12 @@ void LayeredDepthImage::add_global_points(const std::vector<float> &points,
         return (-1 <= f) && (1 >= f);
     };
 
-    for (size_t i = 0; i < points.size(); i++) {
+    for (size_t i = 0; i < (points.size() / 3); i++) {
         // the given points are in global space and need to be transformed into
         // the clip space of the LDI camera
-        vec4 point = m_camera.get_vp() * vec4(4, points.data() + i * 4);
+        vec4 point = m_camera.get_vp()
+                     * vec3(points.at(i), points.at(i + 1), points.at(i + 2))
+                           .lift();
 
         vec3 const p(3, point / point.w());
         // Clip points outside of view frustum

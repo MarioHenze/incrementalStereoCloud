@@ -14,12 +14,13 @@
 
 FastPointCloudRenderer::FastPointCloudRenderer()
 {
-    set_name("fast point cloud renderer");
+    set_name("fast_point_cloud_renderer");
 }
 
 FastPointCloudRenderer::~FastPointCloudRenderer()
 {
-    // TODO bool should close
+    m_destructor_called = true;
+
     if (m_query_worker.joinable())
         m_query_worker.join();
     if (m_hole_finder.joinable())
@@ -31,7 +32,7 @@ bool FastPointCloudRenderer::init(cgv::render::context &ctx)
     // Define what the query worker and hole finder threads will do
     m_query_worker = std::thread([this] {
         // TODO know when to stop
-        while (this->is_visible()) {
+        while (!m_destructor_called) {
             if (!m_point_source)
                 continue;
             m_point_source->compute_queries();
@@ -164,7 +165,7 @@ void FastPointCloudRenderer::on_set(void *member_ptr)
 
 bool FastPointCloudRenderer::self_reflect(cgv::reflect::reflection_handler &srh)
 {
-    // TODO reflect filename
+    return srh.reflect_member("file_name", m_filename);
 }
 
 mat4 FastPointCloudRenderer::compute_view() const

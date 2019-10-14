@@ -1,6 +1,7 @@
 #ifndef FASTPOINTCLOUDRENDERER_H
 #define FASTPOINTCLOUDRENDERER_H
 
+#include <atomic>
 #include <memory>
 #include <thread>
 
@@ -23,8 +24,7 @@ using cgv::render::render_types;
 class FastPointCloudRenderer:
         public cgv::base::node,
         public cgv::gui::provider,
-        public cgv::render::drawable,
-    public
+        public cgv::render::drawable
 {
 protected:
     std::string m_filename;
@@ -99,6 +99,9 @@ private:
 
     //! Represent the current query on the point cloud source
     std::shared_ptr<PointCloudQuery> m_current_query;
+
+    //! Gives an abort condition for worker threads
+    std::atomic<bool> m_destructor_called{false};
 
     /**
      * @brief m_query_worker resolves all pending queries
