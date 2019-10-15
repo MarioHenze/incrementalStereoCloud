@@ -212,6 +212,10 @@ render_types::mat4 FastPointCloudRenderer::compute_projection(
 
 void FastPointCloudRenderer::open_point_data(const std::string &filename)
 {
+#ifndef NDEBUG
+    std::cout << __func__ << ": " << filename << std::endl;
+#endif
+
     m_point_source = std::make_shared<PointCloudSource>(filename);
     assert(m_point_source);
 
