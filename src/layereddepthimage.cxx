@@ -9,6 +9,8 @@
 
 #include <cgv/math/inv.h>
 
+#include "conversion.h"
+
 LayeredDepthImage::LayeredDepthImage(const PinholeCameraModel &pcm)
     : m_layered_points(pcm.get_resolution().first *
                        pcm.get_resolution().second),
@@ -67,9 +69,7 @@ void LayeredDepthImage::add_global_points(const std::vector<float> &points,
     }*/
 
     // Boolean predicate if a vector component lies in the unit cube
-    auto const is_unit = [](float const &f) {
-        return (-1 <= f) && (1 >= f);
-    };
+    auto const is_unit = [](float const &f) { return (-1 <= f) && (1 >= f); };
 
     for (size_t i = 0; i < (points.size() / 3); i++) {
         // the given points are in global space and need to be transformed into
@@ -97,7 +97,30 @@ void LayeredDepthImage::add_global_points(const std::vector<float> &points,
 
     // After we've ensured, that the supplied containers are valid and the data
     // was copied over, we can update the point count of the LDI
-    m_point_count += points.size() / 4;
+    m_point_count += points.size() / 3;
+}
+
+void LayeredDepthImage::add_transformed_points(const std::vector<vec3> &points,
+                                               const std::vector<rgb> &colors)
+{
+    assert(colors.size() == points.size());
+
+    for (size_t i = 0; i < points.size(); ++i) {
+        auto const &p = points.at(i);
+
+        // Skip points outside the view frustum
+        if (0 >= p.x() || 0 >= p.y() || 0 > p.z()
+            || m_camera.get_resolution().first < p.x()
+            || m_camera.get_resolution().second < p.y())
+            continue;
+
+        point_t new_point;
+        new_point.color = colors.at(i);
+        new_point.depth = p.z();
+        m_layered_points.at(to_index(p.x(), p.y())).insert(new_point);
+    }
+
+    m_point_count += points.size();
 }
 
 std::vector<float> LayeredDepthImage::interleave_data() const
@@ -156,10 +179,14 @@ size_t LayeredDepthImage::bytes_per_point() const
 
 size_t LayeredDepthImage::to_index(const int x, const int y) const
 {
-    const size_t index = y * m_camera.get_resolution().first + x;
-    assert(
-        m_camera.get_resolution().first *
-        m_camera.get_resolution().second >= index);
+    assert(x >= 0);
+    assert(y >= 0);
+    assert(static_cast<size_t>(x) < m_camera.get_resolution().first);
+    assert(static_cast<size_t>(y) < m_camera.get_resolution().second);
+
+    const size_t index = static_cast<size_t>(y)
+                             * m_camera.get_resolution().first
+                         + static_cast<size_t>(x);
     return index;
 }
 

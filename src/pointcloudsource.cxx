@@ -42,37 +42,28 @@ void PointCloudSource::compute_queries()
      * that new ones are present for processing
      */
 
-    std::vector<float> points;
+    std::vector<vec3> points;
     // When no color is present in the data, use white points
-    std::vector<float> colors
+    std::vector<rgb> colors
         = m_point_cloud.has_colors()
-              ? std::vector<float>()
-              : std::vector<float>(m_point_cloud.get_nr_points() * 3, 1.F);
+              ? std::vector<rgb>()
+              : std::vector<rgb>(m_point_cloud.get_nr_points(), rgb(1.F));
 
     //TODO get a narrow pinhole camera for query and get points
     assert(std::numeric_limits<int>::max() >= m_point_cloud.get_nr_points());
     const int point_count = static_cast<int>(m_point_cloud.get_nr_points());
 
     for (int i = 0; i < point_count; ++i) {
-        auto const point = m_point_cloud.transformed_pnt(i);
-        // TODO w divide??
-        points.push_back(point.x());
-        points.push_back(point.y());
-        points.push_back(point.z());
+        points.push_back(m_point_cloud.pnt(i));
     }
 
     if (m_point_cloud.has_colors())
         for (int i = 0; i < point_count; ++i) {
-            auto const color = m_point_cloud.clr(i);
-            colors.push_back(color.R());
-            colors.push_back(color.G());
-            colors.push_back(color.B());
+            colors.push_back(m_point_cloud.clr(i));
         }
 
     m_pending_queries.front()->supply_points(points, colors);
     m_pending_queries.front()->trigger_completion();
-
-
 }
 
 std::optional<std::shared_ptr<PointCloudQuery>>
@@ -87,9 +78,13 @@ PointCloudSource::get_finished_query()
                        [](const decltype(m_pending_queries)::value_type& query) {
                            return query->is_complete();
                        });
-    return first_complete == m_pending_queries.cend()
-               ? decltype(get_finished_query())()
-               : decltype(get_finished_query())(*first_complete);
+    auto const ret = first_complete == m_pending_queries.cend()
+                         ? decltype(get_finished_query())()
+                         : decltype(get_finished_query())(*first_complete);
+
+    // TODO remove consumed queries
+
+    return ret;
 }
 
 void PointCloudSource::queryPoints(const std::chrono::microseconds time_budget)

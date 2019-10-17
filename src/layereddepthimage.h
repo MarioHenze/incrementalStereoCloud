@@ -44,7 +44,7 @@ public:
 
     /**
      * @brief add_global_points inserts the given points into the LDI
-     * @param points the 4 component vectors of position
+     * @param points the 3 component vectors of position
      * @param colors the 3 component vectors of colors
      *
      * This function converts the global positions into the specific LDI view
@@ -54,6 +54,18 @@ public:
      */
     void add_global_points(std::vector<float> const &points,
                            std::vector<float> const &colors);
+
+    /**
+     * @brief add_transformed_points inserts the given points into the LDI
+     * @param points the 3 component vectors of position
+     * @param colors the 3 component vectors of colors
+     *
+     * This function assumes, that the supplied points were already processed
+     * into the LDI local coordinate system. Therefore it just copies all LDI-
+     * visible points.
+     */
+    void add_transformed_points(std::vector<vec3> const &points,
+                                std::vector<rgb> const &colors);
 
     /**
      * @brief interleave_data retrieves the LDI information in an OpenGL

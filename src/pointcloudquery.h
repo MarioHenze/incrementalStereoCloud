@@ -6,12 +6,17 @@
 #include <vector>
 #include <queue>
 
+#include <cgv/render/render_types.h>
+
+using vec3 = cgv::render::render_types::vec3;
+using rgb = cgv::render::render_types::rgb;
+
 class PointCloudQuery {
 private:
     std::timed_mutex m_points_mutex;
-    std::queue<float> m_points;
+    std::queue<vec3> m_points;
     std::timed_mutex m_colors_mutex;
-    std::queue<float> m_colors;
+    std::queue<rgb> m_colors;
 
     std::atomic_bool m_completed{false};
 
@@ -40,8 +45,8 @@ public:
      * @param colors the container storing all colors
      */
     void consume_points(
-            std::vector<float> & points,
-            std::vector<float> & colors,
+            std::vector<vec3> & points,
+            std::vector<rgb> & colors,
             const std::chrono::microseconds time_budget
                 = std::chrono::microseconds(1000));
 
@@ -50,6 +55,6 @@ public:
      * @param points the container storing all positions
      * @param colors the container storing all colors
      */
-    void supply_points(const std::vector<float> &points,
-            const std::vector<float> &colors);
+    void supply_points(const std::vector<vec3> &points,
+            const std::vector<rgb> &colors);
 };

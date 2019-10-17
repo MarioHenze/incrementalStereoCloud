@@ -6,10 +6,12 @@
 #include <utility>
 
 #include <cgv/math/ftransform.h>
+#include <cgv/math/transformations.h>
 #include <cgv/render/attribute_array_binding.h>
 
 #include <cgv_gl/gl/gl.h>
 
+#include "conversion.h"
 #include "pinholecameramodel.h"
 
 FastPointCloudRenderer::FastPointCloudRenderer()
@@ -84,23 +86,37 @@ void FastPointCloudRenderer::draw(cgv::render::context & ctx) {
             = m_ldi.get_camera().get_projective_origin() - target_center;
     }
 
-    m_ldi_shader.set_uniform(ctx,
-                             "SOURCE_LDI_P",
-                             m_ldi.get_camera().get_projection(),
-                             true);
-    m_ldi_shader.set_uniform(ctx,
-                             "INV_TARGET_LDI_P",
-                             cgv::math::inv(compute_projection(aspect)),
-                             true);
-    m_ldi_shader.set_uniform(ctx,
-                             "CENTER_DISTANCE",
-                             center_distance,
-                             true);
+    {
+        bool uniform_assignment_successful{true};
+
+        uniform_assignment_successful
+            = uniform_assignment_successful
+              && m_ldi_shader.set_uniform(ctx,
+                                          "SOURCE_LDI_P",
+                                          m_ldi.get_camera().get_projection(),
+                                          true);
+        uniform_assignment_successful
+            = uniform_assignment_successful
+              && m_ldi_shader.set_uniform(ctx,
+                                          "INV_TARGET_LDI_P",
+                                          cgv::math::inv(
+                                              compute_projection(aspect)),
+                                          true);
+        uniform_assignment_successful = uniform_assignment_successful
+                                        && m_ldi_shader
+                                               .set_uniform(ctx,
+                                                            "CENTER_DISTANCE",
+                                                            center_distance,
+                                                            true);
+        assert(uniform_assignment_successful);
+    }
 
     // Draw only if data is present
     if (m_vbo_ldi_data.is_created()) {
+        GLuint vbo_handle{0};
+        m_vbo_ldi_data.put_id(vbo_handle);
         glBindBuffer(GL_ARRAY_BUFFER,
-                     *static_cast<GLuint *>(m_vbo_ldi_data.handle));
+                     vbo_handle);
 
         auto const point_count = m_ldi.point_count();
         assert(std::numeric_limits<GLsizei>::max() >= point_count);
@@ -115,20 +131,65 @@ void FastPointCloudRenderer::draw(cgv::render::context & ctx) {
     m_ldi_shader.disable(ctx);
 }
 
-void FastPointCloudRenderer::finish_draw(cgv::render::context &)
+void FastPointCloudRenderer::finish_draw(cgv::render::context &ctx)
 {
+    // Try to incorporate newly queried points into the LDI
     auto const opt_query = m_point_source
                                ? m_point_source->get_finished_query()
                                : decltype(
                                    m_point_source->get_finished_query())();
+
     if (opt_query.has_value()) {
         const auto &finished_query = opt_query.value();
         assert(finished_query);
 
-        std::vector<float> positions;
-        std::vector<float> colors;
+        std::vector<vec3> positions;
+        std::vector<rgb> colors;
         finished_query->consume_points(positions, colors);
-        m_ldi.add_global_points(positions, colors);
+
+        assert(!positions.empty());
+        assert(!colors.empty());
+
+        std::transform(positions.cbegin(),
+                       positions.cend(),
+                       positions.begin(),
+                       [this, &ctx](decltype(positions)::value_type pos)
+                           -> decltype(positions)::value_type {
+                           auto const width = ctx.get_width();
+                           auto const height = ctx.get_height();
+
+                           assert(std::numeric_limits<int>::max() >= width);
+                           assert(std::numeric_limits<int>::max() >= height);
+
+                           auto const transformation = compute_device(
+                               static_cast<int>(ctx.get_width()),
+                               static_cast<int>(ctx.get_height()));
+                           auto p{transformation * pos.lift()};
+                           p /= p.w();
+                           return vec3(p.x(), p.y(), p.z());
+                       });
+
+        m_ldi.add_transformed_points(positions, colors);
+
+        auto const interleaved_buffer = m_ldi.interleave_data();
+
+        if (interleaved_buffer.empty())
+            return;
+
+        if (m_vbo_ldi_data.is_created()) {
+            auto const success = m_vbo_ldi_data
+                                     .replace(ctx,
+                                              0,
+                                              interleaved_buffer.data(),
+                                              interleaved_buffer.size());
+            assert(success);
+        } else {
+            auto const success = m_vbo_ldi_data
+                                     .create(ctx,
+                                             interleaved_buffer.data(),
+                                             interleaved_buffer.size());
+            assert(success);
+        }
     }
 
     // TODO scan over point density image and determine new query
@@ -210,6 +271,21 @@ render_types::mat4 FastPointCloudRenderer::compute_projection(
     return P;
 }
 
+render_types::mat4 FastPointCloudRenderer::compute_device(const int width,
+                                                          const int height) const
+{
+    // Move NDCs (from -1 to 1) to (0 to 1) and scale to fill device width and
+    // height
+    auto const transformation = cgv::math::scale_44(static_cast<float>(height),
+                                                    static_cast<float>(width),
+                                                    1.F)
+                                * cgv::math::translate_44(1.F, 1.F, 0.F)
+                                * cgv::math::scale_44(.5F);
+
+    return convert_mat<render_types::mat4::base_type::value_type, 4, 4>(
+        transformation);
+}
+
 void FastPointCloudRenderer::open_point_data(const std::string &filename)
 {
 #ifndef NDEBUG
@@ -219,6 +295,7 @@ void FastPointCloudRenderer::open_point_data(const std::string &filename)
     m_point_source = std::make_shared<PointCloudSource>(filename);
     assert(m_point_source);
 
+    // Initially grab all points of the cloud
     m_point_source->queryPoints();
 }
 

@@ -33,15 +33,15 @@ public:
     FastPointCloudRenderer();
     /// There are threads as members for which copy construction won't work
     FastPointCloudRenderer(FastPointCloudRenderer const &other) = delete;
-    /// All members are still trivially movable, therefore force default
-    FastPointCloudRenderer(FastPointCloudRenderer &&other) = default;
+    /// Some members also dont allow move construction
+    FastPointCloudRenderer(FastPointCloudRenderer &&other) = delete;
     ~FastPointCloudRenderer() override;
 
     /// Member threads are not copyable
     FastPointCloudRenderer &operator=(const FastPointCloudRenderer &other)
         = delete;
-    /// Members are trivially moveable
-    FastPointCloudRenderer &operator=(FastPointCloudRenderer &&other) = default;
+    /// some members are also not trivially moveable
+    FastPointCloudRenderer &operator=(FastPointCloudRenderer &&other) = delete;
 
     /// this method is called after creation or recreation of the context,
     /// return whether all necessary functionality is supported
@@ -55,7 +55,7 @@ public:
     void draw(cgv::render::context&ctx) override;
     /// this method is called when the current drawable is left in a tree
     /// traversal that calls the draw method
-    void finish_draw(cgv::render::context&) override;
+    void finish_draw(cgv::render::context&ctx) override;
     /// this method is called in one pass over all drawables after drawing
     void finish_frame(cgv::render::context&) override;
     /// this method is called in one pass over all drawables after finish frame
@@ -83,6 +83,8 @@ private:
      * @return a projection matrix
      */
     [[nodiscard]] mat4 compute_projection(const float aspect) const;
+
+    [[nodiscard]] mat4 compute_device(int const width, int const height) const;
 
     //! The LDI with possibly a representative subset of all points
     LayeredDepthImage m_ldi;

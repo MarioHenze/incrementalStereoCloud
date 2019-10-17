@@ -25,8 +25,8 @@ void PointCloudQuery::trigger_completion()
 }
 
 void PointCloudQuery::consume_points(
-        std::vector<float> &points,
-        std::vector<float> &colors,
+        std::vector<vec3> &points,
+        std::vector<rgb> &colors,
         const std::chrono::microseconds time_budget)
 {
     // Get initial timestamp
@@ -48,18 +48,13 @@ void PointCloudQuery::consume_points(
 
     assert(m_points.size() == m_colors.size());
     std::function<bool()> const has_points = [this] {
-        return !m_points.empty() && !m_colors.empty() && m_points.size() >= 3
-               && m_colors.size() >= 3;
+        return !m_points.empty() && !m_colors.empty();
     };
     while (has_points()) {
-        // As positions and colors are 3 component vectors copy float data in
-        // chunks
-        for (size_t i = 0; i < 3; ++i) {
-            points.push_back(m_points.front());
-            m_points.pop();
-            colors.push_back(m_colors.front());
-            m_colors.pop();
-        }
+        points.push_back(m_points.front());
+        m_points.pop();
+        colors.push_back(m_colors.front());
+        m_colors.pop();
 
         // When time budget is depleted, abort copying
         if (std::chrono::high_resolution_clock::now() - begin_time
@@ -70,12 +65,10 @@ void PointCloudQuery::consume_points(
     assert(points.size() == colors.size());
 }
 
-void PointCloudQuery::supply_points(std::vector<float> const &points,
-                                    std::vector<float> const &colors)
+void PointCloudQuery::supply_points(const std::vector<vec3> &points,
+                                    const std::vector<rgb> &colors)
 {
     assert(!m_completed);
-    assert(points.size() % 3 == 0);
-    assert(colors.size() % 3 == 0);
     assert(points.size() == colors.size());
 
     std::scoped_lock lock(m_points_mutex, m_colors_mutex);
