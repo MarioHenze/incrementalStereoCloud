@@ -8,9 +8,21 @@
 #include <mutex>
 #include <queue>
 
+PointCloudQuery::~PointCloudQuery()
+{
+    if (!m_completed || !m_consumed)
+        std::cerr << "A point cloud query has been deleted, which has not been "
+                     "completed or consumed entirely!";
+}
+
 bool PointCloudQuery::is_complete() const
 {
     return m_completed;
+}
+
+bool PointCloudQuery::is_consumed() const
+{
+    return m_consumed;
 }
 
 void PointCloudQuery::trigger_completion()
@@ -61,6 +73,14 @@ void PointCloudQuery::consume_points(
             >= time_budget)
             break;
     }
+
+    /*
+     * After the while loop, all points have been copied. If the supplying
+     * thread has signaled, that this query is completed, this query can be
+     * marked as consumed
+     */
+    if (m_completed)
+        m_consumed = true;
 
     assert(points.size() == colors.size());
 }

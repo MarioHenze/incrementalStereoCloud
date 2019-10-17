@@ -19,9 +19,11 @@ private:
     std::queue<rgb> m_colors;
 
     std::atomic_bool m_completed{false};
+    std::atomic_bool m_consumed{false};
 
 public:
     PointCloudQuery() = default;
+    ~PointCloudQuery();
 
     /**
      * @brief is_complete retrieves the status of the query
@@ -29,6 +31,13 @@ public:
      * possible points for a given request have been provided, false otherwise.
      */
     [[nodiscard]] bool is_complete() const;
+
+    /**
+     * @brief is_consumed retrives if the query finished its purpose
+     * @return true if the query was completed and all points have been
+     * consumed, false otherwise
+     */
+    [[nodiscard]] bool is_consumed() const;
 
     /**
      * @brief trigger_completion marks this query as completed.

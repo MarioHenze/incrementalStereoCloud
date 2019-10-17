@@ -134,6 +134,9 @@ std::vector<float> LayeredDepthImage::interleave_data() const
     for(size_t i = 0; i < m_layered_points.size(); ++i) {
         auto const ray = m_layered_points.at(i);
 
+        if (ray.point_count() == 0)
+            continue;
+
         // Retrieve the location of the ray on the LDI image plane
         auto const integer_location = to_coord(i);
 

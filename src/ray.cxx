@@ -37,9 +37,9 @@ std::vector<float> Ray::to_buffer(std::pair<float, float> location) const
 
 void Ray::insert(const point_t point)
 {
-    auto const predicate = std::bind(std::greater<>(),
-                                     std::placeholders::_1,
-                                     point);
+    auto const predicate = [&point](decltype(m_points)::value_type other) {
+        return other > point;
+    };
 
     // ensure depth monotonicity by sorted insertion
     auto const first_greater_depth = std::find_if(m_points.cbegin(),

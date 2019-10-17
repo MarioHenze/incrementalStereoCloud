@@ -17,11 +17,27 @@ bool PointCloudSource::unprocessed_present() const
     return (first_uncomplete == m_pending_queries.cend());
 }
 
-PointCloudSource::PointCloudSource(const std::string &filepath) :
-    m_point_cloud(filepath)
+bool PointCloudSource::consumed_present() const
+{
+    if (m_pending_queries.empty())
+        return false;
+
+    auto const first_consumed
+        = std::find_if(m_pending_queries.cbegin(),
+                       m_pending_queries.cend(),
+                       [](decltype(m_pending_queries)::value_type const &query) {
+                           return query->is_consumed();
+                       });
+    return (first_consumed == m_pending_queries.cend());
+}
+
+PointCloudSource::PointCloudSource(const std::string &filepath)
+    : m_point_cloud(filepath)
 {
 
 }
+
+PointCloudSource::PointCloudSource(const point_cloud &pc) : m_point_cloud(pc) {}
 
 void PointCloudSource::compute_queries()
 {
@@ -66,6 +82,26 @@ void PointCloudSource::compute_queries()
     m_pending_queries.front()->trigger_completion();
 }
 
+void PointCloudSource::remove_consumed_queries()
+{
+    std::unique_lock queue_lock(m_pending_queries_mutex);
+
+    // Wait for new queries and guard against spurious wakeups
+    auto const was_in_time
+        = m_queries_present.wait_for(queue_lock,
+                                     std::chrono::seconds(1),
+                                     [this] { return unprocessed_present(); });
+
+    if (!was_in_time)
+        // Timeout
+        return;
+
+    m_pending_queries.remove_if(
+        [](decltype(m_pending_queries)::value_type query) {
+            return query->is_complete() && query->is_consumed();
+        });
+}
+
 std::optional<std::shared_ptr<PointCloudQuery>>
 PointCloudSource::get_finished_query()
 {
@@ -75,8 +111,8 @@ PointCloudSource::get_finished_query()
     auto const first_complete
         = std::find_if(m_pending_queries.cbegin(),
                        m_pending_queries.cend(),
-                       [](const decltype(m_pending_queries)::value_type& query) {
-                           return query->is_complete();
+                       [](const decltype(m_pending_queries)::value_type &query) {
+                           return query->is_complete() && !query->is_consumed();
                        });
     auto const ret = first_complete == m_pending_queries.cend()
                          ? decltype(get_finished_query())()
@@ -100,4 +136,11 @@ void PointCloudSource::queryPoints(const std::chrono::microseconds time_budget)
             std::make_shared<PointCloudQuery>();
     m_pending_queries.push_back(new_query);
     m_queries_present.notify_one();
+}
+
+std::ostream &operator<<(std::ostream &os, const PointCloudSource &pcs)
+{
+    os << "\npending queries size: " << pcs.m_pending_queries.size()
+       << "\nunprocessed queries present: " << pcs.unprocessed_present();
+    return os;
 }

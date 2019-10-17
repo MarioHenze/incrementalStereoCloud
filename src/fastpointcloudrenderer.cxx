@@ -31,6 +31,8 @@ FastPointCloudRenderer::~FastPointCloudRenderer()
 
 bool FastPointCloudRenderer::init(cgv::render::context &ctx)
 {
+    auto const win_mat = ctx.get_window_matrix();
+
     // Define what the query worker and hole finder threads will do
     m_query_worker = std::thread([this] {
         // TODO know when to stop
@@ -38,6 +40,7 @@ bool FastPointCloudRenderer::init(cgv::render::context &ctx)
             if (!m_point_source)
                 continue;
             m_point_source->compute_queries();
+            m_point_source->remove_consumed_queries();
         }
     });
 
@@ -292,7 +295,10 @@ void FastPointCloudRenderer::open_point_data(const std::string &filename)
     std::cout << __func__ << ": " << filename << std::endl;
 #endif
 
-    m_point_source = std::make_shared<PointCloudSource>(filename);
+    //m_point_source = std::make_shared<PointCloudSource>(filename);
+    point_cloud pc;
+    pc.add_point({1,1,1});
+    m_point_source = std::make_shared<PointCloudSource>(pc);
     assert(m_point_source);
 
     // Initially grab all points of the cloud
