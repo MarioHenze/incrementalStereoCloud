@@ -31,8 +31,6 @@ FastPointCloudRenderer::~FastPointCloudRenderer()
 
 bool FastPointCloudRenderer::init(cgv::render::context &ctx)
 {
-    auto const win_mat = ctx.get_window_matrix();
-
     // Define what the query worker and hole finder threads will do
     m_query_worker = std::thread([this] {
         // TODO know when to stop
@@ -46,13 +44,15 @@ bool FastPointCloudRenderer::init(cgv::render::context &ctx)
 
     //m_hole_finder = std::thread([] {});
 
-    const auto aspect = static_cast<float>(ctx.get_width()) / ctx.get_height();
+	
+    mat4 const model_view_mat = ctx.get_modelview_matrix();
 
-    mat4 const MV = compute_view();
-    mat4 const P = compute_projection(aspect);
+	// The window matrix of the cgv viewer is exactly the LDI image plane
+	// transformation
+	auto const win_mat = ctx.get_window_matrix();
 
-    std::pair<size_t, size_t> resolution(ctx.get_width(), ctx.get_height());
-    PinholeCameraModel view_pcm(MV, P, resolution);
+    const std::pair<size_t, size_t> resolution(ctx.get_width(), ctx.get_height());
+    const PinholeCameraModel view_pcm(model_view_mat, win_mat, resolution);
 
     m_ldi = LayeredDepthImage(view_pcm);
 
@@ -77,16 +77,15 @@ void FastPointCloudRenderer::draw(cgv::render::context & ctx) {
     assert(m_ldi_shader.is_linked());
     m_ldi_shader.enable(ctx);
 
-    // Compute aspect ratio
-    auto const aspect = static_cast<float>(ctx.get_width()) / ctx.get_height();
+	// Determine the translational distance between both the current cgv viewer
+	// eye position and the projective center of the LDI
     vec3 const center_distance;
     {
-        auto _ = compute_view().col(3);
-        _ /= _.w();
-        vec3 const target_center(_.x(), _.y(), _.z());
+		auto view = find_view_as_node();
+		assert(view);
 
-        const_cast<vec3 &>(center_distance)
-            = m_ldi.get_camera().get_projective_origin() - target_center;
+        const_cast<vec3 &>(center_distance) =
+			m_ldi.get_camera().get_projective_origin() - view->get_eye();
     }
 
     {
@@ -98,13 +97,17 @@ void FastPointCloudRenderer::draw(cgv::render::context & ctx) {
                                           "SOURCE_LDI_P",
                                           m_ldi.get_camera().get_projection(),
                                           true);
+		assert(uniform_assignment_successful);
+
+		const mat4 inv_target_ldi_p = cgv::math::inv(ctx.get_window_matrix());
+
         uniform_assignment_successful
             = uniform_assignment_successful
               && m_ldi_shader.set_uniform(ctx,
                                           "INV_TARGET_LDI_P",
-                                          cgv::math::inv(
-                                              compute_projection(aspect)),
+                                          inv_target_ldi_p,
                                           true);
+		assert(uniform_assignment_successful);
         uniform_assignment_successful = uniform_assignment_successful
                                         && m_ldi_shader
                                                .set_uniform(ctx,
@@ -112,6 +115,8 @@ void FastPointCloudRenderer::draw(cgv::render::context & ctx) {
                                                             center_distance,
                                                             true);
         assert(uniform_assignment_successful);
+		if (!uniform_assignment_successful)
+			std::terminate();
     }
 
     // Draw only if data is present
@@ -234,7 +239,7 @@ bool FastPointCloudRenderer::self_reflect(cgv::reflect::reflection_handler &srh)
 
 mat4 FastPointCloudRenderer::compute_view() const
 {
-    cgv::render::view *view = find_view_as_node();
+    const cgv::render::view *view = find_view_as_node();
     assert(view);
 
     // Build the PinholeCamera from the parameters of the view

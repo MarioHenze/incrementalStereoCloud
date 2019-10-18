@@ -14,7 +14,7 @@ class PinholeCameraModel
 public:
     PinholeCameraModel() = default;
 
-    PinholeCameraModel(mat4 model_view,
+    PinholeCameraModel(mat4 view,
                        mat4 projection,
                        std::pair<size_t, size_t> m_resolution);
 
@@ -36,23 +36,12 @@ public:
     [[nodiscard]] mat4 get_view() const;
 
     /**
-     * @brief get_device retrieves the device transformation
-     * @return a matrix which transforms into the rasterized camera space
-     */
-    [[nodiscard]] mat4 get_device() const;
-
-    /**
      * @brief get_projective_origin retrieves the world location of the cameras
      * projective center
      * @return the location of the camera
      */
     [[nodiscard]] vec3 get_projective_origin() const;
 
-    /**
-     * @brief get_vp retrieves the view projection matrix of the camera
-     * @return a concatenated view projection transformation
-     */
-    [[nodiscard]] mat4 get_vp() const;
 
     /**
      * @brief get_resolution returns the width and height of the LDI
