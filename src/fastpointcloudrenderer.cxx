@@ -126,14 +126,14 @@ void FastPointCloudRenderer::draw(cgv::render::context & ctx) {
         glBindBuffer(GL_ARRAY_BUFFER,
                      vbo_handle);
 
-        auto const point_count = m_ldi.point_count();
+		/*auto const point_count = m_ldi.point_count();
         assert(std::numeric_limits<GLsizei>::max() >= point_count);
         glBufferData(GL_ARRAY_BUFFER,
                      point_count * 6,
                      m_ldi.interleave_data().data(),
-                     GL_STREAM_DRAW);
+                     GL_STREAM_DRAW);*/
 
-        glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(point_count));
+        glDrawArrays(GL_POINTS, 0, m_ldi.point_count());
     }
 
     m_ldi_shader.disable(ctx);
@@ -158,24 +158,19 @@ void FastPointCloudRenderer::finish_draw(cgv::render::context &ctx)
         assert(!positions.empty());
         assert(!colors.empty());
 
-        std::transform(positions.cbegin(),
-                       positions.cend(),
-                       positions.begin(),
-                       [this, &ctx](decltype(positions)::value_type pos)
-                           -> decltype(positions)::value_type {
-                           auto const width = ctx.get_width();
-                           auto const height = ctx.get_height();
 
-                           assert(std::numeric_limits<int>::max() >= width);
-                           assert(std::numeric_limits<int>::max() >= height);
-
-                           auto const transformation = compute_device(
-                               static_cast<int>(ctx.get_width()),
-                               static_cast<int>(ctx.get_height()));
-                           auto p{transformation * pos.lift()};
-                           p /= p.w();
-                           return vec3(p.x(), p.y(), p.z());
-                       });
+		// The points of the query are in world coordinates. We need to
+		// transform them into LDI window coordinates.
+		std::transform(positions.cbegin(),
+			positions.cend(),
+			positions.begin(),
+			[this, &ctx](decltype(positions)::value_type pos)
+			-> decltype(positions)::value_type{
+				const mat4 transformation {ctx.get_window_matrix()};
+				auto p{transformation * pos.lift()};
+				p /= p.w();
+				return vec3(p.x(), p.y(), p.z());
+			});
 
         m_ldi.add_transformed_points(positions, colors);
 

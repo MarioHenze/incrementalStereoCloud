@@ -47,7 +47,7 @@ void PointCloudQuery::consume_points(
     // There are two locks in this function. Ensure that the locking time is
     // bound to the upper limit of the time budget
     constexpr size_t lock_count = 2;
-    std::chrono::microseconds time_slice(time_budget / lock_count);
+    const std::chrono::microseconds time_slice(time_budget / lock_count);
 
     std::unique_lock points_lock(m_points_mutex, time_slice);
     if(!points_lock.owns_lock()) return;

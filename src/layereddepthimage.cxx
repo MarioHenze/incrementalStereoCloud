@@ -109,7 +109,9 @@ void LayeredDepthImage::add_transformed_points(const std::vector<vec3> &points,
         auto const &p = points.at(i);
 
         // Skip points outside the view frustum
-        if (0 >= p.x() || 0 >= p.y() || 0 > p.z()
+		// TODO are the pixel bounds reasonable?
+		// width 900 -> pixel position from 0 to 899?
+        if (0 > p.x() || 0 > p.y() || 0 > p.z()
             || m_camera.get_resolution().first < p.x()
             || m_camera.get_resolution().second < p.y())
             continue;
@@ -184,8 +186,8 @@ size_t LayeredDepthImage::to_index(const int x, const int y) const
 {
     assert(x >= 0);
     assert(y >= 0);
-    assert(static_cast<size_t>(x) < m_camera.get_resolution().first);
-    assert(static_cast<size_t>(y) < m_camera.get_resolution().second);
+    assert(static_cast<size_t>(x) <= m_camera.get_resolution().first);
+    assert(static_cast<size_t>(y) <= m_camera.get_resolution().second);
 
     const size_t index = static_cast<size_t>(y)
                              * m_camera.get_resolution().first

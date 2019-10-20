@@ -84,7 +84,7 @@ private:
      */
     [[nodiscard]] mat4 compute_projection(const float aspect) const;
 
-    [[nodiscard]] mat4 compute_device(int const width, int const height) const;
+	[[nodiscard]] mat4 compute_device(int const width, int const height) const;
 
     //! The LDI with possibly a representative subset of all points
     LayeredDepthImage m_ldi;

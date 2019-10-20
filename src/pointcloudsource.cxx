@@ -118,8 +118,6 @@ PointCloudSource::get_finished_query()
                          ? decltype(get_finished_query())()
                          : decltype(get_finished_query())(*first_complete);
 
-    // TODO remove consumed queries
-
     return ret;
 }
 

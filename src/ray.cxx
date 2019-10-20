@@ -22,7 +22,11 @@ size_t Ray::point_count() const
 
 std::vector<float> Ray::to_buffer(std::pair<float, float> location) const
 {
-    std::vector<float> buffer(m_points.size());
+    std::vector<float> buffer;
+	buffer.reserve(
+		m_points.size()
+		* (sizeof(decltype(decltype(m_points)::value_type::depth)) 
+			+ sizeof(decltype(decltype(m_points)::value_type::color))));
 
     for (auto const &p : m_points) {
         buffer.push_back(location.first);
