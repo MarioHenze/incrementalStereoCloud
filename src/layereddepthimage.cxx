@@ -172,16 +172,6 @@ size_t LayeredDepthImage::point_count() const
     return m_point_count;
 }
 
-size_t LayeredDepthImage::bytes_per_point() const
-{
-    // The functions assumption are based on the following types
-    static_assert(std::is_same<decltype(point_t::color), rgb>::value);
-    static_assert(std::is_same<decltype(point_t::depth), float>::value);
-
-    // vec3 for position and vec3 for color => 3 + 3
-    return vec3::size() * 2 * sizeof(float);
-}
-
 size_t LayeredDepthImage::to_index(const int x, const int y) const
 {
     assert(x >= 0);

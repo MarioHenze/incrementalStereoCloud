@@ -30,8 +30,58 @@ vec3 morphing_equation(const mat4 &perspective_source,
 
 class LayeredDepthImage
 {
+private:
+	/**
+	 * @brief to_index returns the index for a given 2D position
+	 * @param x horizontal position
+	 * @param y vertical position
+	 * @return linear index
+	 */
+	[[nodiscard]] size_t to_index(const int x, const int y) const;
+
+	/**
+	 * @brief to_coord retrieves the two dimensional position of a given index
+	 * @param index of the ray
+	 * @return the x and y position of the ray
+	 */
+	[[nodiscard]] std::pair<size_t, size_t> to_coord(size_t const index) const;
+
+	/**
+	 * @brief count_points counts all points along all rays in the LDI
+	 * @return the actual amount of points in the LDI
+	 *
+	 * This function can be used as an expensive check to see, if the adhoc
+	 * point count differs from the actual point count in the LDI.
+	 */
+	[[nodiscard]] size_t count_points() const;
+
+	/**
+	 * @brief m_layered_points stores all rays going from the center of
+	 * projection through every pixel
+	 */
+	std::vector<Ray> m_layered_points;
+
+	//! The amount of points in the LDI(-subset) of the point source
+	size_t m_point_count{ 0 };
+
+	/**
+	 * @brief m_camera holds configuration of projection details of the LDI
+	 */
+	PinholeCameraModel m_camera;
+
 public:
-    LayeredDepthImage() = default;
+	using buffer_type = std::vector<float>;
+
+	/*
+	Compile-time constant for the number of bytes necessary to store a point
+	in a buffer. Is composed of the bytes necessary for color and depth and
+	two additional values for the x and y position on the LDI plane.
+	*/
+	static constexpr size_t bytes_per_point{
+		(decltype(m_layered_points)::value_type::value_type::byte_count)
+		+ 2 * sizeof(buffer_type::value_type) };
+
+	LayeredDepthImage() = default;
 
     // TODO Reflect behavoir, when new LDI is resized
     LayeredDepthImage(LayeredDepthImage const &other) = default;
@@ -75,7 +125,7 @@ public:
      * The returned buffer contains at first a 3 component position vector and
      * then a 3 component color vector.
      */
-    [[nodiscard]] std::vector<float> interleave_data() const;
+    [[nodiscard]] buffer_type interleave_data() const;
 
     /**
      * @brief is_valid checks if the LDI configuration and data is valid
@@ -95,52 +145,6 @@ public:
      * @return the amount of points
      */
     [[nodiscard]] size_t point_count() const;
-
-    /**
-     * @brief bytes_per_point retrieves the count of bytes necessary to store
-     * all data of a single point
-     * @return byte count of one point
-     */
-    [[nodiscard]] size_t bytes_per_point() const;
-
-private:
-    /**
-     * @brief to_index returns the index for a given 2D position
-     * @param x horizontal position
-     * @param y vertical position
-     * @return linear index
-     */
-    [[nodiscard]] size_t to_index(const int x, const int y) const;
-
-    /**
-     * @brief to_coord retrieves the two dimensional position of a given index
-     * @param index of the ray
-     * @return the x and y position of the ray
-     */
-    [[nodiscard]] std::pair<size_t, size_t> to_coord(size_t const index) const;
-
-    /**
-     * @brief count_points counts all points along all rays in the LDI
-     * @return the actual amount of points in the LDI
-     *
-     * This function can be used as an expensive check to see, if the adhoc
-     * point count differs from the actual point count in the LDI.
-     */
-    [[nodiscard]] size_t count_points() const;
-
-    /**
-     * @brief m_layered_points stores all rays going from the center of
-     * projection through every pixel
-     */
-    std::vector<Ray> m_layered_points;
-
-    //! The amount of points in the LDI(-subset) of the point source
-    size_t m_point_count{0};
-
-    /**
-     * @brief m_camera holds configuration of projection details of the LDI
-     */
-    PinholeCameraModel m_camera;
 };
 
 #endif // LAYEREDDEPTHIMAGE_H

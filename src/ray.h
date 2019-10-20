@@ -19,6 +19,8 @@ struct point_t
     float depth{};
     size_t splat_index{};
 
+	static constexpr size_t byte_count{sizeof (rgb) + sizeof(depth)};
+
     /**
      * @brief to_buffer transforms the point compound into a float buffer
      * @return a buffer containing depth and then RGB color
@@ -30,7 +32,13 @@ struct point_t
 
 class Ray
 {
+private:
+	//! All the points along the ray
+	std::vector<point_t> m_points;
+
 public:
+	using value_type = decltype(m_points)::value_type;
+
     Ray() = default;
 
     /**
@@ -57,11 +65,7 @@ public:
      * @param depth at which the point lays on the ray
      * @param color of the point
      */
-    void insert(const point_t point);
-
-private:
-    //! All the points along the ray
-    std::vector<point_t> m_points;
+	void insert(const point_t point);
 };
 
 #endif // RAY_H
