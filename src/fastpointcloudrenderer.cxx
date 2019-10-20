@@ -274,21 +274,6 @@ render_types::mat4 FastPointCloudRenderer::compute_projection(
     return P;
 }
 
-render_types::mat4 FastPointCloudRenderer::compute_device(const int width,
-                                                          const int height) const
-{
-    // Move NDCs (from -1 to 1) to (0 to 1) and scale to fill device width and
-    // height
-    auto const transformation = cgv::math::scale_44(static_cast<float>(height),
-                                                    static_cast<float>(width),
-                                                    1.F)
-                                * cgv::math::translate_44(1.F, 1.F, 0.F)
-                                * cgv::math::scale_44(.5F);
-
-    return convert_mat<render_types::mat4::base_type::value_type, 4, 4>(
-        transformation);
-}
-
 void FastPointCloudRenderer::open_point_data(const std::string &filename)
 {
 #ifndef NDEBUG
