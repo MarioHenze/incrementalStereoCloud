@@ -135,22 +135,22 @@ void FastPointCloudRenderer::draw(cgv::render::context & ctx) {
 			std::terminate();
     }
 
-    // Draw only if data is present
+	if (0 != m_ldi_vbo)
+	{
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ldi_vbo);
+		glDrawArrays(GL_POINTS, 0, m_ldi.point_count());
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	}
+
+    /*// Draw only if data is present
     if (m_vbo_ldi_data.is_created()) {
         GLuint vbo_handle{0};
         m_vbo_ldi_data.put_id(vbo_handle);
         glBindBuffer(GL_ARRAY_BUFFER,
                      vbo_handle);
 
-		/*auto const point_count = m_ldi.point_count();
-        assert(std::numeric_limits<GLsizei>::max() >= point_count);
-        glBufferData(GL_ARRAY_BUFFER,
-                     point_count * 6,
-                     m_ldi.interleave_data().data(),
-                     GL_STREAM_DRAW);*/
-
         glDrawArrays(GL_POINTS, 0, m_ldi.point_count());
-    }
+    }*/
 
     m_ldi_shader.disable(ctx);
 }
