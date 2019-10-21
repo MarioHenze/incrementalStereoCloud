@@ -61,6 +61,9 @@ bool FastPointCloudRenderer::init(cgv::render::context &ctx)
         assert(m_ldi_shader.is_linked());
     }
 
+	// For the raw handle m_ldi_vbo a new buffer needs to be generated
+	glGenBuffers(1, &m_ldi_vbo);
+
     return m_ldi.is_valid();
 }
 
@@ -71,7 +74,20 @@ void FastPointCloudRenderer::resize(unsigned int w, unsigned int h)
     // TODO resize ldi;
 }
 
-void FastPointCloudRenderer::init_frame(cgv::render::context &) {}
+void FastPointCloudRenderer::init_frame(cgv::render::context &) {
+	const auto ldi_data = m_ldi.interleave_data();
+
+	// Ensure that ldi data is present and a valid buffer handle was generated
+	if (!ldi_data.empty() && m_ldi_vbo != 0)
+	{
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ldi_vbo);
+		glBufferData(
+			GL_ELEMENT_ARRAY_BUFFER,
+			ldi_data.size() * sizeof(LayeredDepthImage::buffer_type::value_type),
+			ldi_data.data(),
+			GL_STREAM_DRAW);
+	}
+}
 
 void FastPointCloudRenderer::draw(cgv::render::context & ctx) {
     assert(m_ldi_shader.is_linked());

@@ -114,6 +114,8 @@ private:
      */
     std::thread m_hole_finder;
 
+	GLuint m_ldi_vbo;
+
     void open_point_data(std::string const & filename);
 };
 
