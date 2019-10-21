@@ -5,7 +5,7 @@
 
 #include <pmmintrin.h>
 
-#include <boost/align/is_aligned.hpp>
+//#include <boost/align/is_aligned.hpp>
 
 #include <cgv/math/inv.h>
 

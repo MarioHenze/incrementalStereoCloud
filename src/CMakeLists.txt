@@ -54,7 +54,7 @@ target_link_libraries(
     ${OPENGL_LIBRARIES}
     ${cgv_LIBRARIES}
     point_cloud
-    Threads::Threads
+    #Threads::Threads
     #"$<$<CONFIG:Debug>:-fsanitize=address,undefined>"
     )
 cgv_test_shaders(${PROJECT_NAME} ${SHADER_SOURCES})
