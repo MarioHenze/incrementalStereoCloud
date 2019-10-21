@@ -11,14 +11,14 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 #set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wl,--no-undefined")
 
 # Link Boost as dependency
-find_package(Boost REQUIRED)
-if(Boost_FOUND)
-    include_directories(${Boost_INCLUDE_DIRS})
-endif()
+#find_package(Boost REQUIRED)
+#if(Boost_FOUND)
+#    include_directories(${Boost_INCLUDE_DIRS})
+#endif()
 
 # For C++11 Threads the platform specific library must be found
-set (THREADS_PREFER_PTHREAD_FLAG ON)
-find_package(Threads REQUIRED)
+#set (THREADS_PREFER_PTHREAD_FLAG ON)
+#find_package(Threads REQUIRED)
 
 cgv_find_package(point_cloud)
 cgv_find_package(cg_ext)
