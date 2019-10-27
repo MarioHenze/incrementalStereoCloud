@@ -138,12 +138,12 @@ void FastPointCloudRenderer::draw(cgv::render::context & ctx) {
 	// TODO ? For now no group rendering is needed ...
 
 	// TODO test if upload is necessary
-	upload_data(ctx);
+	auto const point_count = upload_data(ctx);
 
 	p_renderer.validate_and_enable(ctx);
 	// TODO separate drawing method?
 	// TODO check if sorted points are needed?
-	glDrawArrays(GL_POINTS, 0, 1);
+	glDrawArrays(GL_POINTS, 0, point_count);
 	p_renderer.disable(ctx);
 }
 
@@ -152,8 +152,7 @@ void FastPointCloudRenderer::finish_draw(cgv::render::context &ctx)
     // Try to incorporate newly queried points into the LDI
     auto const opt_query = m_point_source
                                ? m_point_source->get_finished_query()
-                               : decltype(
-                                   m_point_source->get_finished_query())();
+                               : std::nullopt;
 
     if (opt_query.has_value()) {
         const auto &finished_query = opt_query.value();
@@ -225,7 +224,7 @@ void FastPointCloudRenderer::on_set(void *member_ptr)
     }
 }
 
-bool FastPointCloudRenderer::self_reflect(cgv::reflect::reflection_handler &srh)
+bool FastPointCloudRenderer::self_reflect(cgv::reflect::reflection_handler& srh)
 {
     return srh.reflect_member("file_name", m_filename);
 }
@@ -272,12 +271,12 @@ render_types::mat4 FastPointCloudRenderer::compute_projection(
     return P;
 }
 
-void FastPointCloudRenderer::upload_data(cgv::render::context &ctx) const
+size_t FastPointCloudRenderer::upload_data(cgv::render::context &ctx) const
 {
-	//const auto ldi_data = m_ldi.interleave_data();
-	decltype(m_ldi.interleave_data()) const ldi_data = { 1,1,1,1,1,1 };
+	const auto ldi_data = m_ldi.interleave_data();
+	//decltype(m_ldi.interleave_data()) const ldi_data = { 1,1,1,1,1,1 };
 
-	auto & p_renderer = cgv::render::ref_point_renderer(ctx);
+	auto& p_renderer = cgv::render::ref_point_renderer(ctx);
 	p_renderer.set_position_array(
 		ctx,
 		ldi_data.data(),
@@ -288,6 +287,16 @@ void FastPointCloudRenderer::upload_data(cgv::render::context &ctx) const
 		ldi_data.data() + LayeredDepthImage::color_offset,
 		ldi_data.size() / LayeredDepthImage::stride,
 		LayeredDepthImage::bytes_per_point);
+
+	// As the data in the interleaved buffer are raw floats, but the entity count
+	// groups several floats logically, we need to check that the buffer contains
+	// only multiples of the logical size.
+	assert(!(ldi_data.size() % (
+		LayeredDepthImage::positional_components +
+		LayeredDepthImage::color_components)));
+	return ldi_data.size() / (
+		LayeredDepthImage::positional_components +
+		LayeredDepthImage::color_components);
 }
 
 void FastPointCloudRenderer::open_point_data(const std::string &filename)
@@ -296,10 +305,10 @@ void FastPointCloudRenderer::open_point_data(const std::string &filename)
     std::cout << __func__ << ": " << filename << std::endl;
 #endif
 
-    //m_point_source = std::make_shared<PointCloudSource>(filename);
-    point_cloud pc;
+    m_point_source = std::make_shared<PointCloudSource>(filename);
+    /*point_cloud pc;
     pc.add_point({1,1,1});
-    m_point_source = std::make_shared<PointCloudSource>(pc);
+    m_point_source = std::make_shared<PointCloudSource>(pc);*/
     assert(m_point_source);
 
     // Initially grab all points of the cloud

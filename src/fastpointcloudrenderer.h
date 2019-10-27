@@ -92,8 +92,9 @@ private:
 
 	/**
 	@brief uploads the interleaved point data from the LDI to the GPU
+	@return the number of point entities uploaded
 	*/
-	void upload_data(cgv::render::context& ctx) const;
+	size_t upload_data(cgv::render::context& ctx) const;
 
     //! The LDI with possibly a representative subset of all points
     LayeredDepthImage m_ldi;

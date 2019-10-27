@@ -34,7 +34,8 @@ bool PointCloudSource::consumed_present() const
 PointCloudSource::PointCloudSource(const std::string &filepath)
     : m_point_cloud(filepath)
 {
-
+	if (!m_point_cloud.get_nr_points())
+		throw std::invalid_argument("The created point cloud was empty");
 }
 
 PointCloudSource::PointCloudSource(const point_cloud &pc) : m_point_cloud(pc) {}
@@ -106,7 +107,7 @@ std::optional<std::shared_ptr<PointCloudQuery>>
 PointCloudSource::get_finished_query()
 {
     if (m_pending_queries.empty())
-        return {};
+        return std::nullopt;
 
     auto const first_complete
         = std::find_if(m_pending_queries.cbegin(),
