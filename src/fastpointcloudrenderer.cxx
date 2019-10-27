@@ -31,6 +31,13 @@ FastPointCloudRenderer::~FastPointCloudRenderer()
 
 bool FastPointCloudRenderer::init(cgv::render::context &ctx)
 {
+	// To use the point renderer, increase the reference count
+	cgv::render::ref_point_renderer(ctx, 1);
+
+	// The point manager coordinates the data upload to the gpu
+	if (!m_p_manager.init(ctx))
+		return false;
+
     // Define what the query worker and hole finder threads will do
     m_query_worker = std::thread([this] {
         // TODO know when to stop
@@ -56,14 +63,6 @@ bool FastPointCloudRenderer::init(cgv::render::context &ctx)
 
     m_ldi = LayeredDepthImage(view_pcm);
 
-    {// Create the LDI shader
-        m_ldi_shader.build_dir(ctx, "./src");
-        assert(m_ldi_shader.is_linked());
-    }
-
-	// For the raw handle m_ldi_vbo a new buffer needs to be generated
-	glGenBuffers(1, &m_ldi_vbo);
-
     return m_ldi.is_valid();
 }
 
@@ -74,37 +73,21 @@ void FastPointCloudRenderer::resize(unsigned int w, unsigned int h)
     // TODO resize ldi;
 }
 
-void FastPointCloudRenderer::init_frame(cgv::render::context &) {
-	const auto ldi_data = m_ldi.interleave_data();
-
-	// Ensure that ldi data is present and a valid buffer handle was generated
-	if (!ldi_data.empty() && m_ldi_vbo != 0)
-	{
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ldi_vbo);
-		glBufferData(
-			GL_ELEMENT_ARRAY_BUFFER,
-			ldi_data.size() * sizeof(LayeredDepthImage::buffer_type::value_type),
-			ldi_data.data(),
-			GL_STREAM_DRAW);
-	}
-}
+void FastPointCloudRenderer::init_frame(cgv::render::context &ctx) {}
 
 void FastPointCloudRenderer::draw(cgv::render::context & ctx) {
-    assert(m_ldi_shader.is_linked());
-    m_ldi_shader.enable(ctx);
-
 	// Determine the translational distance between both the current cgv viewer
 	// eye position and the projective center of the LDI
-    vec3 const center_distance;
+    /*vec3 const center_distance;
     {
 		auto view = find_view_as_node();
 		assert(view);
 
         const_cast<vec3 &>(center_distance) =
 			m_ldi.get_camera().get_projective_origin() - view->get_eye();
-    }
+    }*/
 
-    {
+    /*{
         bool uniform_assignment_successful{true};
 
         uniform_assignment_successful
@@ -133,14 +116,7 @@ void FastPointCloudRenderer::draw(cgv::render::context & ctx) {
         assert(uniform_assignment_successful);
 		if (!uniform_assignment_successful)
 			std::terminate();
-    }
-
-	if (0 != m_ldi_vbo)
-	{
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ldi_vbo);
-		glDrawArrays(GL_POINTS, 0, m_ldi.point_count());
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	}
+    }*/
 
     /*// Draw only if data is present
     if (m_vbo_ldi_data.is_created()) {
@@ -152,7 +128,23 @@ void FastPointCloudRenderer::draw(cgv::render::context & ctx) {
         glDrawArrays(GL_POINTS, 0, m_ldi.point_count());
     }*/
 
-    m_ldi_shader.disable(ctx);
+	auto const view_ptr = find_view_as_node();
+	assert(view_ptr);
+	auto & p_renderer = cgv::render::ref_point_renderer(ctx);
+
+	p_renderer.set_reference_point_size(0.005f);
+	p_renderer.set_y_view_angle(float(view_ptr->get_y_view_angle()));
+	p_renderer.set_attribute_array_manager(ctx, &m_p_manager);
+	// TODO ? For now no group rendering is needed ...
+
+	// TODO test if upload is necessary
+	upload_data(ctx);
+
+	p_renderer.validate_and_enable(ctx);
+	// TODO separate drawing method?
+	// TODO check if sorted points are needed?
+	glDrawArrays(GL_POINTS, 0, 1);
+	p_renderer.disable(ctx);
 }
 
 void FastPointCloudRenderer::finish_draw(cgv::render::context &ctx)
@@ -195,20 +187,7 @@ void FastPointCloudRenderer::finish_draw(cgv::render::context &ctx)
         if (interleaved_buffer.empty())
             return;
 
-        if (m_vbo_ldi_data.is_created()) {
-            auto const success = m_vbo_ldi_data
-                                     .replace(ctx,
-                                              0,
-                                              interleaved_buffer.data(),
-                                              interleaved_buffer.size());
-            assert(success);
-        } else {
-            auto const success = m_vbo_ldi_data
-                                     .create(ctx,
-                                             interleaved_buffer.data(),
-                                             interleaved_buffer.size());
-            assert(success);
-        }
+        // upload the points?
     }
 
     // TODO scan over point density image and determine new query
@@ -220,7 +199,10 @@ void FastPointCloudRenderer::finish_frame(cgv::render::context &) {}
 
 void FastPointCloudRenderer::after_finish(cgv::render::context &) {}
 
-void FastPointCloudRenderer::clear(cgv::render::context &) {}
+void FastPointCloudRenderer::clear(cgv::render::context & ctx) {
+	// After destruction, our reference of the point renderer will not be used
+	cgv::render::ref_point_renderer(ctx, -1);
+}
 
 void FastPointCloudRenderer::create_gui()
 {
@@ -288,6 +270,24 @@ render_types::mat4 FastPointCloudRenderer::compute_projection(
                                      100.F);
 
     return P;
+}
+
+void FastPointCloudRenderer::upload_data(cgv::render::context &ctx) const
+{
+	//const auto ldi_data = m_ldi.interleave_data();
+	decltype(m_ldi.interleave_data()) const ldi_data = { 1,1,1,1,1,1 };
+
+	auto & p_renderer = cgv::render::ref_point_renderer(ctx);
+	p_renderer.set_position_array(
+		ctx,
+		ldi_data.data(),
+		ldi_data.size() / LayeredDepthImage::stride,
+		LayeredDepthImage::bytes_per_point);
+	p_renderer.set_color_array(
+		ctx,
+		ldi_data.data() + LayeredDepthImage::color_offset,
+		ldi_data.size() / LayeredDepthImage::stride,
+		LayeredDepthImage::bytes_per_point);
 }
 
 void FastPointCloudRenderer::open_point_data(const std::string &filename)

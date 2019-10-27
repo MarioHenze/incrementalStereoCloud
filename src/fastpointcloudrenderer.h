@@ -14,6 +14,7 @@
 #include <cgv/render/vertex_buffer.h>
 
 #include <cgv_gl/renderer.h>
+#include <cgv_gl/point_renderer.h>
 #include <cgv_gl/gl/gl.h>
 
 #include "pointcloudsource.h"
@@ -70,6 +71,11 @@ public:
     bool self_reflect(cgv::reflect::reflection_handler& srh) override;
 
 private:
+	cgv::render::attribute_array_manager m_p_manager;
+
+	//! Signal if the VBO buffer of the point renderer should be updated
+	std::atomic_bool m_vbo_out_of_date{ true };
+
     /**
      * @brief compute_model_view computes a model view transformation for the
      * current view
@@ -84,18 +90,17 @@ private:
      */
 	[[nodiscard]] mat4 compute_projection(const float aspect) const;
 
+	/**
+	@brief uploads the interleaved point data from the LDI to the GPU
+	*/
+	void upload_data(cgv::render::context& ctx) const;
+
     //! The LDI with possibly a representative subset of all points
     LayeredDepthImage m_ldi;
 
     //! The Point source, which will be used to fill areas in the LDI with
     //! insufficient density of points
     std::shared_ptr<PointCloudSource> m_point_source;
-
-    //! The shader program to render the LDI
-    cgv::render::shader_program m_ldi_shader{true};
-
-    //! The VBO containing all point positions and colors of the LDI
-    cgv::render::vertex_buffer m_vbo_ldi_data;
 
     //! Represent the current query on the point cloud source
     std::shared_ptr<PointCloudQuery> m_current_query;
@@ -113,8 +118,6 @@ private:
      * point density in the LDI
      */
     std::thread m_hole_finder;
-
-	GLuint m_ldi_vbo;
 
     void open_point_data(std::string const & filename);
 };

@@ -70,6 +70,19 @@ private:
 	PinholeCameraModel m_camera;
 
 public:
+	//! In the interleaved data buffer the first 3 floats form the logical 
+	//! position
+	static constexpr size_t positional_components = 3;
+	static constexpr size_t position_offset = 0;
+
+	//! In the interleaved data buffer the next 3 floats form a logical RGB
+	//! color
+	static constexpr size_t color_components = 3;
+	static constexpr size_t color_offset = 3;
+
+	//! Every entry after the stride begins a new point
+	static constexpr size_t stride = positional_components + color_components;
+
 	using buffer_type = std::vector<float>;
 
 	/*
