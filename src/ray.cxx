@@ -15,6 +15,11 @@ bool point_t::operator>(const point_t other) const
     return depth > other.depth;
 }
 
+std::vector<point_t> const& Ray::underlying_data() const
+{
+	return m_points;
+}
+
 size_t Ray::point_count() const
 {
     return m_points.size();

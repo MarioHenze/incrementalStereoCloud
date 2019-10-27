@@ -140,6 +140,20 @@ public:
      */
     [[nodiscard]] buffer_type interleave_data() const;
 
+	/**
+	@brief position_data retrives the LDI points in world coordinates,
+	suitable for direct rendering in OpenGL
+	@return a raw float buffer with the x, y, z position of the LDI points
+	*/
+	[[nodiscard]] std::vector<vec3> position_data() const;
+
+	/**
+	@brief color_data retrives the LDI point colors, suitable for direct 
+	rendering in OpenGL
+	@return a raw float buffer with the r, g, b colors of the LDI points
+	*/
+	[[nodiscard]] std::vector<rgb> color_data() const;
+
     /**
      * @brief is_valid checks if the LDI configuration and data is valid
      * @return true if the LDI can be considered in working state, false

@@ -156,6 +156,44 @@ std::vector<float> LayeredDepthImage::interleave_data() const
     return data;
 }
 
+std::vector<vec3> LayeredDepthImage::position_data() const
+{
+	std::vector<vec3> buffer;
+
+	auto const to_world = cgv::math::inv(m_camera.get_projection());
+
+	for (size_t i = 0; i < m_layered_points.size(); ++i) {
+		auto const & ray = m_layered_points.at(i);
+		auto const location = to_coord(i);
+
+		for (auto const& point : ray.underlying_data()) {
+			vec4 window_pos(location.first, location.second, point.depth, 1);
+			auto const gpos = to_world * window_pos;
+
+			buffer.emplace_back(
+				gpos.x() / gpos.w(),
+				gpos.y() / gpos.w(),
+				gpos.z() / gpos.w()
+			);
+		}
+	}
+
+	return buffer;
+}
+
+std::vector<rgb> LayeredDepthImage::color_data() const
+{
+	std::vector<rgb> buffer;
+
+	for (const auto& ray : m_layered_points) {
+		for (const auto& point : ray.underlying_data()) {
+			buffer.emplace_back(point.color);
+		}
+	}
+
+	return buffer;
+}
+
 bool LayeredDepthImage::is_valid() const
 {
     // TODO can the data also be validated?

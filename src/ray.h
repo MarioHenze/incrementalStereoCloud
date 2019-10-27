@@ -41,6 +41,11 @@ public:
 
     Ray() = default;
 
+	/**
+	@brief underlying_data retrieves a reference to the underlying data
+	*/
+	std::vector<point_t> const& underlying_data() const;
+
     /**
      * @brief point_count retrieves how many points are on the ray
      * @return the count of points on the ray

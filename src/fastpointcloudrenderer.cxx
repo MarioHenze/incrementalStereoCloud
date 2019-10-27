@@ -137,13 +137,10 @@ void FastPointCloudRenderer::draw(cgv::render::context & ctx) {
 	p_renderer.set_attribute_array_manager(ctx, &m_p_manager);
 	// TODO ? For now no group rendering is needed ...
 
-	// TODO test if upload is necessary
-	auto const point_count = upload_data(ctx);
-
 	p_renderer.validate_and_enable(ctx);
 	// TODO separate drawing method?
 	// TODO check if sorted points are needed?
-	glDrawArrays(GL_POINTS, 0, point_count);
+	glDrawArrays(GL_POINTS, 0, m_uploaded_point_count);
 	p_renderer.disable(ctx);
 }
 
@@ -181,12 +178,7 @@ void FastPointCloudRenderer::finish_draw(cgv::render::context &ctx)
 
         m_ldi.add_transformed_points(positions, colors);
 
-        auto const interleaved_buffer = m_ldi.interleave_data();
-
-        if (interleaved_buffer.empty())
-            return;
-
-        // upload the points?
+		upload_data(ctx);
     }
 
     // TODO scan over point density image and determine new query
@@ -271,22 +263,17 @@ render_types::mat4 FastPointCloudRenderer::compute_projection(
     return P;
 }
 
-size_t FastPointCloudRenderer::upload_data(cgv::render::context &ctx) const
+void FastPointCloudRenderer::upload_data(cgv::render::context &ctx)
 {
 	const auto ldi_data = m_ldi.interleave_data();
 	//decltype(m_ldi.interleave_data()) const ldi_data = { 1,1,1,1,1,1 };
 
+	const auto positional_data = m_ldi.position_data();
+	const auto color_data = m_ldi.color_data();
+
 	auto& p_renderer = cgv::render::ref_point_renderer(ctx);
-	p_renderer.set_position_array(
-		ctx,
-		ldi_data.data(),
-		ldi_data.size() / LayeredDepthImage::stride,
-		LayeredDepthImage::bytes_per_point);
-	p_renderer.set_color_array(
-		ctx,
-		ldi_data.data() + LayeredDepthImage::color_offset,
-		ldi_data.size() / LayeredDepthImage::stride,
-		LayeredDepthImage::bytes_per_point);
+	p_renderer.set_position_array(ctx, positional_data);
+	p_renderer.set_color_array(ctx, color_data);
 
 	// As the data in the interleaved buffer are raw floats, but the entity count
 	// groups several floats logically, we need to check that the buffer contains
@@ -294,7 +281,7 @@ size_t FastPointCloudRenderer::upload_data(cgv::render::context &ctx) const
 	assert(!(ldi_data.size() % (
 		LayeredDepthImage::positional_components +
 		LayeredDepthImage::color_components)));
-	return ldi_data.size() / (
+	m_uploaded_point_count = ldi_data.size() / (
 		LayeredDepthImage::positional_components +
 		LayeredDepthImage::color_components);
 }
