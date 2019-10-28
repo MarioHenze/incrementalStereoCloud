@@ -134,7 +134,7 @@ std::vector<float> LayeredDepthImage::interleave_data() const
     std::vector<float> data;
 
     for(size_t i = 0; i < m_layered_points.size(); ++i) {
-        auto const ray = m_layered_points.at(i);
+        auto const & ray = m_layered_points[i];
 
         if (ray.point_count() == 0)
             continue;
@@ -163,7 +163,7 @@ std::vector<vec3> LayeredDepthImage::position_data() const
 	auto const to_world = cgv::math::inv(m_camera.get_projection());
 
 	for (size_t i = 0; i < m_layered_points.size(); ++i) {
-		auto const & ray = m_layered_points.at(i);
+		auto const & ray = m_layered_points[i];
 		auto const location = to_coord(i);
 
 		for (auto const& point : ray.underlying_data()) {
@@ -225,11 +225,12 @@ size_t LayeredDepthImage::to_index(const int x, const int y) const
 
 std::pair<size_t, size_t> LayeredDepthImage::to_coord(const size_t index) const
 {
+	auto const resolution = m_camera.get_resolution();
     assert(index <=
-           m_camera.get_resolution().first *
-           m_camera.get_resolution().second);
-    return {index % m_camera.get_resolution().first,
-            index / m_camera.get_resolution().second};
+           resolution.first *
+           resolution.second);
+    return {index % resolution.first,
+            index / resolution.second};
 }
 
 size_t LayeredDepthImage::count_points() const
