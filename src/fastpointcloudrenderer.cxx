@@ -271,6 +271,14 @@ void FastPointCloudRenderer::upload_data(cgv::render::context &ctx)
 	const auto positional_data = m_ldi.position_data();
 	const auto color_data = m_ldi.color_data();
 
+	// If no data is in the LDI, a VBO update is not necessary
+	if (positional_data.empty || color_data.empty()) {
+#ifdef DEBUG
+		std::err << "LDI was empty?!";
+#endif // DEBUG
+		return;
+	}
+
 	auto& p_renderer = cgv::render::ref_point_renderer(ctx);
 	p_renderer.set_position_array(ctx, positional_data);
 	p_renderer.set_color_array(ctx, color_data);
