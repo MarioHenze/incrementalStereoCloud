@@ -161,7 +161,7 @@ void FastPointCloudRenderer::finish_draw(cgv::render::context &ctx)
 
         assert(!positions.empty());
         assert(!colors.empty());
-
+		assert(positions.size() == colors.size());
 
 		// The points of the query are in world coordinates. We need to
 		// transform them into LDI window coordinates.

@@ -71,7 +71,7 @@ void PointCloudQuery::consume_points(
         // When time budget is depleted, abort copying
         if (std::chrono::high_resolution_clock::now() - begin_time
             >= time_budget)
-            break;
+            return;
     }
 
     /*
