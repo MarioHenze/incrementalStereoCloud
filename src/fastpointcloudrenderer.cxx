@@ -272,7 +272,7 @@ void FastPointCloudRenderer::upload_data(cgv::render::context &ctx)
 	const auto color_data = m_ldi.color_data();
 
 	// If no data is in the LDI, a VBO update is not necessary
-	if (positional_data.empty || color_data.empty()) {
+	if (positional_data.empty() || color_data.empty()) {
 #ifdef DEBUG
 		std::err << "LDI was empty?!";
 #endif // DEBUG
