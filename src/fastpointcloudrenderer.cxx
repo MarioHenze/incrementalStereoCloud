@@ -85,58 +85,6 @@ void FastPointCloudRenderer::resize(unsigned int w, unsigned int h)
 void FastPointCloudRenderer::init_frame(cgv::render::context &ctx) {}
 
 void FastPointCloudRenderer::draw(cgv::render::context & ctx) {
-	// Determine the translational distance between both the current cgv viewer
-	// eye position and the projective center of the LDI
-    /*vec3 const center_distance;
-    {
-		auto view = find_view_as_node();
-		assert(view);
-
-        const_cast<vec3 &>(center_distance) =
-			m_ldi.get_camera().get_projective_origin() - view->get_eye();
-    }*/
-
-    /*{
-        bool uniform_assignment_successful{true};
-
-        uniform_assignment_successful
-            = uniform_assignment_successful
-              && m_ldi_shader.set_uniform(ctx,
-                                          "SOURCE_LDI_P",
-                                          m_ldi.get_camera().get_projection(),
-                                          true);
-		assert(uniform_assignment_successful);
-
-		const mat4 inv_target_ldi_p = cgv::math::inv(ctx.get_window_matrix());
-
-        uniform_assignment_successful
-            = uniform_assignment_successful
-              && m_ldi_shader.set_uniform(ctx,
-                                          "INV_TARGET_LDI_P",
-                                          inv_target_ldi_p,
-                                          true);
-		assert(uniform_assignment_successful);
-        uniform_assignment_successful = uniform_assignment_successful
-                                        && m_ldi_shader
-                                               .set_uniform(ctx,
-                                                            "CENTER_DISTANCE",
-                                                            center_distance,
-                                                            true);
-        assert(uniform_assignment_successful);
-		if (!uniform_assignment_successful)
-			std::terminate();
-    }*/
-
-    /*// Draw only if data is present
-    if (m_vbo_ldi_data.is_created()) {
-        GLuint vbo_handle{0};
-        m_vbo_ldi_data.put_id(vbo_handle);
-        glBindBuffer(GL_ARRAY_BUFFER,
-                     vbo_handle);
-
-        glDrawArrays(GL_POINTS, 0, m_ldi.point_count());
-    }*/
-
 	auto const view_ptr = find_view_as_node();
 	assert(view_ptr);
 	auto & p_renderer = cgv::render::ref_point_renderer(ctx);
