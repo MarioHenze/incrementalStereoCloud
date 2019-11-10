@@ -106,9 +106,12 @@ public:
 
     explicit LayeredDepthImage(const PinholeCameraModel& pcm);
 
-    void warp_reference_into(const PinholeCameraModel &pcm,
-                             const std::vector<rgb> &color,
-                             const std::vector<float>& depth);
+
+	/**
+	@brief warp_reference_into warps another LDI into the current LDI frame
+	@param ldi is the LDI which should be merged into the current LDI
+	*/
+    void warp_reference_into(const LayeredDepthImage& ldi);
 
     /**
      * @brief add_global_points inserts the given points into the LDI

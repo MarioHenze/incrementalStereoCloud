@@ -78,8 +78,7 @@ void FastPointCloudRenderer::resize(unsigned int w, unsigned int h)
 	auto new_ldi = std::make_shared<LayeredDepthImage>(
 		PinholeCameraModel(model_view_mat, win_mat, resolution));
 
-	// TODO Refactor warp reference into
-	new_ldi->warp_reference_into();
+	new_ldi->warp_reference_into(*m_ldi.get());
 
 }
 

@@ -19,20 +19,48 @@ LayeredDepthImage::LayeredDepthImage(const PinholeCameraModel &pcm)
 
 }
 
-void LayeredDepthImage::warp_reference_into(PinholeCameraModel const &pcm,
-                                            const std::vector<rgb> &color,
-                                            const std::vector<float>& depth)
+void LayeredDepthImage::warp_reference_into(const LayeredDepthImage& ldi)
 {
-    {
-        size_t pixel_count = pcm.get_resolution().first
-                             * pcm.get_resolution().second;
-        assert(pcm.is_valid());
-        assert(color.size() == pixel_count);
-        assert(depth.size() == pixel_count);
-    }
+	// Determine the arguments for the morphing equation
+	auto const other_perspective = ldi.get_camera().get_projection();
+	auto const this_perspective = get_camera().get_projection();
+	auto const other_origin = ldi.get_camera().get_projective_origin();
 
+	// Retrieve data buffers from other LDI for easy access
+	auto const other_points = ldi.position_data();
+	auto const other_color = ldi.color_data();
+	assert(other_points.size() == other_color.size());
 
-    // TODO McMillan morph
+	for (size_t i = 0; i < other_points.size(); i++)
+	{
+		auto const morphed_point = morphing_equation(
+			other_perspective,
+			this_perspective,
+			other_origin,
+			other_points[i]);
+		
+		// If the morphed point is outside of our target camera, skip further
+		// computations
+		auto const resolution = get_camera().get_resolution();
+		if (
+			morphed_point.x() < 0.f ||
+			morphed_point.y() < 0.f ||
+			morphed_point.x() >= resolution.first ||
+			morphed_point.y() >= resolution.second)
+			continue;
+		else
+		{
+			point_t const new_point =
+			{
+				other_color[i],
+				morphed_point.z()
+			};
+			m_layered_points[to_index(morphed_point.x(), morphed_point.y())].insert(
+				new_point
+			);
+		}
+
+	}
 }
 
 void LayeredDepthImage::add_global_points(const std::vector<float> &points,
