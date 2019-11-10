@@ -310,3 +310,6 @@ TSWLatexianTemp*
 
 # exclude built pdfs
 thesis/*.pdf
+
+# cmake generated launch config
+.vscode/launch.json

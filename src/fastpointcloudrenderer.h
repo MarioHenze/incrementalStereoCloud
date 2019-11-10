@@ -101,7 +101,7 @@ private:
 	size_t m_uploaded_point_count{ 0 };
 
     //! The LDI with possibly a representative subset of all points
-    LayeredDepthImage m_ldi;
+    std::shared_ptr<LayeredDepthImage> m_ldi;
 
     //! The Point source, which will be used to fill areas in the LDI with
     //! insufficient density of points

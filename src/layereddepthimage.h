@@ -65,9 +65,14 @@ private:
 	size_t m_point_count{ 0 };
 
 	/**
-	 * @brief m_camera holds configuration of projection details of the LDI
+	 @brief m_camera holds configuration of projection details of the LDI
+
+	 As all points are stored in an camera model relative way, a change of this
+	 results in the invalidation of the entire LDI. If a change of camera is
+	 necessary, a new LDI with updated camera needs to be created and the current
+	 LDI needs to be warped into.
 	 */
-	PinholeCameraModel m_camera;
+	PinholeCameraModel const m_camera;
 
 public:
 	//! In the interleaved data buffer the first 3 floats form the logical 

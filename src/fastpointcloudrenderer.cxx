@@ -1,6 +1,7 @@
 #include "fastpointcloudrenderer.h"
 
 #include <cassert>
+#include <memory>
 #include <optional>
 
 #include <utility>
@@ -61,16 +62,25 @@ bool FastPointCloudRenderer::init(cgv::render::context &ctx)
     const std::pair<size_t, size_t> resolution(ctx.get_width(), ctx.get_height());
     const PinholeCameraModel view_pcm(model_view_mat, win_mat, resolution);
 
-    m_ldi = LayeredDepthImage(view_pcm);
+    m_ldi = std::make_shared<LayeredDepthImage>(view_pcm);
 
-    return m_ldi.is_valid();
+    return m_ldi->is_valid();
 }
 
 void FastPointCloudRenderer::resize(unsigned int w, unsigned int h)
 {
     std::pair<size_t, size_t> resolution(w, h);
 
-    // TODO resize ldi;
+	auto const * const ctx = get_context();
+	auto const model_view_mat = ctx->get_modelview_matrix();
+	auto const win_mat = ctx->get_window_matrix();
+
+	auto new_ldi = std::make_shared<LayeredDepthImage>(
+		PinholeCameraModel(model_view_mat, win_mat, resolution));
+
+	// TODO Refactor warp reference into
+	new_ldi->warp_reference_into();
+
 }
 
 void FastPointCloudRenderer::init_frame(cgv::render::context &ctx) {}
@@ -176,7 +186,7 @@ void FastPointCloudRenderer::finish_draw(cgv::render::context &ctx)
 				return vec3(p.x(), p.y(), p.z());
 			});
 
-        m_ldi.add_transformed_points(positions, colors);
+        m_ldi->add_transformed_points(positions, colors);
 
 		upload_data(ctx);
     }
@@ -265,11 +275,11 @@ render_types::mat4 FastPointCloudRenderer::compute_projection(
 
 void FastPointCloudRenderer::upload_data(cgv::render::context &ctx)
 {
-	const auto ldi_data = m_ldi.interleave_data();
+	const auto ldi_data = m_ldi->interleave_data();
 	//decltype(m_ldi.interleave_data()) const ldi_data = { 1,1,1,1,1,1 };
 
-	const auto positional_data = m_ldi.position_data();
-	const auto color_data = m_ldi.color_data();
+	const auto positional_data = m_ldi->position_data();
+	const auto color_data = m_ldi->color_data();
 
 	// If no data is in the LDI, a VBO update is not necessary
 	if (positional_data.empty() || color_data.empty()) {
