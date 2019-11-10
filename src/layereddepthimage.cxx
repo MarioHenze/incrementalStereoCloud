@@ -19,6 +19,27 @@ LayeredDepthImage::LayeredDepthImage(const PinholeCameraModel &pcm)
 
 }
 
+cgv::math::mat<int> LayeredDepthImage::get_density() const
+{
+	assert(is_valid());
+
+	auto const width = m_camera.get_resolution().first;
+	auto const height = m_camera.get_resolution().second;
+	assert(width * height == m_layered_points.size());
+
+	cgv::math::mat<int> density(height, width);
+
+	
+	for (int i = 0; i < m_layered_points.size(); ++i)
+	{
+		auto const coord = to_coord(i);
+		density(coord.second, coord.first) = 
+			m_layered_points[i].point_count();
+	}
+
+	return density;
+}
+
 void LayeredDepthImage::warp_reference_into(const LayeredDepthImage& ldi)
 {
 	// Determine the arguments for the morphing equation
@@ -257,8 +278,12 @@ std::pair<size_t, size_t> LayeredDepthImage::to_coord(const size_t index) const
     assert(index <=
            resolution.first *
            resolution.second);
-    return {index % resolution.first,
-            index / resolution.second};
+	std::pair<size_t, size_t> const coord{
+		index % resolution.first,
+		index / resolution.first };
+	assert(coord.first < resolution.first);
+	assert(coord.second < resolution.second);
+	return coord;
 }
 
 size_t LayeredDepthImage::count_points() const

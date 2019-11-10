@@ -102,6 +102,7 @@ private:
 
     //! The LDI with possibly a representative subset of all points
     std::shared_ptr<LayeredDepthImage> m_ldi;
+	std::recursive_mutex m_ldi_mutex;
 
     //! The Point source, which will be used to fill areas in the LDI with
     //! insufficient density of points

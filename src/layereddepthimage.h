@@ -5,6 +5,7 @@
 #include <utility>
 #include <vector>
 
+#include <cgv/math/mat.h>
 #include <cgv/render/render_types.h>
 
 #include "pinholecameramodel.h"
@@ -106,6 +107,11 @@ public:
 
     explicit LayeredDepthImage(const PinholeCameraModel& pcm);
 
+	/**
+	@brief get_density returns an image with the amount of points on every 
+	pixel of the LDI
+	*/
+	cgv::math::mat<int> get_density() const;
 
 	/**
 	@brief warp_reference_into warps another LDI into the current LDI frame

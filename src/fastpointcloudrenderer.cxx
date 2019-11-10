@@ -41,7 +41,6 @@ bool FastPointCloudRenderer::init(cgv::render::context &ctx)
 
     // Define what the query worker and hole finder threads will do
     m_query_worker = std::thread([this] {
-        // TODO know when to stop
         while (!m_destructor_called) {
             if (!m_point_source)
                 continue;
@@ -50,7 +49,21 @@ bool FastPointCloudRenderer::init(cgv::render::context &ctx)
         }
     });
 
-    //m_hole_finder = std::thread([] {});
+    m_hole_finder = std::thread([this] {
+		while (!m_destructor_called) {
+			if (!m_ldi || !m_point_source)
+				continue;
+			// Finding holes in the LDI requires exclusive access to the LDI
+			// Therefore use a copy of the current LDI
+			std::shared_ptr<LayeredDepthImage> copied_ldi;
+			{
+				std::scoped_lock lock{ m_ldi_mutex };
+				copied_ldi = std::make_shared<LayeredDepthImage>(*m_ldi.get());
+			}
+
+			auto const density_map = copied_ldi->get_density();
+		}
+	});
 
 	
     mat4 const model_view_mat = ctx.get_modelview_matrix();
@@ -62,6 +75,7 @@ bool FastPointCloudRenderer::init(cgv::render::context &ctx)
     const std::pair<size_t, size_t> resolution(ctx.get_width(), ctx.get_height());
     const PinholeCameraModel view_pcm(model_view_mat, win_mat, resolution);
 
+	std::scoped_lock lock{ m_ldi_mutex };
     m_ldi = std::make_shared<LayeredDepthImage>(view_pcm);
 
     return m_ldi->is_valid();
@@ -69,17 +83,22 @@ bool FastPointCloudRenderer::init(cgv::render::context &ctx)
 
 void FastPointCloudRenderer::resize(unsigned int w, unsigned int h)
 {
+
+	// Resize the LDI of this renderer to accomodate the new size
     std::pair<size_t, size_t> resolution(w, h);
 
 	auto const * const ctx = get_context();
 	auto const model_view_mat = ctx->get_modelview_matrix();
 	auto const win_mat = ctx->get_window_matrix();
 
-	auto new_ldi = std::make_shared<LayeredDepthImage>(
-		PinholeCameraModel(model_view_mat, win_mat, resolution));
+	PinholeCameraModel const pcm(model_view_mat, win_mat, resolution);
+	auto new_ldi = std::make_shared<LayeredDepthImage>(pcm);
+	// Emit a point query for the changed viewport to get new points on the
+	// edges of the frame
+	m_point_source->queryPoints(pcm);
 
+	std::scoped_lock lock{ m_ldi_mutex };
 	new_ldi->warp_reference_into(*m_ldi.get());
-
 }
 
 void FastPointCloudRenderer::init_frame(cgv::render::context &ctx) {}
@@ -133,6 +152,7 @@ void FastPointCloudRenderer::finish_draw(cgv::render::context &ctx)
 				return vec3(p.x(), p.y(), p.z());
 			});
 
+		std::scoped_lock lock{ m_ldi_mutex };
         m_ldi->add_transformed_points(positions, colors);
 
 		upload_data(ctx);
@@ -222,6 +242,8 @@ render_types::mat4 FastPointCloudRenderer::compute_projection(
 
 void FastPointCloudRenderer::upload_data(cgv::render::context &ctx)
 {
+	std::scoped_lock lock{ m_ldi_mutex };
+
 	const auto ldi_data = m_ldi->interleave_data();
 	//decltype(m_ldi.interleave_data()) const ldi_data = { 1,1,1,1,1,1 };
 
@@ -258,13 +280,8 @@ void FastPointCloudRenderer::open_point_data(const std::string &filename)
 #endif
 
     m_point_source = std::make_shared<PointCloudSource>(filename);
-    /*point_cloud pc;
-    pc.add_point({1,1,1});
-    m_point_source = std::make_shared<PointCloudSource>(pc);*/
+    
     assert(m_point_source);
-
-    // Initially grab all points of the cloud
-    m_point_source->queryPoints();
 }
 
 extern cgv::base::object_registration<FastPointCloudRenderer> fpcr("");

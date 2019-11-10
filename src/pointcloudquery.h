@@ -8,6 +8,8 @@
 
 #include <cgv/render/render_types.h>
 
+#include "pinholecameramodel.h"
+
 using vec3 = cgv::render::render_types::vec3;
 using rgb = cgv::render::render_types::rgb;
 
@@ -21,8 +23,10 @@ private:
     std::atomic_bool m_completed{false};
     std::atomic_bool m_consumed{false};
 
+	PinholeCameraModel const m_camera;
+
 public:
-    PointCloudQuery() = default;
+	PointCloudQuery(PinholeCameraModel const& pcm);
     ~PointCloudQuery();
 
     /**
@@ -38,6 +42,14 @@ public:
      * consumed, false otherwise
      */
     [[nodiscard]] bool is_consumed() const;
+
+	/**
+	@brief get_camera retrieves the camera model for the query
+
+	As the camera model implicitly defines a view frustum the camera model can
+	be used to clip the points outside of this query.
+	*/
+	[[nodiscard]] PinholeCameraModel get_camera() const;
 
     /**
      * @brief trigger_completion marks this query as completed.

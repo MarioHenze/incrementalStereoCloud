@@ -82,7 +82,8 @@ public:
      */
     std::optional<std::shared_ptr<PointCloudQuery>> get_finished_query();
 
-    void queryPoints(
+	void queryPoints(
+		PinholeCameraModel const& pcm,
         std::chrono::microseconds const time_budget = std::chrono::microseconds(
             1000));
 

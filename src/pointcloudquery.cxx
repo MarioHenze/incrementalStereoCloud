@@ -8,6 +8,11 @@
 #include <mutex>
 #include <queue>
 
+PointCloudQuery::PointCloudQuery(PinholeCameraModel const& pcm) :
+	m_camera(pcm)
+{
+}
+
 PointCloudQuery::~PointCloudQuery()
 {
     if (!m_completed || !m_consumed)
@@ -23,6 +28,11 @@ bool PointCloudQuery::is_complete() const
 bool PointCloudQuery::is_consumed() const
 {
     return m_consumed;
+}
+
+PinholeCameraModel PointCloudQuery::get_camera() const
+{
+	return m_camera;
 }
 
 void PointCloudQuery::trigger_completion()

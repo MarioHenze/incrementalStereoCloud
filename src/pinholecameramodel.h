@@ -12,8 +12,6 @@ using vec4 = cgv::render::render_types::vec4;
 class PinholeCameraModel
 {
 public:
-    PinholeCameraModel() = default;
-
     PinholeCameraModel(mat4 view,
                        mat4 projection,
                        std::pair<size_t, size_t> m_resolution);

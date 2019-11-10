@@ -61,23 +61,35 @@ void PointCloudSource::compute_queries()
 
     std::vector<vec3> points;
     // When no color is present in the data, use white points
-    std::vector<rgb> colors
-        = m_point_cloud.has_colors()
-              ? std::vector<rgb>()
-              : std::vector<rgb>(m_point_cloud.get_nr_points(), rgb(1.F));
+    std::vector<rgb> colors;
 
     //TODO get a narrow pinhole camera for query and get points
+	auto const camera = m_pending_queries.front()->get_camera();
+	auto const projection = camera.get_projection();
+
     assert(std::numeric_limits<int>::max() >= m_point_cloud.get_nr_points());
     const int point_count = static_cast<int>(m_point_cloud.get_nr_points());
 
     for (int i = 0; i < point_count; ++i) {
-        points.push_back(m_point_cloud.pnt(i));
-    }
+		auto const & point = m_point_cloud.pnt(i);
+		
+		auto transformed_point = projection * point.lift();
+		transformed_point /= transformed_point.w();
 
-    if (m_point_cloud.has_colors())
-        for (int i = 0; i < point_count; ++i) {
-            colors.push_back(m_point_cloud.clr(i));
-        }
+		// Skip all points outside of the LDIs view frustum
+		if (
+			transformed_point.x() < 0 ||
+			transformed_point.y() < 0 ||
+			transformed_point.x() > camera.get_resolution().first ||
+			transformed_point.y() > camera.get_resolution().second)
+			continue;
+
+        points.push_back(point);
+		colors.push_back(
+			m_point_cloud.has_colors() ?
+			m_point_cloud.clr(i) :
+			rgb(1.f));
+    }
 
     m_pending_queries.front()->supply_points(points, colors);
     m_pending_queries.front()->trigger_completion();
@@ -122,7 +134,9 @@ PointCloudSource::get_finished_query()
     return ret;
 }
 
-void PointCloudSource::queryPoints(const std::chrono::microseconds time_budget)
+void PointCloudSource::queryPoints(
+	PinholeCameraModel const& pcm,
+	const std::chrono::microseconds time_budget)
 {
     constexpr size_t lock_count = 1;
     std::chrono::microseconds time_slice(time_budget / lock_count);
@@ -132,7 +146,7 @@ void PointCloudSource::queryPoints(const std::chrono::microseconds time_budget)
         return;
 
     std::shared_ptr<PointCloudQuery> new_query =
-            std::make_shared<PointCloudQuery>();
+            std::make_shared<PointCloudQuery>(pcm);
     m_pending_queries.push_back(new_query);
     m_queries_present.notify_one();
 }
