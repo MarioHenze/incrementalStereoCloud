@@ -28,7 +28,6 @@ cgv::math::mat<int> LayeredDepthImage::get_density() const
 	assert(width * height == m_layered_points.size());
 
 	cgv::math::mat<int> density(height, width);
-
 	
 	for (int i = 0; i < m_layered_points.size(); ++i)
 	{

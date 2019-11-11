@@ -12,7 +12,7 @@ bool PointCloudSource::unprocessed_present() const
         = std::find_if(m_pending_queries.cbegin(),
                        m_pending_queries.cend(),
                        [](decltype(m_pending_queries)::value_type const &query) {
-                           return query->is_complete();
+                           return !query->is_complete();
                        });
     return (first_uncomplete != m_pending_queries.cend());
 }
@@ -47,7 +47,7 @@ void PointCloudSource::compute_queries()
     // Wait for new queries and guard against spurious wakeups
     auto const was_in_time
         = m_queries_present.wait_for(queue_lock,
-                                     std::chrono::seconds(1),
+                                     std::chrono::seconds(10),
                                      [this] { return unprocessed_present(); });
 
     if (!was_in_time)
@@ -63,8 +63,15 @@ void PointCloudSource::compute_queries()
     // When no color is present in the data, use white points
     std::vector<rgb> colors;
 
-    //TODO get a narrow pinhole camera for query and get points
-	auto const camera = m_pending_queries.front()->get_camera();
+	auto const first_uncomplete = std::find_if(
+		m_pending_queries.cbegin(),
+		m_pending_queries.cend(),
+		[](decltype(m_pending_queries)::value_type const& query) {
+			return !query->is_complete();
+		});
+	assert(first_uncomplete != m_pending_queries.cend());
+
+	auto const camera = (*first_uncomplete)->get_camera();
 	auto const projection = camera.get_projection();
 
     assert(std::numeric_limits<int>::max() >= m_point_cloud.get_nr_points());
@@ -91,8 +98,8 @@ void PointCloudSource::compute_queries()
 			rgb(1.f));
     }
 
-    m_pending_queries.front()->supply_points(points, colors);
-    m_pending_queries.front()->trigger_completion();
+	(*first_uncomplete)->supply_points(points, colors);
+	(*first_uncomplete)->trigger_completion();
 }
 
 void PointCloudSource::remove_consumed_queries()
@@ -102,7 +109,7 @@ void PointCloudSource::remove_consumed_queries()
     // Wait for new queries and guard against spurious wakeups
     auto const was_in_time
         = m_queries_present.wait_for(queue_lock,
-                                     std::chrono::seconds(1),
+                                     std::chrono::seconds(10),
                                      [this] { return consumed_present(); });
 
     if (!was_in_time)
