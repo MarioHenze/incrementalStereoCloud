@@ -122,7 +122,7 @@ void LayeredDepthImage::add_global_points(const std::vector<float> &points,
     for (size_t i = 0; i < (points.size() / 3); i++) {
         // the given points are in global space and need to be transformed into
         // the clip space of the LDI camera
-        vec4 point = m_camera.get_projection()
+        vec4 point = m_camera.get_projection() * m_camera.get_view()
                      * vec3(points.at(3 * i),
                             points.at(3 * i + 1),
                             points.at(3 * i + 2))
@@ -208,7 +208,8 @@ std::vector<vec3> LayeredDepthImage::position_data() const
 {
 	std::vector<vec3> buffer;
 
-	auto const to_world = cgv::math::inv(m_camera.get_projection());
+	auto const to_world = cgv::math::inv(
+		m_camera.get_projection() * m_camera.get_view());
 
 	for (size_t i = 0; i < m_layered_points.size(); ++i) {
 		auto const & ray = m_layered_points[i];

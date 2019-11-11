@@ -21,7 +21,7 @@ mat4 PinholeCameraModel::get_view() const
 
 vec3 PinholeCameraModel::get_projective_origin() const
 {
-    auto const translation = get_projection().col(3);
+    auto const translation = get_view().col(3);
     const_cast<vec4 &>(translation) /= translation.w();
     return vec3(translation.x(), translation.y(), translation.z());
 }

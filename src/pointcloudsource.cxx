@@ -47,7 +47,7 @@ void PointCloudSource::compute_queries()
     // Wait for new queries and guard against spurious wakeups
     auto const was_in_time
         = m_queries_present.wait_for(queue_lock,
-                                     std::chrono::seconds(10),
+                                     std::chrono::seconds(1),
                                      [this] { return unprocessed_present(); });
 
     if (!was_in_time)
@@ -73,6 +73,7 @@ void PointCloudSource::compute_queries()
 
 	auto const camera = (*first_uncomplete)->get_camera();
 	auto const projection = camera.get_projection();
+	auto const view = camera.get_view();
 
     assert(std::numeric_limits<int>::max() >= m_point_cloud.get_nr_points());
     const int point_count = static_cast<int>(m_point_cloud.get_nr_points());
@@ -80,7 +81,7 @@ void PointCloudSource::compute_queries()
     for (int i = 0; i < point_count; ++i) {
 		auto const & point = m_point_cloud.pnt(i);
 		
-		auto transformed_point = projection * point.lift();
+		auto transformed_point = projection * view * point.lift();
 		transformed_point /= transformed_point.w();
 
 		// Skip all points outside of the LDIs view frustum
@@ -109,7 +110,7 @@ void PointCloudSource::remove_consumed_queries()
     // Wait for new queries and guard against spurious wakeups
     auto const was_in_time
         = m_queries_present.wait_for(queue_lock,
-                                     std::chrono::seconds(10),
+                                     std::chrono::seconds(1),
                                      [this] { return consumed_present(); });
 
     if (!was_in_time)
