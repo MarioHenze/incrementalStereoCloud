@@ -14,7 +14,7 @@ bool PointCloudSource::unprocessed_present() const
                        [](decltype(m_pending_queries)::value_type const &query) {
                            return query->is_complete();
                        });
-    return (first_uncomplete == m_pending_queries.cend());
+    return (first_uncomplete != m_pending_queries.cend());
 }
 
 bool PointCloudSource::consumed_present() const
@@ -28,7 +28,7 @@ bool PointCloudSource::consumed_present() const
                        [](decltype(m_pending_queries)::value_type const &query) {
                            return query->is_consumed();
                        });
-    return (first_consumed == m_pending_queries.cend());
+    return (first_consumed != m_pending_queries.cend());
 }
 
 PointCloudSource::PointCloudSource(const std::string &filepath)
@@ -103,7 +103,7 @@ void PointCloudSource::remove_consumed_queries()
     auto const was_in_time
         = m_queries_present.wait_for(queue_lock,
                                      std::chrono::seconds(1),
-                                     [this] { return unprocessed_present(); });
+                                     [this] { return consumed_present(); });
 
     if (!was_in_time)
         // Timeout

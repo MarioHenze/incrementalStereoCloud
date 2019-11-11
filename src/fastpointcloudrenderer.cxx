@@ -99,6 +99,7 @@ void FastPointCloudRenderer::resize(unsigned int w, unsigned int h)
 
 	std::scoped_lock lock{ m_ldi_mutex };
 	new_ldi->warp_reference_into(*m_ldi.get());
+	m_ldi = new_ldi;
 }
 
 void FastPointCloudRenderer::init_frame(cgv::render::context &ctx) {}
