@@ -136,6 +136,41 @@ nicht wesentlich höher als die direkte Speicherung aller Referenzbilder ist und
 auch die Rechenzeit im schlimmsten Fall gleich dem direkten Rendern aller
 Referenzbilder ist.
 
+\section{Plenoptic Modelling}
+
+Um neuartige Renderansätze zu entwicklen, ist es hilfreich diese in nach einer
+Top-Down Methodik zu entwickeln. Dafür bietet sich die plenoptische Modellierung
+an. Hierbei wird zunächst versucht, die Szene unabhängig von Beobachtern zu
+beschreiben. Adelson und Bergen definieren dafür in \cite{adelson1991plenoptic}
+die plenoptische Funktion wie folgt:
+
+\begin{equation}
+	P_7 = P(V_x, V_y, V_z, \theta, \Phi, \lambda, t)
+\end{equation}
+
+\begin{itemize}
+	\item[\( V_x, V_y, V_z \)] mögliche Position der Kamera
+	\item[\( \theta, \Phi\)] Winkel eines Sichtstrahls
+	\item[\( \lambda \)] Wellenlänge des Lichts
+	\item[\( t \)] Zeitpunkt der Beobachtung
+\end{itemize}
+
+Diese Form der Beschreibung ermöglicht es die Szene zu jedem Zeitpunkt an jeder
+Stelle und in jede Richtung zu samplen. Anhand dieses generellen Modells können
+nun Vereinfachungen vorgenommen werden.
+
+Es ist zunächst festzustellen, dass Punktwolkendaten in einem globalen
+Koordinatensystem gegeben sind. Beim Punktwolkenrendering gehen jedoch nur die
+sichtbaren Punkte in das Bild ein. Außerdem erfolgt die Kamerabewegung von HMDs
+ausschließlich kontinuierlich. Daraus folgt, dass sich die Untermengen alles
+sichtbaren Punkte zwischen zwei gerenderten Ansichten nahezu identisch sind.
+Ähnliche Annahmen liegen auch dem Modell der Layered Depth Images zugrunde.
+
+McMillan und Bishop ermöglichten in \cite{mcmillan1995plenoptic} unter
+Ausschluss von \(t\) und \(\lambda\) das plenoptische Modellieren. In diesem
+Kontext kann ein gewöhnliches Bild nun als unvollständige Abtastung der
+plenoptischen Funktion an einem festen Betrachtungspunkt aufgefasst werden.
+
 \section{Layered Depth Image}
 
 \begin{itemize}
