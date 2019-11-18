@@ -9,6 +9,8 @@ using mat4 = cgv::render::render_types::mat4;
 using vec3 = cgv::render::render_types::vec3;
 using vec4 = cgv::render::render_types::vec4;
 
+mat4 independant_viewport(float width, float height);
+
 class PinholeCameraModel
 {
 public:

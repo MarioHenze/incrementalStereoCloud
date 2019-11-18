@@ -1,6 +1,7 @@
 #include "pinholecameramodel.h"
 
 #include <cgv/math/det.h>
+#include <cgv/math/ftransform.h>
 
 #include <utility>
 
@@ -40,4 +41,26 @@ std::pair<size_t, size_t> PinholeCameraModel::get_resolution() const
 bool PinholeCameraModel::is_valid() const
 {
     return m_resolution.first > 0 && m_resolution.second > 0;
+}
+
+mat4 independant_viewport(float width, float height)
+{
+	// To convert independant from window position, a simple scaling
+	// transformation is sufficient.
+
+	//	w/2	0	0	w/2
+	//	0	h/2	0	h/2
+	//	0	0	1	0
+	//	0	0	0	1
+
+	auto const half_width = width / 2.f;
+	auto const half_height = height / 2.f;
+	mat4 ret = cgv::math::identity4<float>();
+
+	ret(0, 0) = half_width;
+	ret(0, 3) = half_width;
+	ret(1, 1) = half_height;
+	ret(1, 3) = half_height;
+
+	return ret;
 }
