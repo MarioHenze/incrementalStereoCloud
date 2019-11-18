@@ -70,10 +70,10 @@ bool FastPointCloudRenderer::init(cgv::render::context &ctx)
 
 	// The window matrix of the cgv viewer is exactly the LDI image plane
 	// transformation
-	auto const win_mat = ctx.get_window_matrix();
+	auto const proj_mat = ctx.get_projection_matrix();
 
     const std::pair<size_t, size_t> resolution(ctx.get_width(), ctx.get_height());
-    const PinholeCameraModel view_pcm(model_view_mat, win_mat, resolution);
+    const PinholeCameraModel view_pcm(model_view_mat, proj_mat, resolution);
 
 	std::scoped_lock lock{ m_ldi_mutex };
     m_ldi = std::make_shared<LayeredDepthImage>(view_pcm);
@@ -89,9 +89,9 @@ void FastPointCloudRenderer::resize(unsigned int w, unsigned int h)
 
 	auto const * const ctx = get_context();
 	auto const model_view_mat = ctx->get_modelview_matrix();
-	auto const win_mat = ctx->get_window_matrix();
+	auto const proj_mat = ctx->get_projection_matrix();
 
-	PinholeCameraModel const pcm(model_view_mat, win_mat, resolution);
+	PinholeCameraModel const pcm(model_view_mat, proj_mat, resolution);
 	auto new_ldi = std::make_shared<LayeredDepthImage>(pcm);
 	// Emit a point query for the changed viewport to get new points on the
 	// edges of the frame
@@ -140,14 +140,26 @@ void FastPointCloudRenderer::finish_draw(cgv::render::context &ctx)
         assert(!colors.empty());
 		assert(positions.size() == colors.size());
 
+		const mat4 transformation;
+		{
+			std::scoped_lock lock{ m_ldi_mutex };
+			auto const camera = m_ldi->get_camera();
+
+			const_cast<mat4&>(transformation) =
+				camera.get_sensor() *
+				camera.get_projection() *
+				camera.get_view();
+		}
+
 		// The points of the query are in world coordinates. We need to
 		// transform them into LDI window coordinates.
 		std::transform(positions.cbegin(),
 			positions.cend(),
 			positions.begin(),
-			[this, &ctx](decltype(positions)::value_type pos)
-			-> decltype(positions)::value_type{
-				const mat4 transformation {ctx.get_window_matrix()};
+			[&transformation]
+			(decltype(positions)::value_type pos)
+			-> decltype(positions)::value_type
+			{
 				auto p{transformation * pos.lift()};
 				p /= p.w();
 				return vec3(p.x(), p.y(), p.z());

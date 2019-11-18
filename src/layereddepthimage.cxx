@@ -209,7 +209,9 @@ std::vector<vec3> LayeredDepthImage::position_data() const
 	std::vector<vec3> buffer;
 
 	auto const to_world = cgv::math::inv(
-		m_camera.get_projection() * m_camera.get_view());
+		m_camera.get_sensor() *
+		m_camera.get_projection() * 
+		m_camera.get_view());
 
 	for (size_t i = 0; i < m_layered_points.size(); ++i) {
 		auto const & ray = m_layered_points[i];

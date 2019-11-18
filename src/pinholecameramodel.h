@@ -35,6 +35,17 @@ public:
      */
     [[nodiscard]] mat4 get_view() const;
 
+	/**
+	@brief get_sensor retrieves the matrix which transforms to the pixel 
+	location on the sensorplane of the LDI
+	@return a transformation matrix into the sensor/window plane
+
+	This sensor matrix is analogous to the last step in an conventional
+	rendering pipeline, where the normalized device coordinates get mapped
+	into the window pixel positions.
+	*/
+	[[nodiscard]] mat4 get_sensor() const;
+
     /**
      * @brief get_projective_origin retrieves the world location of the cameras
      * projective center

@@ -20,6 +20,12 @@ mat4 PinholeCameraModel::get_view() const
     return m_view;
 }
 
+mat4 PinholeCameraModel::get_sensor() const
+{
+	auto const resolution = get_resolution();
+	return independant_viewport(resolution.first, resolution.second);
+}
+
 vec3 PinholeCameraModel::get_projective_origin() const
 {
     auto const translation = get_view().col(3);
