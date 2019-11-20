@@ -66,7 +66,9 @@ void LayeredDepthImage::warp_reference_into(const LayeredDepthImage& ldi)
 			morphed_point.x() < 0.f ||
 			morphed_point.y() < 0.f ||
 			morphed_point.x() >= resolution.first ||
-			morphed_point.y() >= resolution.second)
+			morphed_point.y() >= resolution.second ||
+			isnan(morphed_point.x()) ||
+			isnan(morphed_point.y()))
 			continue;
 		else
 		{
