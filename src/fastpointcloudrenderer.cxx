@@ -257,9 +257,6 @@ void FastPointCloudRenderer::upload_data(cgv::render::context &ctx)
 {
 	std::scoped_lock lock{ m_ldi_mutex };
 
-	const auto ldi_data = m_ldi->interleave_data();
-	//decltype(m_ldi.interleave_data()) const ldi_data = { 1,1,1,1,1,1 };
-
 	const auto positional_data = m_ldi->position_data();
 	const auto color_data = m_ldi->color_data();
 
@@ -275,15 +272,7 @@ void FastPointCloudRenderer::upload_data(cgv::render::context &ctx)
 	p_renderer.set_position_array(ctx, positional_data);
 	p_renderer.set_color_array(ctx, color_data);
 
-	// As the data in the interleaved buffer are raw floats, but the entity count
-	// groups several floats logically, we need to check that the buffer contains
-	// only multiples of the logical size.
-	assert(!(ldi_data.size() % (
-		LayeredDepthImage::positional_components +
-		LayeredDepthImage::color_components)));
-	m_uploaded_point_count = ldi_data.size() / (
-		LayeredDepthImage::positional_components +
-		LayeredDepthImage::color_components);
+	m_uploaded_point_count = positional_data.size();
 }
 
 void FastPointCloudRenderer::open_point_data(const std::string &filename)
