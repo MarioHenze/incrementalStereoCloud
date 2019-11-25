@@ -59,11 +59,11 @@ bool FastPointCloudRenderer::init(cgv::render::context &ctx) {
 
   mat4 const model_view_mat = ctx.get_modelview_matrix();
 
+  const std::pair<size_t, size_t> resolution(ctx.get_width(), ctx.get_height());
   // The window matrix of the cgv viewer is exactly the LDI image plane
   // transformation
-  auto const proj_mat = ctx.get_projection_matrix();
-
-  const std::pair<size_t, size_t> resolution(ctx.get_width(), ctx.get_height());
+  auto const proj_mat = compute_projection(
+      static_cast<float>(resolution.first) / resolution.second);
   const PinholeCameraModel view_pcm(model_view_mat, proj_mat, resolution);
 
   std::scoped_lock lock{m_ldi_mutex};
@@ -78,7 +78,7 @@ void FastPointCloudRenderer::resize(unsigned int w, unsigned int h) {
 
   auto const *const ctx = get_context();
   auto const model_view_mat = ctx->get_modelview_matrix();
-  auto const proj_mat = ctx->get_projection_matrix();
+  auto const proj_mat = compute_projection(static_cast<float>(w)/h);
 
   PinholeCameraModel const pcm(model_view_mat, proj_mat, resolution);
   auto new_ldi = std::make_shared<LayeredDepthImage>(pcm);
@@ -190,41 +190,15 @@ bool FastPointCloudRenderer::self_reflect(
   return srh.reflect_member("file_name", m_filename);
 }
 
-mat4 FastPointCloudRenderer::compute_view() const {
-  const cgv::render::view *view = find_view_as_node();
-  assert(view);
-
-  // Build the PinholeCamera from the parameters of the view
-  // The translation of the camera
-  auto const eye = view->get_eye();
-  // The direction from camera to -z
-  auto const direction = view->get_view_dir();
-  auto const direction_up = view->get_view_up_dir();
-  // Direction to right
-  auto const direction_ortho = cgv::math::cross(direction, direction_up);
-
-  mat4 V;
-  V.set_col(0, direction.lift());
-  V.set_col(1, direction_up.lift());
-  V.set_col(2, direction_ortho.lift());
-  V.set_col(3, eye.lift());
-
-  // coordinate axis are directions -> w = 0
-  // eye point is a point -> w = 1
-  V.set_row(3, {0, 0, 0, 1});
-
-  return V;
-}
-
 render_types::mat4 FastPointCloudRenderer::compute_projection(
     float const aspect) const {
   cgv::render::view *view = find_view_as_node();
   assert(view);
 
   mat4 P = cgv::math::perspective4(static_cast<float>(view->get_y_view_angle()),
-                                   aspect, 1.F, 100.F);
+                                   aspect, 0.01F, 100.F);
 
-  return P;
+  return cgv::math::transpose(P);
 }
 
 void FastPointCloudRenderer::upload_data(cgv::render::context &ctx) {

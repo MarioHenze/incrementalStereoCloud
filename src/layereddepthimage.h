@@ -100,10 +100,10 @@ public:
 		(decltype(m_layered_points)::value_type::value_type::byte_count)
 		+ 2 * sizeof(buffer_type::value_type) };
 
-	LayeredDepthImage() = default;
+	//LayeredDepthImage() = default;
 
     // TODO Reflect behavoir, when new LDI is resized
-    LayeredDepthImage(LayeredDepthImage const &other) = default;
+    //LayeredDepthImage(LayeredDepthImage const &other) = default;
 
     explicit LayeredDepthImage(const PinholeCameraModel& pcm);
 
