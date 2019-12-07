@@ -198,7 +198,7 @@ render_types::mat4 FastPointCloudRenderer::compute_projection(
   mat4 P = cgv::math::perspective4(static_cast<float>(view->get_y_view_angle()),
                                    aspect, 0.01F, 100.F);
 
-  return cgv::math::transpose(P);
+  return P;
 }
 
 void FastPointCloudRenderer::upload_data(cgv::render::context &ctx) {

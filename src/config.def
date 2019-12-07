@@ -1,5 +1,6 @@
 show all
+name(main):vsynch="true"
 name(point_cloud_viewer):file_name="bunny_34835.bpc"
 name(point_cloud_viewer):file_name="lego1.bpc"
 name(point_cloud_viewer):file_name="ADFEX_V0b_Punktwolke.bpc"
-name(fast_point_cloud_renderer):file_name="data/bunny_34835.bpc"
+name(fast_point_cloud_renderer):file_name="D:\projects\incrementalStereoCloud\data\bunny_34835.bpc"
