@@ -6,6 +6,7 @@
 
 #include <utility>
 
+#include <cgv/gui/mouse_event.h>
 #include <cgv/math/ftransform.h>
 #include <cgv/math/transformations.h>
 #include <cgv/render/attribute_array_binding.h>
@@ -78,7 +79,7 @@ void FastPointCloudRenderer::resize(unsigned int w, unsigned int h) {
 
   auto const *const ctx = get_context();
   auto const model_view_mat = ctx->get_modelview_matrix();
-  auto const proj_mat = compute_projection(static_cast<float>(w)/h);
+  auto const proj_mat = compute_projection(static_cast<float>(w) / h);
 
   PinholeCameraModel const pcm(model_view_mat, proj_mat, resolution);
   auto new_ldi = std::make_shared<LayeredDepthImage>(pcm);
@@ -146,7 +147,7 @@ void FastPointCloudRenderer::finish_draw(cgv::render::context &ctx) {
                      return vec3(p.x(), p.y(), p.z());
                    });
 
-	{
+    {
       std::scoped_lock lock{m_ldi_mutex};
       m_ldi->add_transformed_points(positions, colors);
     }
@@ -189,6 +190,57 @@ bool FastPointCloudRenderer::self_reflect(
     cgv::reflect::reflection_handler &srh) {
   return srh.reflect_member("file_name", m_filename);
 }
+
+bool FastPointCloudRenderer::handle(cgv::gui::event &e) {
+  // At the end of a mouse dragging the change of frustum has happend.
+  // Use this state flag to determine the end of a dragging process
+  static bool still_dragging{false};
+
+  if (e.get_kind() == cgv::gui::EventId::EID_MOUSE) {
+    auto const mev = static_cast<cgv::gui::mouse_event &>(e);
+    switch (mev.get_action()) {
+      case cgv::gui::MA_PRESS: {
+        post_redraw();
+        return false;
+        break;
+      }
+      case cgv::gui::MA_RELEASE: {
+        if (still_dragging) {
+          // The mouse was dragged and is now released
+          still_dragging = false;
+
+          // A mouse dragging event changes the frustum. Therefore an point
+          // update is needed
+          auto const ctx = get_context();
+
+          auto const width = ctx->get_width();
+          auto const height = ctx->get_height();
+
+          auto const view_transform = ctx->get_modelview_matrix();
+          auto const projection =
+              compute_projection(static_cast<float>(width) / height);
+          PinholeCameraModel new_pcm(view_transform, projection,
+                                     std::make_pair(width, height));
+          m_point_source->queryPoints(new_pcm);
+        }
+        post_redraw();
+        return false;
+        break;
+      }
+      case cgv::gui::MA_DRAG: {
+        // Begin the dragging state
+        still_dragging = true;
+        return false;
+        break;
+      }
+      default:
+        break;
+    }
+  }
+  return false;
+}
+
+void FastPointCloudRenderer::stream_help(std::ostream &os) {}
 
 render_types::mat4 FastPointCloudRenderer::compute_projection(
     float const aspect) const {

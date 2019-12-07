@@ -7,6 +7,8 @@
 
 #include <cgv/base/node.h>
 #include <cgv/gui/provider.h>
+#include <cgv\gui\event.h>
+#include <cgv/gui/event_handler.h>
 #include <cgv/render/attribute_array_binding.h>
 #include <cgv/render/context.h>
 #include <cgv/render/drawable.h>
@@ -24,6 +26,7 @@ using cgv::render::render_types;
 
 class FastPointCloudRenderer : public cgv::base::node,
                                public cgv::gui::provider,
+                               public cgv::gui::event_handler,
                                public cgv::render::drawable {
  protected:
   std::string m_filename;
@@ -67,6 +70,11 @@ class FastPointCloudRenderer : public cgv::base::node,
   void on_set(void *member_ptr) override;
 
   bool self_reflect(cgv::reflect::reflection_handler &srh) override;
+
+  /// overload and implement this method to handle events
+  virtual bool handle(cgv::gui::event &e);
+  /// overload to stream help information to the given output stream
+  virtual void stream_help(std::ostream &os);
 
  private:
   cgv::render::attribute_array_manager m_p_manager;
