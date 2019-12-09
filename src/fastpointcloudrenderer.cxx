@@ -70,6 +70,11 @@ bool FastPointCloudRenderer::init(cgv::render::context &ctx) {
   std::scoped_lock lock{m_ldi_mutex};
   m_ldi = std::make_shared<LayeredDepthImage>(view_pcm);
 
+  // Set up a continous trigger to feed fetched points into the LDI at a steady
+  // rate
+  cgv::signal::connect(cgv::gui::get_animation_trigger().shoot, this,
+                       &FastPointCloudRenderer::point_incorporate_slot);
+
   return m_ldi->is_valid();
 }
 
@@ -112,48 +117,9 @@ void FastPointCloudRenderer::draw(cgv::render::context &ctx) {
 }
 
 void FastPointCloudRenderer::finish_draw(cgv::render::context &ctx) {
-  // Try to incorporate newly queried points into the LDI
-  auto const opt_query =
-      m_point_source ? m_point_source->get_finished_query() : std::nullopt;
+  incorporate_queries();
 
-  if (opt_query.has_value()) {
-    const auto &finished_query = opt_query.value();
-    assert(finished_query);
-
-    std::vector<vec3> positions;
-    std::vector<rgb> colors;
-    finished_query->consume_points(positions, colors);
-
-    assert(!positions.empty());
-    assert(!colors.empty());
-    assert(positions.size() == colors.size());
-
-    const mat4 transformation;
-    {
-      std::scoped_lock lock{m_ldi_mutex};
-      auto const camera = m_ldi->get_camera();
-
-      const_cast<mat4 &>(transformation) =
-          camera.get_sensor() * camera.get_projection() * camera.get_view();
-    }
-
-    // The points of the query are in world coordinates. We need to
-    // transform them into LDI window coordinates.
-    std::transform(positions.cbegin(), positions.cend(), positions.begin(),
-                   [&transformation](decltype(positions)::value_type pos)
-                       -> decltype(positions)::value_type {
-                     auto p{transformation * pos.lift()};
-                     p /= p.w();
-                     return vec3(p.x(), p.y(), p.z());
-                   });
-
-    {
-      std::scoped_lock lock{m_ldi_mutex};
-      m_ldi->add_transformed_points(positions, colors);
-    }
-
-    upload_data(ctx);
-  }
+  upload_data(ctx);
 
   // TODO scan over point density image and determine new query
 
@@ -222,6 +188,12 @@ bool FastPointCloudRenderer::handle(cgv::gui::event &e) {
           PinholeCameraModel new_pcm(view_transform, projection,
                                      std::make_pair(width, height));
           m_point_source->queryPoints(new_pcm);
+
+		  // The underlying LDI of the view needs to be update aswell
+          auto new_ldi = std::make_shared<LayeredDepthImage>(new_pcm);
+          std::scoped_lock lock{m_ldi_mutex};
+          new_ldi->warp_reference_into(*m_ldi);
+          m_ldi.swap(new_ldi);
         }
         post_redraw();
         return false;
@@ -241,6 +213,13 @@ bool FastPointCloudRenderer::handle(cgv::gui::event &e) {
 }
 
 void FastPointCloudRenderer::stream_help(std::ostream &os) {}
+
+void FastPointCloudRenderer::point_incorporate_slot(double t, double dt) {
+  incorporate_queries();
+  auto * const ctx_ptr = get_context();
+  upload_data(*ctx_ptr);
+  post_redraw();
+}
 
 render_types::mat4 FastPointCloudRenderer::compute_projection(
     float const aspect) const {
@@ -286,6 +265,53 @@ void FastPointCloudRenderer::open_point_data(const std::string &filename) {
   m_point_source = std::make_shared<PointCloudSource>(filename);
 
   assert(m_point_source);
+}
+
+bool FastPointCloudRenderer::incorporate_queries() {
+  auto const opt_query =
+      m_point_source ? m_point_source->get_finished_query() : std::nullopt;
+
+  if (opt_query.has_value()) {
+    const auto &finished_query = opt_query.value();
+    assert(finished_query);
+
+    std::vector<vec3> positions;
+    std::vector<rgb> colors;
+    finished_query->consume_points(positions, colors);
+
+    assert(!positions.empty());
+    assert(!colors.empty());
+    assert(positions.size() == colors.size());
+
+    const mat4 transformation;
+    {
+      std::scoped_lock lock{m_ldi_mutex};
+      auto const camera = m_ldi->get_camera();
+
+      const_cast<mat4 &>(transformation) =
+          camera.get_sensor() * camera.get_projection() * camera.get_view();
+    }
+
+    // The points of the query are in world coordinates. We need to
+    // transform them into LDI window coordinates.
+    std::transform(positions.cbegin(), positions.cend(), positions.begin(),
+                   [&transformation](decltype(positions)::value_type pos)
+                       -> decltype(positions)::value_type {
+                     auto p{transformation * pos.lift()};
+                     p /= p.w();
+                     return vec3(p.x(), p.y(), p.z());
+                   });
+
+    {
+      std::scoped_lock lock{m_ldi_mutex};
+      m_ldi->add_transformed_points(positions, colors);
+    }
+	// Because new points were copied
+    return true;
+  } else {
+    // There were no new points
+    return false;
+  }
 }
 
 extern cgv::base::object_registration<FastPointCloudRenderer> fpcr("");

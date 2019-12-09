@@ -7,8 +7,9 @@
 
 #include <cgv/base/node.h>
 #include <cgv/gui/provider.h>
-#include <cgv\gui\event.h>
+#include <cgv/gui/event.h>
 #include <cgv/gui/event_handler.h>
+#include <cgv/gui/trigger.h>
 #include <cgv/render/attribute_array_binding.h>
 #include <cgv/render/context.h>
 #include <cgv/render/drawable.h>
@@ -76,6 +77,8 @@ class FastPointCloudRenderer : public cgv::base::node,
   /// overload to stream help information to the given output stream
   virtual void stream_help(std::ostream &os);
 
+  void point_incorporate_slot(double t, double dt);
+
  private:
   cgv::render::attribute_array_manager m_p_manager;
 
@@ -125,6 +128,13 @@ class FastPointCloudRenderer : public cgv::base::node,
   std::thread m_hole_finder;
 
   void open_point_data(std::string const &filename);
+
+  /**
+  @brief incorporate_queries tries to get a query with new points copies them
+  into the LDI of the view
+  @return true if new points were copied, false otherwise
+  */
+  bool incorporate_queries();
 };
 
 #endif  // FASTPOINTCLOUDRENDERER_H
