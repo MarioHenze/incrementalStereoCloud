@@ -50,10 +50,11 @@ void Ray::insert(const point_t point)
         return other > point;
     };
 
-    // ensure depth monotonicity by sorted insertion
+    /*// ensure depth monotonicity by sorted insertion
     auto const first_greater_depth = std::find_if(m_points.cbegin(),
                                                   m_points.cend(),
                                                   predicate);
 
-    m_points.insert(first_greater_depth, point);
+    m_points.insert(first_greater_depth, point);*/
+    m_points.push_back(point);
 }

@@ -43,7 +43,7 @@ bool FastPointCloudRenderer::init(cgv::render::context &ctx) {
     }
   });
 
-  m_hole_finder = std::thread([this] {
+  /*m_hole_finder = std::thread([this] {
     while (!m_destructor_called) {
       if (!m_ldi || !m_point_source) continue;
       // Finding holes in the LDI requires exclusive access to the LDI
@@ -56,7 +56,7 @@ bool FastPointCloudRenderer::init(cgv::render::context &ctx) {
 
       auto const density_map = copied_ldi->get_density();
     }
-  });
+  });*/
 
   mat4 const model_view_mat = ctx.get_modelview_matrix();
 
@@ -117,9 +117,10 @@ void FastPointCloudRenderer::draw(cgv::render::context &ctx) {
 }
 
 void FastPointCloudRenderer::finish_draw(cgv::render::context &ctx) {
-  incorporate_queries();
-
-  upload_data(ctx);
+  /*auto const new_points_copied = incorporate_queries();
+  if (new_points_copied) {
+    upload_data(ctx);
+  }*/
 
   // TODO scan over point density image and determine new query
 
