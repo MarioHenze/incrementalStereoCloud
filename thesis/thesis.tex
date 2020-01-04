@@ -16,13 +16,14 @@
 % notoc......... do not generate table of contents
 % twoside...... two sided layout
 
+\usepackage{verbatim}
 
 \author{Mario Henze}
 \title{The title of the thesis}
 \birthday{19. July 1994}
 \placeofbirth{Wernigerode}
 \matno{4039602}
-\betreuer{Dr. B. Russig}
+\betreuer{Dr.\ B.\ Russig}
 \bibfiles{literature}
 \problem{
 VR environments become more and more important in visualization and engineering
@@ -79,7 +80,7 @@ der finalen Fassung nicht vorkommen.
 	\item[\cite{mcmillan2009image}]
 \end{description}
 
-\section{Einleitung}
+\chapter{Einleitung}
 \label{sec:einleitung}
 
 Der Prozess der Punktwolkenakquisition ist durch technologische Fortschritte
@@ -108,7 +109,7 @@ Kombinationsmöglichkeiten untersucht. In einem weiteren Schritt soll, das so
 entwickelte Verfahren als C++ Plugin für das cgv-Framework des Lehrstuhls
 umgesetzt werden.
 
-\section{Verwandte Arbeiten}
+\chapter{Verwandte Arbeiten}
 \label{sec:verwandte_arbeiten}
 
 Im Bereich des Image-based Rendering kann die Arbeit \cite{shum2000review} als
@@ -171,7 +172,7 @@ Ausschluss von \(t\) und \(\lambda\) das plenoptische Modellieren. In diesem
 Kontext kann ein gewöhnliches Bild nun als unvollständige Abtastung der
 plenoptischen Funktion an einem festen Betrachtungspunkt aufgefasst werden.
 
-\section{Layered Depth Image}
+\chapter{Layered Depth Image}
 
 \begin{itemize}
 \item Von kamera position
@@ -180,6 +181,94 @@ plenoptischen Funktion an einem festen Betrachtungspunkt aufgefasst werden.
 Kameraposition
 \item neuer Viewport über Matrixtransformation
 \end{itemize}
+
+\chapter{Konzeption}
+
+Die Entkopplung und Nebenläufigkeit der Abläufe in der Implementation sind von
+großer Wichtigkeit. So können folgende unabhängige Prozesse definiert werden.
+
+Zunächst ist eine Datenverarbeitung notwendig. In Abhängigkeit des
+Datenformates und der Größe der Punktwolkendatei müssen die Punkte als Ganzes
+oder als Teilmenge im Arbeitsspeicher vorgehalten werden. Des Weiteren sollten
+initiale Koordinatentransformation in diesem Prozess durchgeführt werden.
+
+Einen weiteren Prozess stellt das Rendering der Punktwolke dar. Um eine
+konstante Framerate zu erreichen muss der Arbeitsaufwand möglichst konstant
+gehalten werden. Deshalb werden die Punkte in einem LDI vorgehalten. Diese
+Datenstruktur ermöglicht eine triviale Rasterrisierung und die Anwendung der
+Morphing Equation.
+
+Da bei großen Datenwolken Speicherknappheit auftreten würde, muss eine
+Selektion aus dem gesamten Datensatz geschehen. Unter der Annahme, dass nur ein
+Teil der Punkte im Sichtfeld des Betrachters für eine qualitative
+Repräsentation der Daten ausreicht kann der letzte Prozess deklariert werden.
+Hierfür wird das LDI des Renderingprozesses als der Kegelstumpf der
+Betrachtungstransformation interpretiert. Die Vereinigung dieses Kegelstumpfes
+und dem Koordinatenraum der Punktwolke schränkt die Menge der zu verarbeitenden
+Punkte initial ein. Da das LDI lediglich Daten in Bezug auf den Betrachter
+speichert, würden alle außerhalb liegenden Punkte nicht in der Rasterisierung
+auftreten und können somit verworfen werden. Wenn sich die
+Betrachtungstransformation geändert hat, muss außerdem ein neues LDI erzeugt
+werden. Unter der Vorraussetzung, dass die Differenz der beiden Betrachtungen
+möglichst gering sind, können die Punkte des alten LDIs übernommen werden.
+Hierbei besitzen zwei Kegelstümpfe eine geringen Unterschied, wenn sich deren
+vereinigtes Volumen nicht stark vom Volumen eines einzigen Keglstumpfes
+unterscheidet. Eine Translation um ein Viertel der Bildschirmbreite oder eine
+Rotation entlang der Blickrichtungsachse sind Beispiele für einen geringen
+Unterschied zwischen zwei Betrachtern. In diesem Fall ist das Morphing mit
+seinem geringen linearen Aufwand besonders lohnenswert, da bestenfalls der
+Großteil der neuen Perspektive mit bereits transformierten Daten abgedeckt
+werden kann. Es werden sich aber immer Stellen im LDI ergeben, an denen keine
+Daten vorhanden sind. Diese Ausschnitte müssen deshalb erkannt und mit Daten
+der ursprünglichen Punktwolke gefüllt werden. Hierfür muss nach dem Morphen die
+lokale Punktdichte im LDI ermittelt werden. Ziel dieser Berechnung ist es
+möglichst zusammenhängende Pixelbereiche zu erkennen. Sind diese Bereiche
+können diese als Anfrage an den ursprünglichen Datensatz gestellt werden.
+
+Durch die oben beschriebene Trennung ist eine Implementation möglich, welche
+aus Sicht des Renderings besonders gleichmäßige Frametimes ermöglicht. So
+stellt die Rasterisierung der Punkte im Sichfeld den einzigen zeitkritischen
+Pfad im System dar, welcher direkt auf die Qualität der Darstellung Einfluss
+nimmt. Die Datenverarbeitung der ursprünglichen Punktwolke in ein geeignetes
+Format und die Bearbeitung der LDIs sind sekundäre Faktoren. Das heißt die Rate
+mit der neue Punkte nachgeladen werden können, verbessert die Detailwiedergabe,
+ist für die prinzipielle Funktion jedoch beliebig.
+
+\chapter{Implementation}
+
+Die vorliegende Arbeit implementiert den oben beschriebenen Ansatz eines LDIs.
+Als Grundlage für die Benutzeroberfläche und die Interaktion mit der
+Grafikhardware wird das CGV Framework des Lehrstuhls verwendet. Um möglichst
+viele Punktwolkenformate als Eingabe nutzen zu können wird weiterhin die
+bestehende Klasse \texttt{point\_cloud} genutzt.
+
+\section{Grundlegende Abstraktionen}
+
+Da die LDIs prinzipbedingt auf den Betrachter bezogen definiert sind, ist die
+Klassendeklaration \texttt{PinholeCameraModel} nützlich. Hierbei wird die in
+der Literatur häufig getroffene Vereinfachung einer Lochkameratransformation
+nachgebildet. So kann die Lochkamera als idealisierte optische Kamera
+aufgefasst werden, welche alle Sichtstrahlen in aus der Szene in einem einzigen
+Punkt bündelt. Bei praktischen Aufbauten eine Lochkamera wird das projizierte
+Bild hinter diesem Brennpunkt gespiegelt auf einer Ebene abgebildet. Zur
+Vereinfachung wird auf diesen Umstand verzichtet und die Bildebene kurz vor dem
+Brennpunkt zwischen Szene und Koordinatenursprung der Kamera platziert. In
+Anlehnung an digitale Linsenkameras wird diese Ebene im Quellcode auch als
+Sensorebene bezeichnet.
+
+\section{Die Punktwolke und Punktwolkenanfragen}
+
+Die Punktwolke wird durch die \texttt{PointCloudSource} abstrahiert. Die
+konkreten Punktdaten werden als Membervariable vom Typ \texttt{point\_cloud}
+gekapselt. Durch diesen ist es möglich getrennt auf Koordinaten und andere
+Punktmerkmale wie Farbe oder Normalen zuzugreifen.
+
+Außerdem verwaltet die \texttt{PointCloudSource} eine Liste aller gestellten
+\texttt{PointCloudQuery}s in einer weiteren Membervariable. Diese Anfragen speichern als Member zunächst die Kamerakonfiguration vom Typ \texttt{PinholeCameraModel}
+
+\section{Das Layered Depth Image}
+
+\section{Der Punktwolkenrenderer}
 
 \section{Systemablauf}
 
