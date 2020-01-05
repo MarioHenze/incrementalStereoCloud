@@ -1,0 +1,57 @@
+\begin{tikzpicture}[
+    tdplot_main_coords,
+    poi/.style = {draw, shape = circle}
+]
+    %\draw[->] (0, 0, 0) -- (8, 0, 0) node[anchor = north]{x};
+    %\draw[->] (0, 0, 0) -- (0, 8, 0) node[anchor = west]{y};
+    %\draw[->] (0, 0, 0) -- (0, 0, 8) node[anchor = south]{z};
+    \node[poi, label=below:{Brennpunkt}] (focal) at (0, 0, 0) {};
+    % image corners
+    \node[poi, fill=red] (ul) at (-4, 10, 2.25) {};
+    \node[poi, fill=blue] (ur) at (4, 10, 2.25) {};
+    \node[poi, fill=green] (lr) at (4, 10, -2.25) {};
+    \node[poi, fill=yellow] (ll) at (-4, 10, -2.25) {};
+    % sensor corners
+    \node[poi, fill=red] (sul) at (-2, 5, 1.125) {};
+    \node[poi, fill=blue] (sur) at (2, 5, 1.125) {};
+    \node[poi, fill=green] (slr) at (2, 5, -1.125) {};
+    \node[poi, fill=yellow] (sll) at (-2, 5, -1.125) {};
+    % projection corners
+    \node[poi, fill=green] (pul) at (-2, -5, 1.125) {};
+    \node[poi, fill=yellow] (pur) at (2, -5, 1.125) {};
+    \node[poi, fill=red] (plr) at (2, -5, -1.125) {};
+    \node[poi, fill=blue] (pll) at (-2, -5, -1.125) {};
+    % coords of image
+    %\draw[->] (focal) -- (ul);
+    %\draw[->] (ul) -- ++(2,0,0);
+    %\draw[->] (ul) -- ++(0,0,-2);
+    % image borders
+    \draw (ul) -- (ur);
+    \draw (ll) -- (lr);
+    \draw (ul) -- (ll);
+    \draw (ur) -- (lr);
+    % view frustum
+    \draw (focal) -- (sul);
+    \draw (focal) -- (sur);
+    \draw (focal) -- (slr);
+    \draw (focal) -- (sll);
+    \draw (sul) -- (ul);
+    \draw (sur) -- (ur);
+    \draw (slr) -- (lr);
+    \draw (sll) -- (ll);
+    % sensor edges
+    \draw (sul) -- (sur);
+    \draw (sll) -- (slr);
+    \draw (sul) -- (sll);
+    \draw (sur) -- (slr);
+    % projection edges
+    \draw[dotted] (pul) -- (pur);
+    \draw[dotted] (pll) -- (plr);
+    \draw[dotted] (pul) -- (pll);
+    \draw[dotted] (pur) -- (plr);
+    % view frustum
+    \draw[dotted] (focal) -- (pul);
+    \draw[dotted] (focal) -- (pur);
+    \draw[dotted] (focal) -- (plr);
+    \draw[dotted] (focal) -- (pll);
+\end{tikzpicture}
