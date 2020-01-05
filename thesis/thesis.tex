@@ -58,7 +58,7 @@ Optional Tasks:
 }
 \copyrighterklaerung{If the author used ressources from third parties (texts,
 images, code) he or she should state the consents of the copyright owners here
-or cite the given general conditions (e.g. CC/(L)GPL/BSD copyright notices)}
+or cite the given general conditions (e.g. CC/ (L) GPL/BSD copyright notices)}
 \acknowledgments{I'd like to thank...}
 \abstracten{abstract text english}
 \abstractde{ abstract text german}
@@ -82,7 +82,7 @@ der finalen Fassung nicht vorkommen.
 	\item[\cite{mcmillan2009image}]
 \end{description}
 
-\chapter{Einleitung}
+\chapter{Einleitung}%
 \label{sec:einleitung}
 
 Der Prozess der Punktwolkenakquisition ist durch technologische Fortschritte
@@ -111,10 +111,10 @@ Kombinationsmöglichkeiten untersucht. In einem weiteren Schritt soll, das so
 entwickelte Verfahren als C++ Plugin für das cgv-Framework des Lehrstuhls
 umgesetzt werden.
 
-\chapter{Verwandte Arbeiten}
+\chapter{Verwandte Arbeiten}%
 \label{sec:verwandte_arbeiten}
 
-Im Bereich des Image-based Rendering kann die Arbeit \cite{shum2000review} als
+Im Bereich des Image-based Rendering kann die Arbeit~\cite{shum2000review} als
 Überblick gesehen werden. Heung-Yeung und Sing Bing arbeiten hierbei die
 unterschiedliche Verwendung von geometrischen Information bei verschiedenen
 Bildsyntheseverfahren heraus. So wird zunächst eine plenoptische Funktion
@@ -125,7 +125,7 @@ die geometrische Redundanz zweier aufeinanderfolgender Bilder ausnutzen. Zuletzt
 werden auch die klassischen Verfahren der Bildsynthese, welche auf explizite
 Geometrie wie Dreiecksnetze aufsetzen, eingeordnet.
 
-In \cite{chang1999ldi} stellen Chun-Fa et al. basierend auf \cite{he1998layered}
+In~\cite{chang1999ldi} stellen Chun-Fa et al.\ basierend auf~\cite{he1998layered}
 eine Datenstruktur vor, welche zur Organisation von Referenzbildern mit
 variierender Tiefenauflösung genutzt werden können. So werden Bilder aus
 verschieden Perspektiven in einen sog. Layered Depth Tree eingfügt. Da bei
@@ -134,7 +134,7 @@ Tiefeninformationen höher abtasten als entferntere, können diese in einen Octr
 eingeordnet werden und es entsteht eine Art Ordnungsrelation. Mithilfe dieser
 Datenstruktur ist es nun möglich, die Referenzbilder auswählen, deren
 Tiefenauflösung in etwa dem zu synthetisierenden Bildausschnitts entspricht. In
-der praktischen Umsetzung zeigen Chun-Fa et al. auf, dass der Speicherverbrauch
+der praktischen Umsetzung zeigen Chun-Fa et al.\ auf, dass der Speicherverbrauch
 nicht wesentlich höher als die direkte Speicherung aller Referenzbilder ist und
 auch die Rechenzeit im schlimmsten Fall gleich dem direkten Rendern aller
 Referenzbilder ist.
@@ -144,7 +144,7 @@ Referenzbilder ist.
 Um neuartige Renderansätze zu entwicklen, ist es hilfreich diese in nach einer
 Top-Down Methodik zu entwickeln. Dafür bietet sich die plenoptische Modellierung
 an. Hierbei wird zunächst versucht, die Szene unabhängig von Beobachtern zu
-beschreiben. Adelson und Bergen definieren dafür in \cite{adelson1991plenoptic}
+beschreiben. Adelson und Bergen definieren dafür in~\cite{adelson1991plenoptic}
 die plenoptische Funktion wie folgt:
 
 \begin{equation}
@@ -153,7 +153,7 @@ die plenoptische Funktion wie folgt:
 
 \begin{itemize}
 	\item[\( V_x, V_y, V_z \)] mögliche Position der Kamera
-	\item[\( \theta, \Phi\)] Winkel eines Sichtstrahls
+	\item[\( \theta, \Phi \)] Winkel eines Sichtstrahls
 	\item[\( \lambda \)] Wellenlänge des Lichts
 	\item[\( t \)] Zeitpunkt der Beobachtung
 \end{itemize}
@@ -169,9 +169,9 @@ ausschließlich kontinuierlich. Daraus folgt, dass sich die Untermengen alles
 sichtbaren Punkte zwischen zwei gerenderten Ansichten nahezu identisch sind.
 Ähnliche Annahmen liegen auch dem Modell der Layered Depth Images zugrunde.
 
-McMillan und Bishop ermöglichten in \cite{mcmillan1995plenoptic} unter
-Ausschluss von \(t\) und \(\lambda\) das plenoptische Modellieren. In diesem
-Kontext kann ein gewöhnliches Bild nun als unvollständige Abtastung der
+McMillan und Bishop ermöglichten in~\cite{mcmillan1995plenoptic} unter
+Ausschluss von \( t \) und \( \lambda \) das plenoptische Modellieren. In
+diesem Kontext kann ein gewöhnliches Bild nun als unvollständige Abtastung der
 plenoptischen Funktion an einem festen Betrachtungspunkt aufgefasst werden.
 
 \chapter{Layered Depth Image}
@@ -251,7 +251,7 @@ bestehende Klasse \texttt{point\_cloud} genutzt.
 	\tdplotsetmaincoords{70}{110}
 	\input{figures/pinholecamera.tikz}
 	\caption{Abbildungsverhältnisse einer Lochkamera auf Sensor- und reale 
-	Bildebene}
+	Bildebene}%
 	\label{fig:pinholecamera}
 \end{figure}
 
