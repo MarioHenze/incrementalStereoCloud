@@ -313,3 +313,7 @@ thesis/*.pdf
 
 # cmake generated launch config
 .vscode/launch.json
+
+# latex and vscode specifics for thesis
+/thesis/build
+/thesis/.vscode

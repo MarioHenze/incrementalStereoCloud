@@ -16,6 +16,7 @@
 % notoc......... do not generate table of contents
 % twoside...... two sided layout
 
+%\usepackage[ngerman]{babel}
 \usepackage{verbatim}
 \usepackage{tikz}
 \usepackage{tikz-3dplot}
@@ -177,11 +178,11 @@ plenoptischen Funktion an einem festen Betrachtungspunkt aufgefasst werden.
 \chapter{Layered Depth Image}
 
 \begin{itemize}
-\item Von kamera position
-\item x- und y-Auflösung als raytracing
-\item layered depth pixel ist Farbwert mit Tiefeninformation in Abhängigkeit der
-Kameraposition
-\item neuer Viewport über Matrixtransformation
+	\item Von kamera position
+	\item x- und y-Auflösung als raytracing
+	\item layered depth pixel ist Farbwert mit Tiefeninformation in Abhängigkeit der
+	      Kameraposition
+	\item neuer Viewport über Matrixtransformation
 \end{itemize}
 
 \chapter{Konzeption}
@@ -250,30 +251,33 @@ bestehende Klasse \texttt{point\_cloud} genutzt.
 	\centering
 	\tdplotsetmaincoords{70}{110}
 	\input{figures/pinholecamera.tikz}
-	\caption{Abbildungsverhältnisse einer Lochkamera auf Sensor- und reale 
-	Bildebene}%
+	\caption{Abbildungsverhältnisse einer Lochkamera auf Sensor- und reale
+		Bildebene}%
 	\label{fig:pinholecamera}
 \end{figure}
 
-Da die LDIs prinzipbedingt auf den Betrachter bezogen definiert sind, ist die
+Da LDIs prinzipbedingt auf den Betrachter bezogen definiert sind, ist die
 Klassendeklaration \texttt{PinholeCameraModel} nützlich. Hierbei wird die in
 der Literatur häufig getroffene Vereinfachung einer Lochkameratransformation
 nachgebildet. So kann die Lochkamera als idealisierte optische Kamera
 aufgefasst werden, welche alle Sichtstrahlen in aus der Szene in einem einzigen
-Punkt bündelt. Bei praktischen Aufbauten eine Lochkamera wird das projizierte
-Bild hinter diesem Brennpunkt gespiegelt auf einer Ebene abgebildet. Zur
-Vereinfachung wird auf diesen Umstand verzichtet und die Bildebene kurz vor dem
-Brennpunkt zwischen Szene und Koordinatenursprung der Kamera platziert. Dadurch
-wird auch die Spieglung der Abbildung verhindert und die geometrischen
-Zusammenhänge können mit einfachen Strahlensätzen interpretiert werden. In
-Anlehnung an digitale Linsenkameras wird diese Ebene im Quellcode auch als
-Sensorebene bezeichnet. Des Weiteren definiert die Lochkamera mit ihrem
-Öffnungswinkel und ihrem Seitenverhältnis einen Sichtkegelstumpf. Die
-\texttt{PinholeCameraModel} Klasse vereint diese beiden Anwendungen, indem es
-die Kamera- und Perspektivtransformation als Membervariable speichert und in
-geeigneter Weise über Zugriffmethoden bereit stellt. So kann der
-Sichtkegelstumpf eines LDIs zur Sichtbarkeitsprüfung von Punkten genutzt
-werden.
+Punkt bündelt (siehe Abbildung~\ref{fig:pinholecamera}). Bei praktischen
+Aufbauten eine Lochkamera wird das projizierte Bild hinter diesem Brennpunkt
+gespiegelt auf einer Ebene abgebildet. Zur Vereinfachung wird auf diesen
+Umstand verzichtet und die Bildebene kurz vor dem Brennpunkt zwischen Szene und
+Koordinatenursprung der Kamera platziert. Dadurch wird auch die Spieglung der
+Abbildung verhindert und die geometrischen Zusammenhänge können mit einfachen
+Strahlensätzen interpretiert werden. In Anlehnung an digitale Linsenkameras
+wird diese Ebene im Quellcode auch als Sensorebene bezeichnet. Des Weiteren
+definiert die Lochkamera mit ihrem Öffnungswinkel und ihrem Seitenverhältnis
+einen Sichtkegelstumpf. Die \texttt{PinholeCameraModel} Klasse vereint diese
+beiden Anwendungen, indem es die Kamera- und Perspektivtransformation als
+Membervariable speichert und in geeigneter Weise über Zugriffmethoden bereit
+stellt. So kann der Sichtkegelstumpf eines LDIs zur Sichtbarkeitsprüfung von
+Punkten genutzt werden. Durch die Rasterisierung der Punkte im LDI ist es
+außerdem notwendig die Pixelauflösung der Sensorebene und damit auch der
+Lochkamera zu speichern. Dies geschieht durch eine weitere Membervariable vom
+Typ \texttt{std::pair<size\_t, size\_t>}.
 
 \section{Die Punktwolke und Punktwolkenanfragen}
 
@@ -285,26 +289,68 @@ Punktmerkmale wie Farbe oder Normalen zuzugreifen.
 Außerdem verwaltet die \texttt{PointCloudSource} eine Liste aller gestellten
 \texttt{PointCloudQuery}s in einer weiteren Membervariable. Diese Anfragen
 speichern als Member zunächst die Kamerakonfiguration vom Typ
-\texttt{PinholeCameraModel}
+\texttt{PinholeCameraModel}. Mit dieser ist es möglich, die Punkte der gesamten
+Punktwolke nach Sichtbarkeit zu filtern. Die \texttt{PointCloudQuery} besitzt
+zwei eigene Membervariablen zum Speichern der Punktpositionen und Farben. Nach
+der Sichtbarkeitsprüfung werden alle verbliebenen Punkte deshalb in die Anfrage
+kopiert. Da die Anfrageklasse außerdem den Schnittpunkt zwischen
+Dateiverarbeitung und Rendering darstellt ist eine weitere Membervariable zur
+Sicherung von kritischen Abschnitten notwendig. Die Mutexvariablen vom Typ
+\texttt{std::timed\_mutex} besitzen die Besonderheit eine vorher definierte
+Wartezeit zu berücksichtigen. Dies ist aus Sicht des Renderings notwendig um
+eine Obergrenze für die Frametimes einhalten zu können. 
+
+Um den Verwaltungsaufwand gering zu halten, durlaufen alle Anfragen drei
+Zustände entsprechend ihrer Bearbeitung. Anfangs befinden sich die Anfragen in
+einem ``unvollständigen'' Zustand. Dieser bedeutet, dass noch nicht alle Punkte
+aus der Datenverarbeitung vorliegen. Nach dem vollständigen Kopieren aller
+sichtbaren Punkte geht die Anfrage in einem ``vollständigen'' und
+``konsumierbarem'' Zustand über. Daraufhin filtert der Renderingprozess die
+Liste aller Anfragen nach der Konsumierbarkeit und fügt die entsprechenden
+Punkte ein. So wird während des Renderings vesucht im vorgegebenen Zeitbudget
+so viele Punkte wie möglich in das LDI zu transformieren. Anschließend ist der
+Zweck der Anfrage erfüllt und sie kann aus der Liste entfernt werden. Um
+Wettlauf-Risiken bei den obigen Zustandsänderungen auszuschließen, werden zwei
+Membervariablen des Typs \texttt{std::atomic\_bool} verwendet. Deren Umsetzung
+garantiert auf x86 basierten Computern einen wohldefinierten Zustand zu allen
+Zeitpunkten der nebenläufigen Benutzung. Außerdem kann hierdurch auf
+laufzeittechnisch teure Mutexvariablen und deren fehleranfällige Verwaltung
+verzichtet werden.
 
 \section{Das Layered Depth Image}
+
+Das Layered Depth Image stellt die zentrale Datenstruktur der Implementation
+dar. Sie kann als eine um einen Datenspeicher erweiterte Lochkamera
+interpretiert werden. So ist bereits die \texttt{PinholeCameraModel} Klasse mit
+rasterisierten Koordinaten ausgestattet. Da diese Pixelauflösung die Grenze der
+Positionsauflösung auf der Sensorebene darstellt, ergeben sich folgende
+Festlegungen. Nach der entsprechenden Perspektivtransformation befinden sich
+alle sichtbaren Punkte an einer diskreten \( (x, y) \) Position auf der
+Sensorebene. Zusätzlich ist deren Tiefe in Bezug auf die Kamera von Bedeutung.
+Werden räumlich verschiedene Punkte auf die selbe \( (x,y) \) Position
+transformiert, unterscheidet sich deren Tiefenwert \(z\). Konventionelle
+Rasterrisierungsansätze würden bei diesem Ansatz den Tiefenpuffer zur
+Konfliktauflösung verwenden und den der Kamera näheren Punkt in das Bild
+zeichnen. Da zusätzliche Bildinformationen aber ausdrücklich für eine
+kurzfristige Verdeckungskompensation erwünscht sind, müssen diese verdeckten
+Punkte auch in das Bild übernommen werden.
 
 \section{Der Punktwolkenrenderer}
 
 \section{Systemablauf}
 
 \begin{itemize}
-\item Eingabe von Punktwolke
-\item räumliche Unterteilung der Punktwolke (Octree)
-\item Raytracing durch Octree
-\item ergibt alle depth Pixel auf einem strahl
-\item Kriterium für optimalen Abstand und Anzahl von Tiefenebenen von Framerateziel
-\item Detail Culling und Viewport Culling
-\item eigentliches Rendern geschieht nur durch rendern/morphen des LDI
-\item bei bewegen des Viewport sollte möglichst schnell der LDI als Bild zur Verfügung stehen
-\item Parallel dazu wird neuer optimaler LDI generiert aus Kombination von altem LDI und der Punktwolke
-\item Stellen im alten gemorphten LDI finden, die undersampled sind und mit informationen aus Punktwolke auffüllen?
-\item wieder detail culling an oversampled Stellen
+	\item Eingabe von Punktwolke
+	\item räumliche Unterteilung der Punktwolke (Octree)
+	\item Raytracing durch Octree
+	\item ergibt alle depth Pixel auf einem strahl
+	\item Kriterium für optimalen Abstand und Anzahl von Tiefenebenen von Framerateziel
+	\item Detail Culling und Viewport Culling
+	\item eigentliches Rendern geschieht nur durch rendern/morphen des LDI
+	\item bei bewegen des Viewport sollte möglichst schnell der LDI als Bild zur Verfügung stehen
+	\item Parallel dazu wird neuer optimaler LDI generiert aus Kombination von altem LDI und der Punktwolke
+	\item Stellen im alten gemorphten LDI finden, die undersampled sind und mit informationen aus Punktwolke auffüllen?
+	\item wieder detail culling an oversampled Stellen
 \end{itemize}
 
 \end{document}

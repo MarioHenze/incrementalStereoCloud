@@ -1,7 +1,7 @@
 \begin{tikzpicture}[
-    tdplot_main_coords,
-    poi/.style = {draw, shape = circle}
-]
+        tdplot_main_coords,
+        poi/.style = {draw, shape = circle}
+    ]
     %\draw[->] (0, 0, 0) -- (8, 0, 0) node[anchor = north]{x};
     %\draw[->] (0, 0, 0) -- (0, 8, 0) node[anchor = west]{y};
     %\draw[->] (0, 0, 0) -- (0, 0, 8) node[anchor = south]{z};
