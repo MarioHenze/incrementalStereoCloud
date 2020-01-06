@@ -333,7 +333,14 @@ Rasterrisierungsansätze würden bei diesem Ansatz den Tiefenpuffer zur
 Konfliktauflösung verwenden und den der Kamera näheren Punkt in das Bild
 zeichnen. Da zusätzliche Bildinformationen aber ausdrücklich für eine
 kurzfristige Verdeckungskompensation erwünscht sind, müssen diese verdeckten
-Punkte auch in das Bild übernommen werden.
+Punkte auch in das Bild übernommen werden. Hierfür wird die \texttt{ray\_t}
+Struktur definiert. Es handelt sich hierbei um einen \texttt{std::vector} der
+für jeden Punkt dessen \( (x,y) \) Position auf dem Sensor und dessen Tiefenwert
+speichert. Wie an der Benennung zu erkennen, kann jede dieser Strukturen als ein
+Strahl vom Brennpunkt durch den jeweiligen Pixel des Sensors gesehen werden.
+Parallelen zum Raytracing ergeben sich nur aus der Art und Weise der
+Datenerfassung. Das eigentliche zeichnen geschieht nach dem klassischen
+Rasterisierungsansatz.
 
 \section{Der Punktwolkenrenderer}
 
