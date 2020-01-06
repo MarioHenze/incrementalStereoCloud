@@ -335,14 +335,39 @@ zeichnen. Da zusätzliche Bildinformationen aber ausdrücklich für eine
 kurzfristige Verdeckungskompensation erwünscht sind, müssen diese verdeckten
 Punkte auch in das Bild übernommen werden. Hierfür wird die \texttt{ray\_t}
 Struktur definiert. Es handelt sich hierbei um einen \texttt{std::vector} der
-für jeden Punkt dessen \( (x,y) \) Position auf dem Sensor und dessen Tiefenwert
-speichert. Wie an der Benennung zu erkennen, kann jede dieser Strukturen als ein
-Strahl vom Brennpunkt durch den jeweiligen Pixel des Sensors gesehen werden.
-Parallelen zum Raytracing ergeben sich nur aus der Art und Weise der
-Datenerfassung. Das eigentliche zeichnen geschieht nach dem klassischen
-Rasterisierungsansatz.
+für jeden Punkt dessen Tiefenwert und Farbe speichert. Die \( (x,y) \) Position
+ist indirekt durch die Zugehörigkeit zum jeweiligen Strahlvektor gegeben. Wie
+an der Benennung zu erkennen, kann jede dieser Strukturen als ein Strahl vom
+Brennpunkt durch den jeweiligen Pixel des Sensors gesehen werden. Parallelen
+zum Raytracing ergeben sich nur aus der Art und Weise der Datenerfassung. Das
+eigentliche Zeichnen geschieht nach dem klassischen Rasterisierungsansatz. Die
+Gesamtheit aller Pixel des LDI werden wiederum gespeichert als
+\texttt{std::vector<ray\_t>}. Hierbei ist zu beachten, dass der lineare Zugriff
+durch den Array Subscript Operator zusammen mit einer Hilfsfunktion erfolgt,
+die zweidimensionale Koordinaten entsprechend umrechnet.
+
+Um den zentralen Vorteil der linearen Korrespondenz zwischen zwei LDIs zu
+nutzen, wird die \texttt{warp\_reference\_into} Memberfunktion deklariert.
+Diese wendet die McMillan Morphing Gleichung auf das Argument LDI an und
+übernimmt alle weiterhin sichtbaren Punkte in sich selbst. Des Weiteren können
+Punkte aus dem globalen oder dem kamerabezogenen Koordinatensystem mit
+\texttt{add\_global\_points} bzw. \texttt{add\_transformed\_points} eingfügt
+werden.
 
 \section{Der Punktwolkenrenderer}
+
+Der \texttt{FastPointCloudRenderer} setzt die oben aufgezählten
+Funktionalitäten zusammen, indem er den aktiven Viewport bzw. Framebuffer des
+CGV-Viewers als LDI auffasst. Um diese Interoperabilität zu ermöglichen, leitet
+die Renderklasse zunächst von \texttt{cgv::render::drawable} ab und
+implementiert die entsprechenden Funktionen des klassischen Renderingablaufs.
+So wird für den Drawcall der Referenzpunktrenderer des Frameworks genutzt, der
+zuvor mit den Daten des LDIs versorgt wurde.
+
+Nach einem erfolgten Drawcall wird von der Punktwolken Membervariable eine
+abgeschlossene Anfrage gefordert und die enthaltenen Punkte in das Viewport LDI
+eingfügt. Dies bedeutet implizit, dass die entsprechenden Daten durch den
+Referenzpunktrenderer auf den Speicher der GPU geladen werden.
 
 \section{Systemablauf}
 
