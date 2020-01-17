@@ -367,7 +367,20 @@ zuvor mit den Daten des LDIs versorgt wurde.
 Nach einem erfolgten Drawcall wird von der Punktwolken Membervariable eine
 abgeschlossene Anfrage gefordert und die enthaltenen Punkte in das Viewport LDI
 eingfügt. Dies bedeutet implizit, dass die entsprechenden Daten durch den
-Referenzpunktrenderer auf den Speicher der GPU geladen werden.
+Referenzpunktrenderer auf den Speicher der GPU geladen werden. Hierfür muss
+zunächst ein kritischer Abschnitt begonnen werden. Innerhalb diesem können nun
+die Punkte aus der Punktwolkenanfrage in ein neues LDI übernommen werden.
+Zusätzlich wird das alte LDI in die neue Ansicht gemorpht. Abschließend wird die
+Membervariable \texttt{m\_ldi} durch das eben erstellte LDI ersetzt und der
+kritische Abschnitt kann wieder verlassen werden.
+
+Da die Klasse \texttt{FastPointCloudRenderer} ein zentraler Interaktionspunkt
+zwischen CGV Viewer und allen anderen Bestandteilen der Implementation ist, wird
+die beschriebene Nebenläufigkeit durch Threads als Membervariablen umgesetzt.
+Deren Funktionalität wird definiert durch Zuweisung eines Lambda Ausdrucks in
+der \texttt{init()} Methode. Hierdurch wird eine Trennung zwischen
+Funktionalität und der Art und Weise der Ausführung erreicht. Somit sind
+Anpassung an neuartige Parallelitätsmuster wie Coroutines einfacher möglich.
 
 \section{Systemablauf}
 
