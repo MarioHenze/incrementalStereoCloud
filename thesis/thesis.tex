@@ -17,6 +17,7 @@
 % twoside...... two sided layout
 
 %\usepackage[ngerman]{babel}
+\usepackage{enumitem}
 \usepackage{verbatim}
 \usepackage{tikz}
 \usepackage{tikz-3dplot}
@@ -65,24 +66,6 @@ or cite the given general conditions (e.g. CC/ (L) GPL/BSD copyright notices)}
 \abstractde{ abstract text german}
 \begin{document}
 
-\section{Literaturübersicht}
-
-Dieser Abschnitt dient zunächst der Auflistung potentieller Quellen und wird in
-der finalen Fassung nicht vorkommen.
-
-\begin{description}
-	\item[\cite{discher2018point}]
-	\item[\cite{rusinkiewicz2000qsplat}]
-	\item[\cite{goswami2010high}]
-	\item[\cite{wimmer2006instant}]
-	\item[\cite{shum2000review}]
-	\item[\cite{mark1997post}]
-	\item[\cite{mcmillan1995head}]
-	\item[\cite{chang1999ldi}]
-	\item[\cite{he1998layered}]
-	\item[\cite{mcmillan2009image}]
-\end{description}
-
 \chapter{Einleitung}%
 \label{sec:einleitung}
 
@@ -115,6 +98,8 @@ umgesetzt werden.
 \chapter{Verwandte Arbeiten}%
 \label{sec:verwandte_arbeiten}
 
+\section{Überblick}
+
 Im Bereich des Image-based Rendering kann die Arbeit~\cite{shum2000review} als
 Überblick gesehen werden. Heung-Yeung und Sing Bing arbeiten hierbei die
 unterschiedliche Verwendung von geometrischen Information bei verschiedenen
@@ -140,6 +125,123 @@ nicht wesentlich höher als die direkte Speicherung aller Referenzbilder ist und
 auch die Rechenzeit im schlimmsten Fall gleich dem direkten Rendern aller
 Referenzbilder ist.
 
+Ein generelles Vorgehen beim Warpen von 3D Renderings wird von Mark et al.\
+in~\cite{mark1997post} vorgestellt. So wird die These untersucht, dass ein Paar
+von gerenderten Bildern und deren entsprechende Tiefenpuffer ausreichen um
+beliebige Ansichten aus benachbarten Perspektiven zu zeichnen. Unter
+Zuhilfenahme der in~\cite{mcmillan1995head} formulierten Morphing Gleichung
+wird eine Korrespondenz zwischen beiden Bildern hergestellt und ein
+kombiniertes Bild an einer neuen Position erzeugt. Anschließend werden
+verschiedene Probleme des Verfahrens aufgezeigt. So entstehen beim
+bildbasierten Morphing partielle und totale Verdeckungsartefakte. Die in Bezug
+zum Betrachter variierende diskrete Abtastung von Oberflächen führt weiterhin
+zur Entstehung von Löchern. Um diese Effekte auszugleichen werden mehrere
+Strategien vorgestellt, welche auf der Rekonstruktion von Geometrie und
+optimierter Interpolation basieren.
+
+Mit QSplat wurde ein einflussreiches Verfahren zum Zeichnen von Punktwolken von
+Rusinkiewicz und Levoy in~\cite{rusinkiewicz2000qsplat} entwickelt. Hierbei
+wird das effiziente Rendern durch die Verwendung einer Hierarchie von
+Begrenzungskugeln ermöglicht. In einem Vorverarbeitungsschritt wird zunächst
+ein Dreiecksnetz genutzt um bei der Bestimmung der Begrenzungskugeln
+Oberflächennormalen einzubeziehen und Lochartefakte unterbinden zu können.
+Anschließend kann die Hierarchie durch eine rekursive Durchquerung gezeichnet
+werden. Dabei werden alle Pfade bei Verfehlen eines Sichtbarkeitskriteriums
+verworfen. Des Weiteren werden der Einfluss von verschiedenen Splatting Formen
+auf die Bildqualität untersucht und die Laufzeit von Vorverarbeitung und
+Rendering aufgeschlüsselt.
+
+Goswami et al.\ benutzen ein variablen Detailgrad beim Zeichnen und eine
+Baumstruktur zur Verwaltung der Punktwolke~\cite{goswami2010high}. Grundlegend
+muss bei diesem Verfahren zunächst eine Vereinfachung und Zusammenfassung der
+Punkte erfolgen. Dafür werden verschieden große Cluster in Abhängigkeit der
+lokalen Varianz erzeugt und in einen KD Baum eingefügt. Eine Quantisierung des
+Datenraums entlang der Koordinatenachsen ermöglicht weiterhin eine schnelle
+Umsetzung dieses Prozesses, da jede Zelle parallel bearbeitet werden kann. Für
+das Rendering werden alle Knoten dieses LOD-Baums in eine
+Prioritätswarteschlange nach ihrem Detailgrad eingeordnet. Beginnend vom
+Wurzelknoten werden solange die Cluster expandiert, bis eine ausreichende
+Punktdichte erreicht ist.
+
+Einen weitere Implementation mit Fokus auf Virtual Reality wird von Discher et
+al.\ in~\cite{discher2018point} vorgestellt. Das Punktwolkenrenderering wird
+dabei in drei Phase eingeteilt. Zunächst wird eine sog.\ repräsentative
+Untermenge in Abhängigkeit der Auslastung von CPU und GPU ausgewählt. Nach dem
+Entfernen von Punkten außerhalb des Sichtkegelstumpfes und überflüssigen
+Details wird ein KD Baum aufgebaut. Das Renderen erfolgt dann in G-Buffer
+(siehe~\cite{saito1990comprehensible}), welche bestimmte geometrische
+Eigenschaften wie Tiefe oder Oberflächennormalen als Zwischenbild abspeichern.
+Die Anwendung dieser Zwischentexturen ermöglicht abschließend eine
+Bildnachbearbeitung. Dieser finale Schritt dient dazu die Bildqualität
+nachträglich zu steigern. Zum Beispiel können Löcher gefüllt, Aliasing
+Artefakte beseitigt und Kanten besonders hervorgehoben werden. Außerdem wurden
+mehrere Kompositionsansätze für die anschließende Bildsynthese untersucht und
+deren Laufzeitperformance evaluiert.
+
+Wimmer und Scheiblauer entwickeln in~\cite{wimmer2006instant} ein Verfahren,
+dass ohne Vorverarbeitung eine möglichst große Menge an Punkten mit
+interaktiven Bildraten darstellen soll. Zur Umsetzung werden memory optimized
+sequential point trees (MOSPT) und verschachtelte Octrees als Datenstrukturen
+vorgestellt. Dies ermöglicht ein serielles Rendern der Punktwolke nach dem out
+of core Prinzip. Um eine lokale Zusammenfassung von Punkten und damit eine
+Datenreduktion zu erreichen wird eine Fehlermetrik eingeführt die zur
+Sortierung der MOSPT genutzt wird. Die so gewonnene Hierarchie ermöglicht nun
+das Verwerfen von Knoten mit zu geringem Einfluss auf das resultierende Bild.
+Für den Rendervorgang werden zunächst ein Intervall auf der Fehlermetrik
+bestimmt und alle entsprechenden Knoten des MOSPT gezeichnet. Da die Nutzung
+eines einzelnen MOSPT statische Vorraussetzungen wie ein globales LOD
+vorraussetzen wird nur ein Teil der Punktwolken in diesen angeordnet. Diese
+Teilmengen werden wiederum in einen Octree eingefügt. Abschließend wird der
+Laufzeitvorteil der MOSPT untersucht und auf Artefakte des Renderingprozesses
+eingegangen.
+
+\section{Motivation des Renderingansatzes}
+
+Wie bereits in Abschnitt~\ref{sec:verwandte_arbeiten} aufgezeigt, existieren
+eine Vielzahl an Renderverfahren für Punktwolken und bildbasierten Morphing
+Ansätzen. Das Ziel dieser Arbeit besteht darin eine Kombination dieser beiden
+Vorgehen zu entwickeln, welche sowohl ein schnelles Zeichnen von
+unverarbeiteten Punktwolken als auch eine Wiederverwendung von bereits
+gezeichneten Bildbereichen ermöglicht.
+
+Zunächst ist hervorzuheben, dass der Großteil der Punktzeichnungs Algorithmen
+eine Vorverarbeitung der Punktwolke vorrausetzt. So ist zu erkennen, dass
+generell Artefakte der Punktwolkenakquisition ausgeglichen und eine
+Speicherzugriff optimierende Datenstruktur erreicht werden soll. Hierfür wird
+fast ausschließlich die räumlich variierende Punktdichte zum Clustering
+genutzt. Anschließend wird eine Baumstruktur Hierarchie aufgebaut, welche das
+rekursive Zeichnen bis zu einem ausreichenden Detailgrad ermöglicht. Da die
+vorliegende Arbeit jedoch darauf abzielt zu einem späteren Zeitpunkt
+kontinuierlich erfasste Punkte in die Darstellung einfließen zu lassen, ist ein
+aufwendiges Verarbeiten nicht möglich. So liegt der Zeitaufwand von
+QSplat~\cite{rusinkiewicz2000qsplat} beim Preprocessing einer Wolke mit rund
+127 Millionen Punkten bei einer knappen Stunde. Selbst modernere Ansätze
+wie~\cite{goswami2010high} benötigen für diesen Verarbeitungsschritt immer noch
+mehrere Minuten. Auch wenn diese Angaben aufgrund von unterschiedlicher
+Hardware nicht direkt vergleichbar sind, geben sie eine Größenordnung der zu
+erwartenden Laufzeitkosten an.
+
+Betrachtet man die Problemstellungen jedoch aus Sicht des bildbasierten
+Morphings, verspricht die Umsetzung des Renderingprozesses als Layered Depth
+Image analog zu~\cite{chang1999ldi} einen Vorteil. So werden in dem LDI
+Bildpunkte mit verschiedenen Tiefen gespeichert. Außerdem ist eine elegante
+Interpolation zwischen verschiedenen Referenzen durch die Morphing Gleichung
+von McMillan (siehe~\cite{mcmillan1995list} und~\cite{mcmillan1995plenoptic})
+möglich. Unter der Annahmen, dass die globalen Punkte der Wolke äquivalent zu
+den relativen Punkten des LDIs sind, kann das Rendern von Punktwolken in ein
+Rendern von LDIs überführt werden. Das bedeutet, der einzige
+Vorverarbeitungsschritt der Punktdaten besteht darin, die Punkte aus dem
+globalen Koordinatensystem in das kamerabezogene System zu transformieren.
+
+Außerdem ist festzustellen, dass bei der Anwendung von HMDs eine ständige
+Veränderung der Kameraposition durch die teilweise willkürlichen Bewegungen des
+menschlichen Kopfes auftreten. Somit sind Renderverfahren von Vorteil, die eine
+schnelle Interpolation von benachbarten Ansichten ermöglichen. Da auch dieses
+Kriterium durch die LDIs abgedeckt wird, baut die folgende Implementation auf
+Basis dieser einen eigenen Rendervorgang auf.
+
+\chapter{Theoretische Betrachtungen}
+
 \section{Plenoptic Modelling}
 
 Um neuartige Renderansätze zu entwicklen, ist es hilfreich diese in nach einer
@@ -152,12 +254,12 @@ die plenoptische Funktion wie folgt:
 	P_7 = P(V_x, V_y, V_z, \theta, \Phi, \lambda, t)
 \end{equation}
 
-\begin{itemize}
+\begin{description}[style=sameline]
 	\item[\( V_x, V_y, V_z \)] mögliche Position der Kamera
 	\item[\( \theta, \Phi \)] Winkel eines Sichtstrahls
 	\item[\( \lambda \)] Wellenlänge des Lichts
 	\item[\( t \)] Zeitpunkt der Beobachtung
-\end{itemize}
+\end{description}
 
 Diese Form der Beschreibung ermöglicht es die Szene zu jedem Zeitpunkt an jeder
 Stelle und in jede Richtung zu samplen. Anhand dieses generellen Modells können
@@ -175,7 +277,7 @@ Ausschluss von \( t \) und \( \lambda \) das plenoptische Modellieren. In
 diesem Kontext kann ein gewöhnliches Bild nun als unvollständige Abtastung der
 plenoptischen Funktion an einem festen Betrachtungspunkt aufgefasst werden.
 
-\chapter{Layered Depth Image}
+\section{Layered Depth Image}
 
 \begin{itemize}
 	\item Von kamera position
@@ -298,7 +400,7 @@ Dateiverarbeitung und Rendering darstellt ist eine weitere Membervariable zur
 Sicherung von kritischen Abschnitten notwendig. Die Mutexvariablen vom Typ
 \texttt{std::timed\_mutex} besitzen die Besonderheit eine vorher definierte
 Wartezeit zu berücksichtigen. Dies ist aus Sicht des Renderings notwendig um
-eine Obergrenze für die Frametimes einhalten zu können. 
+eine Obergrenze für die Frametimes einhalten zu können.
 
 Um den Verwaltungsaufwand gering zu halten, durlaufen alle Anfragen drei
 Zustände entsprechend ihrer Bearbeitung. Anfangs befinden sich die Anfragen in
