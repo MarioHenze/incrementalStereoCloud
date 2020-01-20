@@ -72,6 +72,12 @@ class FastPointCloudRenderer : public cgv::base::node,
 
   bool self_reflect(cgv::reflect::reflection_handler &srh) override;
 
+  /**
+  @brief this method will be called from handle() after the conditions for an 
+  update of the LDI have been met.
+  */
+  void update_ldi_slot();
+
   /// overload and implement this method to handle events
   virtual bool handle(cgv::gui::event &e);
   /// overload to stream help information to the given output stream

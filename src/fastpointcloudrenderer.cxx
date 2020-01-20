@@ -114,13 +114,16 @@ void FastPointCloudRenderer::draw(cgv::render::context &ctx) {
   // TODO check if sorted points are needed?
   glDrawArrays(GL_POINTS, 0, m_uploaded_point_count);
   p_renderer.disable(ctx);
+
+  static int i = 0;
+  ctx.write_frame_buffer_to_image(std::to_string(++i) + ".png");
 }
 
 void FastPointCloudRenderer::finish_draw(cgv::render::context &ctx) {
-  /*auto const new_points_copied = incorporate_queries();
+  auto const new_points_copied = incorporate_queries();
   if (new_points_copied) {
     upload_data(ctx);
-  }*/
+  }
 
   // TODO scan over point density image and determine new query
 
@@ -158,6 +161,28 @@ bool FastPointCloudRenderer::self_reflect(
   return srh.reflect_member("file_name", m_filename);
 }
 
+void FastPointCloudRenderer::update_ldi_slot() {
+  auto const ctx = get_context();
+
+  auto const width = ctx->get_width();
+  auto const height = ctx->get_height();
+
+  auto const view_transform = ctx->get_modelview_matrix();
+  auto const projection =
+      compute_projection(static_cast<float>(width) / height);
+  PinholeCameraModel new_pcm(view_transform, projection,
+                             std::make_pair(width, height));
+  m_point_source->queryPoints(new_pcm);
+
+  // The underlying LDI of the view needs to be update aswell
+  auto new_ldi = std::make_shared<LayeredDepthImage>(new_pcm);
+  std::scoped_lock lock{m_ldi_mutex};
+  new_ldi->warp_reference_into(*m_ldi);
+  m_ldi.swap(new_ldi);
+
+  post_redraw();
+}
+
 bool FastPointCloudRenderer::handle(cgv::gui::event &e) {
   // At the end of a mouse dragging the change of frustum has happend.
   // Use this state flag to determine the end of a dragging process
@@ -178,27 +203,15 @@ bool FastPointCloudRenderer::handle(cgv::gui::event &e) {
 
           // A mouse dragging event changes the frustum. Therefore an point
           // update is needed
-          auto const ctx = get_context();
-
-          auto const width = ctx->get_width();
-          auto const height = ctx->get_height();
-
-          auto const view_transform = ctx->get_modelview_matrix();
-          auto const projection =
-              compute_projection(static_cast<float>(width) / height);
-          PinholeCameraModel new_pcm(view_transform, projection,
-                                     std::make_pair(width, height));
-          m_point_source->queryPoints(new_pcm);
-
-		  // The underlying LDI of the view needs to be update aswell
-          auto new_ldi = std::make_shared<LayeredDepthImage>(new_pcm);
-          std::scoped_lock lock{m_ldi_mutex};
-          new_ldi->warp_reference_into(*m_ldi);
-          m_ldi.swap(new_ldi);
+          update_ldi_slot();
         }
-        post_redraw();
+        
         return false;
         break;
+      }
+      case cgv::gui::MA_WHEEL: {
+        update_ldi_slot();
+        return false;
       }
       case cgv::gui::MA_DRAG: {
         // Begin the dragging state
