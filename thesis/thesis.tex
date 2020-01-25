@@ -21,6 +21,9 @@
 \usepackage{verbatim}
 \usepackage{tikz}
 \usepackage{tikz-3dplot}
+\usepackage{pgffor}
+
+\usetikzlibrary{calc}
 
 \author{Mario Henze}
 \title{The title of the thesis}
@@ -278,6 +281,14 @@ diesem Kontext kann ein gewöhnliches Bild nun als unvollständige Abtastung der
 plenoptischen Funktion an einem festen Betrachtungspunkt aufgefasst werden.
 
 \section{Layered Depth Image}
+
+\begin{figure}
+	\centering
+	\tdplotsetmaincoords{70}{110}
+	\input{figures/layereddepthimage.tikz}
+	\caption{Veranschaulichung von Punkten in verschiedenen Tiefenebenen}%
+	\label{fig:layereddepthimage}
+\end{figure}
 
 \begin{itemize}
 	\item Von kamera position

@@ -1,11 +1,11 @@
 \begin{tikzpicture}[
         tdplot_main_coords,
-        poi/.style = {draw, shape = circle}
+        poi/.style = {circle, inner sep=1.5pt}
     ]
     %\draw[->] (0, 0, 0) -- (8, 0, 0) node[anchor = north]{x};
     %\draw[->] (0, 0, 0) -- (0, 8, 0) node[anchor = west]{y};
     %\draw[->] (0, 0, 0) -- (0, 0, 8) node[anchor = south]{z};
-    \node[poi, label=below:{Brennpunkt}] (focal) at (0, 0, 0) {};
+    \node[poi, fill=gray, label=below:{Brennpunkt}] (focal) at (0, 0, 0) {};
     % image corners
     \node[poi, fill=red] (ul) at (-4, 10, 2.25) {};
     \node[poi, fill=blue] (ur) at (4, 10, 2.25) {};
