@@ -111,31 +111,31 @@
     \draw[dashed] (fsc.center) -- ($ (fsc.center)!-.25!(fwc.center) $);
     \draw (fsc.center) -- (fwc.center);
     \draw[dashed] (fwc.center) -- ($ (fsc.center)!1.2!(fwc.center) $);
-    \node[fill, draw, circle, inner sep=1.5pt, label=above:\(z_1\)]%
+    \node[fill=orange, draw, circle, inner sep=1.5pt, label=above:\(z_1\)]%
         at ($ (fsc)!.1!(fwc)$) {};
-    \node[fill, draw, circle, inner sep=1.5pt, label=below:\(z_2\)]%
+    \node[fill=gray, draw, circle, inner sep=1.5pt, label=below:\(z_2\)]%
         at ($ (fsc)!.14!(fwc)$) {};
-    \node[fill, draw, circle, inner sep=1.5pt, label=above:\(z_3\)]%
+    \node[fill=green, draw, circle, inner sep=1.5pt, label=above:\(z_3\)]%
         at ($ (fsc)!.3!(fwc)$) {};
-    \node[fill, draw, circle, inner sep=1.5pt, label=above:\(z_4\)]%
+    \node[fill=blue, draw, circle, inner sep=1.5pt, label=above:\(z_4\)]%
         at ($ (fsc)!.4!(fwc)$) {};
-    \node[fill, draw, circle, inner sep=1.5pt, label=above:\(z_5\)]%
+    \node[fill=purple, draw, circle, inner sep=1.5pt, label=above:\(z_5\)]%
         at ($ (fsc)!.77!(fwc)$) {};
     \draw[dashed] (asc.center) -- ($ (asc.center)!-.2!(awc.center) $);
     \draw (asc.center) -- (awc.center);
     \draw[dashed] (awc.center) -- ($ (asc.center)!1.35!(awc.center) $);
-    \node[fill, draw, circle, inner sep=1.5pt, label=below:\(z_6\)]%
+    \node[fill=gray, draw, circle, inner sep=1.5pt, label=below:\(z_6\)]%
         at ($ (asc)!.15!(awc)$) {};
-    \node[fill, draw, circle, inner sep=1.5pt, label=above:\(z_7\)]%
+    \node[fill=red, draw, circle, inner sep=1.5pt, label=above:\(z_7\)]%
         at ($ (asc)!.24!(awc)$) {};
-    \node[fill, draw, circle, inner sep=1.5pt, label=below:\(z_8\)]%
+    \node[fill=orange, draw, circle, inner sep=1.5pt, label=below:\(z_8\)]%
         at ($ (asc)!.3!(awc)$) {};
-    \node[fill, draw, circle, inner sep=1.5pt, label=above:\(z_9\)]%
+    \node[fill=blue, draw, circle, inner sep=1.5pt, label=above:\(z_9\)]%
         at ($ (asc)!.5!(awc)$) {};
-    \node[fill, draw, circle, inner sep=1.5pt, label=above:\(z_{10}\)]%
+    \node[fill=green, draw, circle, inner sep=1.5pt, label=above:\(z_{10}\)]%
         at ($ (asc)!.7!(awc)$) {};
-    \node[fill, draw, circle, inner sep=1.5pt, label=below:\(z_{11}\)]%
+    \node[fill=lightgray, draw, circle, inner sep=1.5pt, label=below:\(z_{11}\)]%
         at ($ (asc)!.75!(awc)$) {};
-    \node[fill, draw, circle, inner sep=1.5pt, label=above:\(z_{12}\)]%
+    \node[fill=purple, draw, circle, inner sep=1.5pt, label=above:\(z_{12}\)]%
         at ($ (asc)!.9!(awc)$) {};
 \end{tikzpicture}
