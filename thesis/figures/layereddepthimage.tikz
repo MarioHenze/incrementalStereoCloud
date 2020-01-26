@@ -1,0 +1,141 @@
+\begin{tikzpicture}[
+        tdplot_main_coords,
+        poi/.style = {draw, shape = circle}
+    ]
+    %\draw[->] (0, 0, 0) -- (8, 0, 0) node[anchor = north]{x};
+    %\draw[->] (0, 0, 0) -- (0, 8, 0) node[anchor = west]{y};
+    %\draw[->] (0, 0, 0) -- (0, 0, 8) node[anchor = south]{z};
+    \node (focal) at (0, 0, 0) {};
+    % image corners
+    \node (ul) at (-4, 10, 2.25) {};
+    \node (ur) at (4, 10, 2.25) {};
+    \node (lr) at (4, 10, -2.25) {};
+    \node (ll) at (-4, 10, -2.25) {};
+    % sensor corners
+    \node (sul) at (-2, 5, 1.125) {};
+    \node (sur) at (2, 5, 1.125) {};
+    \node (slr) at (2, 5, -1.125) {};
+    \node (sll) at (-2, 5, -1.125) {};
+    % coords of image
+    %\draw[->] (focal) -- (ul);
+    %\draw[->] (ul) -- ++(2,0,0);
+    %\draw[->] (ul) -- ++(0,0,-2);
+    % image borders
+    \draw[dotted] (ul.center) -- (ur.center);
+    \draw[dotted] (ll.center) -- (lr.center);
+    \draw[dotted] (ul.center) -- (ll.center);
+    \draw[dotted] (ur.center) -- (lr.center);
+    % view frustum
+    \draw[dotted] (focal.center) -- (sul.center);
+    \draw[dotted] (focal.center) -- (sur.center);
+    \draw[dotted] (focal.center) -- (slr.center);
+    \draw[dotted] (focal.center) -- (sll.center);
+    \draw[dotted] (sul.center) -- (ul.center);
+    \draw[dotted] (sur.center) -- (ur.center);
+    \draw[dotted] (slr.center) -- (lr.center);
+    \draw[dotted] (sll.center) -- (ll.center);
+    % sensor edges
+    \draw[] (sul.center) -- (sur.center);
+    \draw[] (sll.center) -- (slr.center);
+    \draw[] (sul.center) -- (sll.center);
+    \draw[] (sur.center) -- (slr.center);
+    % sensor grid
+    %\draw[dotted] ($ (sul)!.25!(sll) $) -- ($ (sur)!.25!(slr) $);
+    \foreach \n in {1,...,8}{
+        \draw[] ($ (sul)!.125*\n!(sll) $) -- ($ (sur)!.125*\n!(slr) $);};
+    \foreach \n in {1,...,16}{
+        \draw[] ($ (sul)!.0625*\n!(sur) $) -- ($ (sll)!.0625*\n!(slr) $);};
+    % world grid
+    %\draw[dotted] ($ (sul)!.25!(sll) $) -- ($ (sur)!.25!(slr) $);
+    \foreach \n in {1,...,8}{
+        \draw[dotted] ($ (ul)!.125*\n!(ll) $) -- ($ (ur)!.125*\n!(lr) $);};
+    \foreach \n in {1,...,16}{
+        \draw[dotted] ($ (ul)!.0625*\n!(ur) $) -- ($ (ll)!.0625*\n!(lr) $);};
+    % first example ray --> "f" as prefix
+    % highlight sensor cell
+    % calculate points on border
+    \node (fslb1) at ($ (sul)!.125*1!(sll) $) {};
+    \node (fslb2) at ($ (sul)!.125*2!(sll) $) {};
+    \node (fsrb1) at ($ (sur)!.125*1!(slr) $) {};
+    \node (fsrb2) at ($ (sur)!.125*2!(slr) $) {};
+
+    \node (fsul) at ($ (fslb1)!.0625*1!(fsrb1) $) {};
+    \node (fsll) at ($ (fslb2)!.0625*1!(fsrb2) $) {};
+    \node (fslr) at ($ (fslb2)!.0625*2!(fsrb2) $) {};
+    \node (fsur) at ($ (fslb1)!.0625*2!(fsrb1) $) {};
+    \filldraw[draw=red, fill=red!20] (fsul.center) -- (fsll.center) -- (fslr.center) -- (fsur.center) -- cycle;
+    % highlight world cell
+    % calculate points on border
+    \node (flb1) at ($ (ul)!.125*1!(ll) $) {};
+    \node (flb2) at ($ (ul)!.125*2!(ll) $) {};
+    \node (frb1) at ($ (ur)!.125*1!(lr) $) {};
+    \node (frb2) at ($ (ur)!.125*2!(lr) $) {};
+
+    \node (ful) at ($ (flb1)!.0625*1!(frb1) $) {};
+    \node (fll) at ($ (flb2)!.0625*1!(frb2) $) {};
+    \node (flr) at ($ (flb2)!.0625*2!(frb2) $) {};
+    \node (fur) at ($ (flb1)!.0625*2!(frb1) $) {};
+    \filldraw[draw=red, fill=red!20] (ful.center) -- (fll.center) -- (flr.center) -- (fur.center) -- cycle;
+
+    % another example ray --> "a" as prefix
+    % highlight sensor cell
+    % calculate points on border
+    \node (aslb1) at ($ (sul)!.125*5!(sll) $) {};
+    \node (aslb2) at ($ (sul)!.125*6!(sll) $) {};
+    \node (asrb1) at ($ (sur)!.125*5!(slr) $) {};
+    \node (asrb2) at ($ (sur)!.125*6!(slr) $) {};
+
+    \node (asul) at ($ (aslb1)!.0625*11!(asrb1) $) {};
+    \node (asll) at ($ (aslb2)!.0625*11!(asrb2) $) {};
+    \node (aslr) at ($ (aslb2)!.0625*12!(asrb2) $) {};
+    \node (asur) at ($ (aslb1)!.0625*12!(asrb1) $) {};
+    \filldraw[draw=red, fill=red!20] (asul.center) -- (asll.center) -- (aslr.center) -- (asur.center) -- cycle;
+    % highlight world cell
+    % calculate points on border
+    \node (alb1) at ($ (ul)!.125*5!(ll) $) {};
+    \node (alb2) at ($ (ul)!.125*6!(ll) $) {};
+    \node (arb1) at ($ (ur)!.125*5!(lr) $) {};
+    \node (arb2) at ($ (ur)!.125*6!(lr) $) {};
+
+    \node (aul) at ($ (alb1)!.0625*11!(arb1) $) {};
+    \node (all) at ($ (alb2)!.0625*11!(arb2) $) {};
+    \node (alr) at ($ (alb2)!.0625*12!(arb2) $) {};
+    \node (aur) at ($ (alb1)!.0625*12!(arb1) $) {};
+    \filldraw[draw=red, fill=red!20] (aul.center) -- (all.center) -- (alr.center) -- (aur.center) -- cycle;
+
+    % the layered pixels
+    \node (fsc) at ($ (fsul)!.5!(fslr) $) {}; % first example sensor center
+    \node (fwc) at ($ (ful)!.5!(flr) $) {}; % first example world center
+    \node (asc) at ($ (asul)!.5!(aslr) $) {}; % another example sensor center
+    \node (awc) at ($ (aul)!.5!(alr) $) {}; % another example world center
+    \draw[dashed] (fsc.center) -- ($ (fsc.center)!-.25!(fwc.center) $);
+    \draw (fsc.center) -- (fwc.center);
+    \draw[dashed] (fwc.center) -- ($ (fsc.center)!1.2!(fwc.center) $);
+    \node[fill, draw, circle, inner sep=1.5pt, label=above:\(z_1\)]%
+        at ($ (fsc)!.1!(fwc)$) {};
+    \node[fill, draw, circle, inner sep=1.5pt, label=below:\(z_2\)]%
+        at ($ (fsc)!.14!(fwc)$) {};
+    \node[fill, draw, circle, inner sep=1.5pt, label=above:\(z_3\)]%
+        at ($ (fsc)!.3!(fwc)$) {};
+    \node[fill, draw, circle, inner sep=1.5pt, label=above:\(z_4\)]%
+        at ($ (fsc)!.4!(fwc)$) {};
+    \node[fill, draw, circle, inner sep=1.5pt, label=above:\(z_5\)]%
+        at ($ (fsc)!.77!(fwc)$) {};
+    \draw[dashed] (asc.center) -- ($ (asc.center)!-.2!(awc.center) $);
+    \draw (asc.center) -- (awc.center);
+    \draw[dashed] (awc.center) -- ($ (asc.center)!1.35!(awc.center) $);
+    \node[fill, draw, circle, inner sep=1.5pt, label=below:\(z_6\)]%
+        at ($ (asc)!.15!(awc)$) {};
+    \node[fill, draw, circle, inner sep=1.5pt, label=above:\(z_7\)]%
+        at ($ (asc)!.24!(awc)$) {};
+    \node[fill, draw, circle, inner sep=1.5pt, label=below:\(z_8\)]%
+        at ($ (asc)!.3!(awc)$) {};
+    \node[fill, draw, circle, inner sep=1.5pt, label=above:\(z_9\)]%
+        at ($ (asc)!.5!(awc)$) {};
+    \node[fill, draw, circle, inner sep=1.5pt, label=above:\(z_{10}\)]%
+        at ($ (asc)!.7!(awc)$) {};
+    \node[fill, draw, circle, inner sep=1.5pt, label=below:\(z_{11}\)]%
+        at ($ (asc)!.75!(awc)$) {};
+    \node[fill, draw, circle, inner sep=1.5pt, label=above:\(z_{12}\)]%
+        at ($ (asc)!.9!(awc)$) {};
+\end{tikzpicture}
