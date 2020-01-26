@@ -23,7 +23,7 @@
 \usepackage{tikz-3dplot}
 \usepackage{pgffor}
 
-\usetikzlibrary{calc}
+\usetikzlibrary{calc, intersections}
 
 \author{Mario Henze}
 \title{The title of the thesis}
@@ -301,6 +301,14 @@ plenoptischen Funktion an einem festen Betrachtungspunkt aufgefasst werden.
 	\(a\), \(b\) und \(c\) sind die Basis LDI Bildraums. (Darstellung 
 	adaptiert aus~\cite{mcmillan1997image})}%
 	\label{fig:ldicoord}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\input{figures/planemorph.tikz}
+	\caption{Morphing von zwei Kamerapositionen. (Darstellung adaptiert
+	aus~\cite{mcmillan1997image})}%
+	\label{fig:ldimorph}
 \end{figure}
 
 \begin{itemize}

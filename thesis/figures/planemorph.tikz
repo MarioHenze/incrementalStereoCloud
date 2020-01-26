@@ -1,0 +1,29 @@
+\begin{tikzpicture}
+    % positions
+    \node[draw, circle, inner sep=1.5pt, label=below:\(C_2\)] (C2) at (0, 0) {};
+    \node[draw, circle, inner sep=1.5pt, label=below:\(C_1\)] (C1) at (5, 0) {};
+    \node[draw, circle, inner sep=1.5pt, label=above:\(X\)] (X) at (7, 7) {};
+    \draw[lightgray, name path=c1x] (C1) -- (X);
+    \draw[lightgray, name path=c2x] (C2) -- (X);
+    \draw[lightgray] (C2) -- (C1);
+    \draw[|<->|] ($(C1)!5mm!-90:(X)$)--node[fill=white] {\(r\)} ($(X)!5mm!90:(C1)$);
+    % frustum corners
+    \begin{scope}[rotate around={-30:(C2)}]
+        \node (c2l) at (-1, 2) {};
+        \node (c2r) at (1, 2) {};
+    \end{scope}
+    \begin{scope}[rotate around={-22:(C1)}]
+        \node (c1l) at (4, 2) {};
+        \node (c1r) at (6, 2) {};
+    \end{scope}
+    % image planes
+    \draw[gray, thick, name path=i1] (c1l) -- (c1r);
+    \draw[gray, thick, name path=i2] (c2l) -- (c2r);
+    % image point vectors
+    \path [name intersections={of = c1x and i1}];
+    \node (c1ix) at (intersection-1) {};
+    \path [name intersections={of = c2x and i2}];
+    \node (c2ix) at (intersection-1) {};
+    \draw[-latex, thick] (C1) -- (c1ix.center);
+    \draw[-latex, thick] (C2) -- (c2ix.center);
+\end{tikzpicture}
