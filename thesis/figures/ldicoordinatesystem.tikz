@@ -1,0 +1,22 @@
+\begin{tikzpicture}[
+        tdplot_main_coords
+    ]
+% general world coordinate system
+\draw[->, very thick] (0, 0, 0) -- node[above] {\(i\)} ++ (3, 0, 0);
+\draw[->, very thick] (0, 0, 0) -- node[above] {\(k\)} ++ (0, 3, 0);
+\draw[->, very thick] (0, 0, 0) -- node[left] {\(j\)} ++ (0, 0, -3);
+
+% image coordinate system
+\node (ul) at (4, 4, 4) {};
+\node (ll) at ($ (ul) + (0,.5,-2) $) {};
+\node (lr) at ($ (ul) + (4,.5,-2) $) {};
+\node (ur) at ($ (ul) + (4,0,0) $) {};
+\draw[->, thick] (0, 0, 0) -- node[above] {\(c\)} ++ (ul.center);
+\draw[->, thick] (ul.center) -- node[above] {\(a\)} ++ (ur);
+\draw[->, thick] (ul.center) -- node[left] {\(b\)} ++ (ll);
+
+\foreach \n in {0,...,8}{
+    \draw[] ($ (ul)!.125*\n!(ll) $) -- ($ (ur)!.125*\n!(lr) $);};
+\foreach \n in {0,...,16}{
+    \draw[] ($ (ul)!.0625*\n!(ur) $) -- ($ (ll)!.0625*\n!(lr) $);};
+\end{tikzpicture}
