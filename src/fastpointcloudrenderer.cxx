@@ -115,8 +115,8 @@ void FastPointCloudRenderer::draw(cgv::render::context &ctx) {
   glDrawArrays(GL_POINTS, 0, m_uploaded_point_count);
   p_renderer.disable(ctx);
 
-  static int i = 0;
-  ctx.write_frame_buffer_to_image(std::to_string(++i) + ".png");
+  //static int i = 0;
+  //ctx.write_frame_buffer_to_image(std::to_string(++i) + ".png");
 }
 
 void FastPointCloudRenderer::finish_draw(cgv::render::context &ctx) {

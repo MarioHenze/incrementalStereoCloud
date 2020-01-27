@@ -317,3 +317,4 @@ thesis/*.pdf
 # latex and vscode specifics for thesis
 /thesis/build
 /thesis/.vscode
+/thesis/.vs
