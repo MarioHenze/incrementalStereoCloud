@@ -1,0 +1,24 @@
+\begin{tikzpicture}
+    \node[cloud, draw, cloud puffs=10,cloud puff arc=120, aspect=2] 
+    (pointcloud) at (0, 0) {Punktwolke};
+    \node[below = of pointcloud, align = center, draw]
+    (PCdispatcher) {Punktwolken\\Verarbeitung};
+    \node[right = 3cm of PCdispatcher, draw] (LDI) {LDI};
+    \node[above = of LDI, draw] (Renderer) {Renderer};
+    \node[above = of Renderer, draw] (GPU) {GPU};
+    \node[right = 3cm of LDI, align = center, draw]
+    (Querygen) {LDI Anfragen-\\generator};
+    \node[below right = of PCdispatcher, draw] (Query) {Anfrage};
+
+    % control- and data flow
+    \draw[->, thick] (PCdispatcher) to [bend right] (pointcloud);
+    \draw[->, thick] (pointcloud) to [bend right] (PCdispatcher);
+    \draw[->, thick] (PCdispatcher) -- node[fill=white]
+    {\faHourglassHalf\space\faLock} (LDI);
+    \draw[->, thick] (LDI) -- node[fill=white]
+    {\faHourglassHalf\space\faLock} (Querygen);
+    \draw[->, red, thick] (LDI) -- node[fill=white] {\faLock} (Renderer);
+    \draw[->, red, thick] (Renderer) -- (GPU);
+    \draw[->, thick] (Querygen) to [in=0, out=230] node[fill=white] {\faLock} (Query);
+    \draw[<->, thick] (Query) to [in=270, out=180] (PCdispatcher);
+\end{tikzpicture}

@@ -17,13 +17,14 @@
 % twoside...... two sided layout
 
 %\usepackage[ngerman]{babel}
+\usepackage{fontawesome5}
 \usepackage{enumitem}
 \usepackage{verbatim}
 \usepackage{tikz}
 \usepackage{tikz-3dplot}
 \usepackage{pgffor}
 
-\usetikzlibrary{calc, intersections}
+\usetikzlibrary{calc, intersections, shapes, positioning}
 
 \author{Mario Henze}
 \title{The title of the thesis}
@@ -320,6 +321,16 @@ plenoptischen Funktion an einem festen Betrachtungspunkt aufgefasst werden.
 \end{itemize}
 
 \chapter{Konzeption}
+
+\begin{figure}
+	\centering
+	\input{figures/sysoverview.tikz}
+	\caption{Systemüberblick des Renderingprozesses. Übergänge mit \faLock\
+	symbolisieren den gegenseitig exklusiv gesicherten Datenaustausch. Mit
+	einem zusätzlichen \faHourglassHalf\ erfolgt der Austausch mit
+	Zeitbegrenzung.}%
+	\label{fig:sysoverview}
+\end{figure}
 
 Die Entkopplung und Nebenläufigkeit der Abläufe in der Implementation sind von
 großer Wichtigkeit. So können folgende unabhängige Prozesse definiert werden.
