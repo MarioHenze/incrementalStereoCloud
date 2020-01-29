@@ -27,7 +27,7 @@
 \usetikzlibrary{calc, intersections, shapes, positioning}
 
 \author{Mario Henze}
-\title{The title of the thesis}
+\title{Layered Depth Images als Ad hoc Rendering für Punktwolken}
 \birthday{19. July 1994}
 \placeofbirth{Wernigerode}
 \matno{4039602}
@@ -90,19 +90,30 @@ es herschen harte Schranken für Eingabeverzögerung und Bildwiederholfrequenz u
 deren Übertretung hat den Verlust von Interaktivität und im schlimmsten Fall
 physiologische Probleme wie Motion Sickness zur Folge.
 
-In dieser Arbeit soll ein Verfahren zur interaktiven Darstellung von Punktwolken
-entwickelt werden, welches in Hinblick auf die genannten Probleme optimiert ist.
-So besteht das Ziel darin, selbst größte Datensätze noch in interaktiver Weise
-darzustellen. Dazu werden zunächst Ansätze zur klassischen Punktwolken
-Darstellung und zum inkrementellen Rendering vorgestellt und deren
+In dieser Arbeit soll ein Verfahren zur interaktiven Darstellung von
+Punktwolken entwickelt werden, welches in Hinblick auf die genannten Probleme
+optimiert ist. So besteht das Ziel darin, selbst größte Datensätze noch in
+interaktiver Weise darzustellen. Dazu werden zunächst Ansätze zur klassischen
+Punktwolken Darstellung und zum inkrementellen Rendering vorgestellt und deren
 Kombinationsmöglichkeiten untersucht. In einem weiteren Schritt soll, das so
 entwickelte Verfahren als C++ Plugin für das cgv-Framework des Lehrstuhls
-umgesetzt werden.
+umgesetzt werden. Abschließend werden die gewonnen Erfahrung in Bezug auf
+Laufzeitverhalten und Implementation dargelegt und erklärt.
 
 \chapter{Verwandte Arbeiten}%
 \label{sec:verwandte_arbeiten}
 
 \section{Überblick}
+
+Das Ziel dieser Arbeit besteht darin einen hybriden Renderingprozess zu
+entwerfen, welcher temporale Redundanz als zusätzliche Optimierung in ein
+klassischen Punktwolkenrenderer einfügt. Um dies zu erreichen werden in den
+folgenden Abschnitten zunächst sog.\ Image-based Rendering Verfahren
+vorgestellt. Diese Algorithmen werden hauptsächlich zur Interpolation von neuen
+Bildern aus bereits Bekannten benutzt. Danach werden klassische
+Renderingverfahren für Punktwolken vorgestellt.
+
+\section{Image-based Rendering}
 
 Im Bereich des Image-based Rendering kann die Arbeit~\cite{shum2000review} als
 Überblick gesehen werden. Heung-Yeung und Sing Bing arbeiten hierbei die
@@ -142,6 +153,8 @@ zum Betrachter variierende diskrete Abtastung von Oberflächen führt weiterhin
 zur Entstehung von Löchern. Um diese Effekte auszugleichen werden mehrere
 Strategien vorgestellt, welche auf der Rekonstruktion von Geometrie und
 optimierter Interpolation basieren.
+
+\section{Klassische Punktwolkenrenderer}
 
 Mit QSplat wurde ein einflussreiches Verfahren zum Zeichnen von Punktwolken von
 Rusinkiewicz und Levoy in~\cite{rusinkiewicz2000qsplat} entwickelt. Hierbei
@@ -245,6 +258,40 @@ Kriterium durch die LDIs abgedeckt wird, baut die folgende Implementation auf
 Basis dieser einen eigenen Rendervorgang auf.
 
 \chapter{Theoretische Betrachtungen}
+
+\section{Lochkamera}
+
+\begin{figure}
+	\centering
+	\tdplotsetmaincoords{70}{110}
+	\input{figures/pinholecamera.tikz}
+	\caption{Abbildungsverhältnisse einer Lochkamera auf Sensor- und reale
+		Bildebene}%
+	\label{fig:pinholecamera}
+\end{figure}
+
+Da LDIs prinzipbedingt auf den Betrachter bezogen definiert sind, ist die
+Klassendeklaration \texttt{PinholeCameraModel} nützlich. Hierbei wird die in
+der Literatur häufig getroffene Vereinfachung einer Lochkameratransformation
+nachgebildet. So kann die Lochkamera als idealisierte optische Kamera
+aufgefasst werden, welche alle Sichtstrahlen in aus der Szene in einem einzigen
+Punkt bündelt (siehe Abbildung~\ref{fig:pinholecamera}). Bei praktischen
+Aufbauten eine Lochkamera wird das projizierte Bild hinter diesem Brennpunkt
+gespiegelt auf einer Ebene abgebildet. Zur Vereinfachung wird auf diesen
+Umstand verzichtet und die Bildebene kurz vor dem Brennpunkt zwischen Szene und
+Koordinatenursprung der Kamera platziert. Dadurch wird auch die Spieglung der
+Abbildung verhindert und die geometrischen Zusammenhänge können mit einfachen
+Strahlensätzen interpretiert werden. In Anlehnung an digitale Linsenkameras
+wird diese Ebene im Quellcode auch als Sensorebene bezeichnet. Des Weiteren
+definiert die Lochkamera mit ihrem Öffnungswinkel und ihrem Seitenverhältnis
+einen Sichtkegelstumpf. Die \texttt{PinholeCameraModel} Klasse vereint diese
+beiden Anwendungen, indem es die Kamera- und Perspektivtransformation als
+Membervariable speichert und in geeigneter Weise über Zugriffmethoden bereit
+stellt. So kann der Sichtkegelstumpf eines LDIs zur Sichtbarkeitsprüfung von
+Punkten genutzt werden. Durch die Rasterisierung der Punkte im LDI ist es
+außerdem notwendig die Pixelauflösung der Sensorebene und damit auch der
+Lochkamera zu speichern. Dies geschieht durch eine weitere Membervariable vom
+Typ \texttt{std::pair<size\_t, size\_t>}.
 
 \section{Plenoptic Modelling}
 
@@ -391,15 +438,6 @@ viele Punktwolkenformate als Eingabe nutzen zu können wird weiterhin die
 bestehende Klasse \texttt{point\_cloud} genutzt.
 
 \section{Grundlegende Abstraktionen}
-
-\begin{figure}
-	\centering
-	\tdplotsetmaincoords{70}{110}
-	\input{figures/pinholecamera.tikz}
-	\caption{Abbildungsverhältnisse einer Lochkamera auf Sensor- und reale
-		Bildebene}%
-	\label{fig:pinholecamera}
-\end{figure}
 
 Da LDIs prinzipbedingt auf den Betrachter bezogen definiert sind, ist die
 Klassendeklaration \texttt{PinholeCameraModel} nützlich. Hierbei wird die in

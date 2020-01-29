@@ -5,45 +5,45 @@
     %\draw[->] (0, 0, 0) -- (8, 0, 0) node[anchor = north]{x};
     %\draw[->] (0, 0, 0) -- (0, 8, 0) node[anchor = west]{y};
     %\draw[->] (0, 0, 0) -- (0, 0, 8) node[anchor = south]{z};
-    \node[poi, fill=gray, label=below:{Brennpunkt}] (focal) at (0, 0, 0) {};
+    \node[poi, fill=gray, pin={south:Brennpunkt}] (focal) at (0, 0, 0) {};
     % image corners
-    \node[poi, fill=red] (ul) at (-4, 10, 2.25) {};
-    \node[poi, fill=blue] (ur) at (4, 10, 2.25) {};
-    \node[poi, fill=green] (lr) at (4, 10, -2.25) {};
-    \node[poi, fill=yellow] (ll) at (-4, 10, -2.25) {};
+    \node[poi, fill=red] (ul) at (-4, 8, 2.25) {};
+    \node[poi, fill=blue] (ur) at (4, 8, 2.25) {};
+    \node[poi, fill=green, pin={south:Szene}] (lr) at (4, 8, -2.25) {};
+    \node[poi, fill=yellow] (ll) at (-4, 8, -2.25) {};
     % sensor corners
-    \node[poi, fill=red] (sul) at (-2, 5, 1.125) {};
-    \node[poi, fill=blue] (sur) at (2, 5, 1.125) {};
-    \node[poi, fill=green] (slr) at (2, 5, -1.125) {};
-    \node[poi, fill=yellow] (sll) at (-2, 5, -1.125) {};
+    \node[poi, fill=red] (sul) at (-2, 4, 1.125) {};
+    \node[poi, fill=blue] (sur) at (2, 4, 1.125) {};
+    \node[poi, fill=green, pin={south:Sensor}] (slr) at (2, 4, -1.125) {};
+    \node[poi, fill=yellow] (sll) at (-2, 4, -1.125) {};
     % projection corners
-    \node[poi, fill=green] (pul) at (-2, -5, 1.125) {};
-    \node[poi, fill=yellow] (pur) at (2, -5, 1.125) {};
-    \node[poi, fill=red] (plr) at (2, -5, -1.125) {};
-    \node[poi, fill=blue] (pll) at (-2, -5, -1.125) {};
+    \node[poi, fill=green] (pul) at (-2, -4, 1.125) {};
+    \node[poi, fill=yellow] (pur) at (2, -4, 1.125) {};
+    \node[poi, fill=red, pin={south:Projektion}] (plr) at (2, -4, -1.125) {};
+    \node[poi, fill=blue] (pll) at (-2, -4, -1.125) {};
     % coords of image
     %\draw[->] (focal) -- (ul);
     %\draw[->] (ul) -- ++(2,0,0);
     %\draw[->] (ul) -- ++(0,0,-2);
     % image borders
-    \draw (ul) -- (ur);
-    \draw (ll) -- (lr);
-    \draw (ul) -- (ll);
-    \draw (ur) -- (lr);
+    \draw[very thick] (ul) -- (ur);
+    \draw[very thick] (ll) -- (lr);
+    \draw[very thick] (ul) -- (ll);
+    \draw[very thick] (ur) -- (lr);
     % view frustum
-    \draw (focal) -- (sul);
-    \draw (focal) -- (sur);
-    \draw (focal) -- (slr);
-    \draw (focal) -- (sll);
-    \draw (sul) -- (ul);
-    \draw (sur) -- (ur);
-    \draw (slr) -- (lr);
-    \draw (sll) -- (ll);
+    \draw[dashed] (focal) -- (sul);
+    \draw[dashed] (focal) -- (sur);
+    \draw[dashed] (focal) -- (slr);
+    \draw[dashed] (focal) -- (sll);
+    \draw[dashed] (sul) -- (ul);
+    \draw[dashed] (sur) -- (ur);
+    \draw[dashed] (slr) -- (lr);
+    \draw[dashed] (sll) -- (ll);
     % sensor edges
-    \draw (sul) -- (sur);
-    \draw (sll) -- (slr);
-    \draw (sul) -- (sll);
-    \draw (sur) -- (slr);
+    \draw[very thick] (sul) -- (sur);
+    \draw[very thick] (sll) -- (slr);
+    \draw[very thick] (sul) -- (sll);
+    \draw[very thick] (sur) -- (slr);
     % projection edges
     \draw[dotted] (pul) -- (pur);
     \draw[dotted] (pll) -- (plr);
@@ -54,4 +54,11 @@
     \draw[dotted] (focal) -- (pur);
     \draw[dotted] (focal) -- (plr);
     \draw[dotted] (focal) -- (pll);
+    % House of santa claus
+    \draw[thick,rounded corners=8pt]
+    (-1, 8, -2) -- (-1, 8, 0) -- (0, 8, 1.25) -- (1, 8, 0) -- (1, 8, -2) -- (-1, 8, 0) -- (1, 8, 0) -- (-1, 8, -2) -- (1, 8, -2);
+    \draw[thick,rounded corners=8pt]
+    (-.5, 4, -1) -- (-.5, 4, 0) -- (0, 4, .625) -- (.5, 4, 0) -- (.5, 4, -1) -- (-.5, 4, 0) -- (.5, 4, 0) -- (-.5, 4, -1) -- (.5, 4, -1);
+    \draw[thick,rounded corners=8pt]
+    (-.5, -4, 1) -- (-.5, -4, 0) -- (0, -4, -.625) -- (.5, -4, 0) -- (.5, -4, 1) -- (-.5, -4, 0) -- (.5, -4, 0) -- (-.5, -4, 1) -- (.5, -4, 1);
 \end{tikzpicture}
