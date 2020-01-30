@@ -270,28 +270,20 @@ Basis dieser einen eigenen Rendervorgang auf.
 	\label{fig:pinholecamera}
 \end{figure}
 
-Da LDIs prinzipbedingt auf den Betrachter bezogen definiert sind, ist die
-Klassendeklaration \texttt{PinholeCameraModel} nützlich. Hierbei wird die in
-der Literatur häufig getroffene Vereinfachung einer Lochkameratransformation
-nachgebildet. So kann die Lochkamera als idealisierte optische Kamera
-aufgefasst werden, welche alle Sichtstrahlen in aus der Szene in einem einzigen
-Punkt bündelt (siehe Abbildung~\ref{fig:pinholecamera}). Bei praktischen
-Aufbauten eine Lochkamera wird das projizierte Bild hinter diesem Brennpunkt
-gespiegelt auf einer Ebene abgebildet. Zur Vereinfachung wird auf diesen
-Umstand verzichtet und die Bildebene kurz vor dem Brennpunkt zwischen Szene und
+Da LDIs prinzipbedingt auf den Betrachter bezogen definiert sind und einer
+Perspektivtransformation unterliegen, ist die Definition einer Lochkamera
+sinnvoll. So kann die Lochkamera als idealisierte optische Kamera aufgefasst
+werden, welche alle Sichtstrahlen in aus der Szene in einem einzigen Punkt
+bündelt (siehe Abbildung~\ref{fig:pinholecamera}). Bei praktischen Aufbauten
+eine Lochkamera wird das projizierte Bild hinter diesem Brennpunkt gespiegelt
+auf einer Ebene abgebildet. Zur Vereinfachung wird auf diesen Umstand
+verzichtet und die Bildebene kurz vor dem Brennpunkt zwischen Szene und
 Koordinatenursprung der Kamera platziert. Dadurch wird auch die Spieglung der
 Abbildung verhindert und die geometrischen Zusammenhänge können mit einfachen
 Strahlensätzen interpretiert werden. In Anlehnung an digitale Linsenkameras
 wird diese Ebene im Quellcode auch als Sensorebene bezeichnet. Des Weiteren
 definiert die Lochkamera mit ihrem Öffnungswinkel und ihrem Seitenverhältnis
-einen Sichtkegelstumpf. Die \texttt{PinholeCameraModel} Klasse vereint diese
-beiden Anwendungen, indem es die Kamera- und Perspektivtransformation als
-Membervariable speichert und in geeigneter Weise über Zugriffmethoden bereit
-stellt. So kann der Sichtkegelstumpf eines LDIs zur Sichtbarkeitsprüfung von
-Punkten genutzt werden. Durch die Rasterisierung der Punkte im LDI ist es
-außerdem notwendig die Pixelauflösung der Sensorebene und damit auch der
-Lochkamera zu speichern. Dies geschieht durch eine weitere Membervariable vom
-Typ \texttt{std::pair<size\_t, size\_t>}.
+einen Sichtkegelstumpf.
 
 \section{Plenoptic Modelling}
 
@@ -313,8 +305,8 @@ die plenoptische Funktion wie folgt:
 \end{description}
 
 Diese Form der Beschreibung ermöglicht es die Szene zu jedem Zeitpunkt an jeder
-Stelle und in jede Richtung zu samplen. Anhand dieses generellen Modells können
-nun Vereinfachungen vorgenommen werden.
+Stelle und aus jeder Richtung zu samplen. Anhand dieses generellen Modells
+können nun Vereinfachungen vorgenommen werden.
 
 Es ist zunächst festzustellen, dass Punktwolkendaten in einem globalen
 Koordinatensystem gegeben sind. Beim Punktwolkenrendering gehen jedoch nur die
@@ -323,10 +315,19 @@ ausschließlich kontinuierlich. Daraus folgt, dass sich die Untermengen alles
 sichtbaren Punkte zwischen zwei gerenderten Ansichten nahezu identisch sind.
 Ähnliche Annahmen liegen auch dem Modell der Layered Depth Images zugrunde.
 
-McMillan und Bishop ermöglichten in~\cite{mcmillan1995plenoptic} unter
-Ausschluss von \( t \) und \( \lambda \) das plenoptische Modellieren. In
-diesem Kontext kann ein gewöhnliches Bild nun als unvollständige Abtastung der
-plenoptischen Funktion an einem festen Betrachtungspunkt aufgefasst werden.
+McMillan und Bishop ermöglichen in~\cite{mcmillan1995plenoptic} unter
+Ausschluss von \( t \) und \( \lambda \) das plenoptische Modellieren. So
+ergibt sich durch die Annahme einer statischen Szene:
+
+\begin{equation}
+	P_5 = P(V_x, V_y, V_z, \theta, \Phi)
+\end{equation}
+
+In diesem Kontext kann ein gewöhnliches Bild als unvollständige Abtastung der
+plenoptischen Funktion an einem festen Betrachtungspunkt aufgefasst werden. Die
+zentrale Fragestellung des Image-based Renderings besteht also darin aus einer
+Menge von unvollständigen und diskreten Abtastungen die kontinuierliche
+plenoptische Funktion zu rekonstruieren~\cite{mcmillan1995plenoptic}.
 
 \section{Layered Depth Image}
 
@@ -334,22 +335,86 @@ plenoptischen Funktion an einem festen Betrachtungspunkt aufgefasst werden.
 	\centering
 	\tdplotsetmaincoords{70}{110}
 	\input{figures/layereddepthimage.tikz}
-	\caption{Veranschaulichung von Punkten in einem LDI. Alle Punkte mit
+	\caption{Veranschaulichung von Punkten in einem LDI.\@ Alle Punkte mit
 	gleicher Pixelzugehörigkeit werden zusammenhängend gespeichert. Jeder
 	Punkt im Pixel besitzt eine Tiefe \(z\) und eine Farbe \(c\).}%
 	\label{fig:layereddepthimage}
 \end{figure}
 
+Das Layered Depth Image wurden von Shade et al.\ in~\cite{he1998layered}
+vorgestellt. Es fügt sich in die Taxonomie der Abtastungen der plenoptischen
+Funktion zwischen Lichtfeldaufnahmen bzw. Lumigraphs und klassische
+Kugelpanoramen ein. LDIs wurden entwickelt um generelle Verdeckungsartefakte zu
+beseitigen, bei denen Konventionelle Sprite Warping Algorithmen versagten.
+Hierfür werden die Pixel eines gewöhnlichen Bildpuffers mit Informationen
+überbelegt. Es wird sozusagen die Menge aller Pixel in verschieden Tiefen mit
+gleicher Bildposition gespeichert (siehe
+Abbildung~\ref{fig:layereddepthimage}). Um dieses LDI zu erzeugen wurden
+ursprünglich mehrere Referenzbilder mit Tiefeninformation erfasst und diese
+dann in die Ansicht des LDIs gewarpt.
+
 \begin{figure}
 	\centering
 	\tdplotsetmaincoords{70}{60}
 	\input{figures/ldicoordinatesystem.tikz}
-	\caption{Zusammenhänge im LDI Koordinatensystem. Die Vektoren \(i\),
-	\(j\) und \(k\) spannen das Weltkoordinatensystem auf. Die Vektoren
-	\(a\), \(b\) und \(c\) sind die Basis LDI Bildraums. (Darstellung 
-	adaptiert aus~\cite{mcmillan1997image})}%
+	\caption{Zusammenhänge im LDI Koordinatensystem. Die Vektoren \( \hat{\imath}
+	\), \( \hat{\jmath} \) und \( \hat{k} \) spannen das Weltkoordinatensystem
+	auf. Die Vektoren \( \hat{a} \), \( \hat{b} \) und \(c\) sind die Basis LDI
+	Bildraums. (Darstellung adaptiert aus~\cite{mcmillan1997image})}%
 	\label{fig:ldicoord}
 \end{figure}
+
+Wie in~\cite{chang1999ldi} dargelegt ist die McMillan 3D Morphing Gleichung
+(siehe~\cite{mcmillan1995list} und~\cite{mcmillan1995plenoptic}) auf das LDI
+anwendbar. Um diese definieren zu können muss jedoch zunächst das Kameramodell
+nach~\cite{mcmillan1997image} beschrieben werden (siehe
+Abbildung~\ref{fig:ldicoord}). Generell befindet sich das LDI in einem
+dreidimensionalen euklidischen Raum mit den Basisvektoren \( (\hat{\imath},
+\hat{\jmath}, \hat{k}) \). Außerdem wird ein weiteres zweidimensionales
+Koordinatensystem durch die Basis \( (\hat{a}, \hat{b}) \) aufgespannt. Allen
+gespeicherten Bildpunkten werden Koordinaten in dieser Bildebene zugewiesen.
+Ohne Beschränkung der Allgemeinheit wird der Ursprung in eine Ecke des
+abgeschlossenen Bildbereiches durch den Vektor \( c \) festgelegt.
+
+Unter der Annahme, dass alle Sichtstrahlen aus den Koordinatenursprung \(
+(0,0,0) \) stammen, kann eine direkte Korrespondenz zwischen dem
+Richtungsvektor \( \vec{d} \) und den Bildpunkten des LDI definiert werden:
+%
+\begin{equation}
+	\vec{d} =
+	\begin{pmatrix}
+		d_{\hat{\imath}} \\
+		d_{\hat{\jmath}} \\
+		d_{\hat{k}}
+	\end{pmatrix} =
+	\begin{pmatrix}
+		a_{\hat{\imath}} &
+		b_{\hat{\imath}} &
+		c_{\hat{\imath}} \\
+		a_{\hat{\jmath}} &
+		b_{\hat{\jmath}} &
+		c_{\hat{\jmath}} \\
+		a_{\hat{k}} &
+		b_{\hat{k}} &
+		c_{\hat{k}} \\
+	\end{pmatrix}
+	\begin{pmatrix}
+		u \\
+		v \\
+		1
+	\end{pmatrix} =
+	\mathbf{P}
+	\begin{pmatrix}
+		u \\
+		v \\
+		1
+	\end{pmatrix}
+\end{equation}
+%
+Hierbei ist jedoch zu beachten, dass alle skalaren Vielfachen der Abbildung \(
+\mathbf{P} \) auch eine gültige Transformation ergeben.
+
+\section{Morphing Gleichung}
 
 \begin{figure}
 	\centering
@@ -359,13 +424,31 @@ plenoptischen Funktion an einem festen Betrachtungspunkt aufgefasst werden.
 	\label{fig:ldimorph}
 \end{figure}
 
-\begin{itemize}
-	\item Von kamera position
-	\item x- und y-Auflösung als raytracing
-	\item layered depth pixel ist Farbwert mit Tiefeninformation in Abhängigkeit der
-	      Kameraposition
-	\item neuer Viewport über Matrixtransformation
-\end{itemize}
+Mit den getroffenen Definitionen kann die Morphing Gleichung
+nach~\cite{mcmillan1997image} formuliert werden. Um zwei LDIs in einander
+überführen zu können, müssen deren Kameramodelle gleichgesetzt werden. Für
+einen Punkt \(X\) im Weltkoordinatensystem gilt somit:
+%
+\begin{equation}
+	X = C_1 + t_1 \mathbf{P_1} x_1 %
+	= C_2 + t_2 \mathbf{P_2} x_2
+\end{equation}
+%
+\begin{description}[style=sameline]
+	\item[\( C \)] Position der Kamera
+	\item[\( t \)] unbekannter Skalierungsfaktor der Abbildung
+	\item[\( \mathbf{P} \)] Abbildung von Bildpunkt auf Richtungsvektor
+	\item[\( x \)] Bildposition
+\end{description}
+
+Nach der Termumstellung ergibt sich der Sichtstrahl direkt:
+\begin{equation}
+	\frac{t_2}{t_1} \mathbf{P_2} x_2 = %
+	\frac{1}{t_1}(C_1 - C_2) + \mathbf{P_1} x_1
+\end{equation}
+
+Da die Abbildung \( \mathbf{P} \) auch unter Skalierung gültig bleibt, kann der
+Term \( \frac{t_2}{t_1} \) dadurch absorbiert werden.
 
 \chapter{Konzeption}
 
@@ -565,20 +648,34 @@ der \texttt{init()} Methode. Hierdurch wird eine Trennung zwischen
 Funktionalität und der Art und Weise der Ausführung erreicht. Somit sind
 Anpassung an neuartige Parallelitätsmuster wie Coroutines einfacher möglich.
 
-\section{Systemablauf}
+\chapter{Evaluation}
 
-\begin{itemize}
-	\item Eingabe von Punktwolke
-	\item räumliche Unterteilung der Punktwolke (Octree)
-	\item Raytracing durch Octree
-	\item ergibt alle depth Pixel auf einem strahl
-	\item Kriterium für optimalen Abstand und Anzahl von Tiefenebenen von Framerateziel
-	\item Detail Culling und Viewport Culling
-	\item eigentliches Rendern geschieht nur durch rendern/morphen des LDI
-	\item bei bewegen des Viewport sollte möglichst schnell der LDI als Bild zur Verfügung stehen
-	\item Parallel dazu wird neuer optimaler LDI generiert aus Kombination von altem LDI und der Punktwolke
-	\item Stellen im alten gemorphten LDI finden, die undersampled sind und mit informationen aus Punktwolke auffüllen?
-	\item wieder detail culling an oversampled Stellen
-\end{itemize}
+\section{temporaler Aspekt}
+
+\begin{figure}
+	\centering
+	\includegraphics[width = .48\linewidth]{images/incrementalLoading/95}%
+	\includegraphics[width = .48\linewidth]{images/incrementalLoading/97}
+	\includegraphics[width = .48\linewidth]{images/incrementalLoading/99}%
+	\includegraphics[width = .48\linewidth]{images/incrementalLoading/101}
+	\includegraphics[width = .48\linewidth]{images/incrementalLoading/105}%
+	\includegraphics[width = .48\linewidth]{images/incrementalLoading/107}
+	\includegraphics[width = .48\linewidth]{images/incrementalLoading/109}%
+	\includegraphics[width = .48\linewidth]{images/incrementalLoading/115}
+	\caption{Inkrementelles Nachladen von Punkten der Wolke in das LDI.}%
+	\label{img:incload}
+\end{figure}
+
+\section{Diskussion}
+
+Coroutines
+
+deterministische Abfolge beim Nachladen
+
+eigene Datenverwaltung bei großen Modellen notwendig -> LZ4 + Clustering
+
+Memory Bottleneck
+
+GPU lokale Vorhaltung
 
 \end{document}
