@@ -448,7 +448,25 @@ Nach der Termumstellung ergibt sich der Sichtstrahl direkt:
 \end{equation}
 
 Da die Abbildung \( \mathbf{P} \) auch unter Skalierung gültig bleibt, kann der
-Term \( \frac{t_2}{t_1} \) dadurch absorbiert werden.
+Term \( \frac{t_2}{t_1} \) dadurch absorbiert werden. Außerdem lässt sich \(
+\frac{1}{t_1} \) durch \( \delta(x_1) \) ersetzen:
+\begin{equation}
+	\mathbf{P_2} x_2 = %
+	\delta(x_1) (C_1 - C_2) + \mathbf{P_1} x_1
+\end{equation}
+
+Der Term \( \delta(x_1) \) ist als generalisierte Disparität bekannt und tritt
+bei der Fragestellung auf, aus zwei Stereobildern eine Tiefenkarte zu
+erstellen. Diese Zusammenhänge sind in Abbildung~\ref{fig:ldimorph}
+dargestellt. Durch die Nutzung der Strahlensätze lässt sich eine Gleichung zu
+Bestimmung der generalisierten Disparität finden:
+\begin{align}
+	\frac{r}{\lvert C_1 - C_2 \rvert} =&
+	\frac{\mathbf{P_1} x_1}{\delta(x_1) \lvert (C_1 - C_2) \rvert}
+	\\ %
+	\implies \delta(x_1) =&
+	\frac{\lvert \mathbf{P} x_1 \lvert}{r}
+\end{align}
 
 \chapter{Konzeption}
 
@@ -520,30 +538,17 @@ Grafikhardware wird das CGV Framework des Lehrstuhls verwendet. Um möglichst
 viele Punktwolkenformate als Eingabe nutzen zu können wird weiterhin die
 bestehende Klasse \texttt{point\_cloud} genutzt.
 
-\section{Grundlegende Abstraktionen}
+\section{Lochkamera Modell}
 
-Da LDIs prinzipbedingt auf den Betrachter bezogen definiert sind, ist die
-Klassendeklaration \texttt{PinholeCameraModel} nützlich. Hierbei wird die in
-der Literatur häufig getroffene Vereinfachung einer Lochkameratransformation
-nachgebildet. So kann die Lochkamera als idealisierte optische Kamera
-aufgefasst werden, welche alle Sichtstrahlen in aus der Szene in einem einzigen
-Punkt bündelt (siehe Abbildung~\ref{fig:pinholecamera}). Bei praktischen
-Aufbauten eine Lochkamera wird das projizierte Bild hinter diesem Brennpunkt
-gespiegelt auf einer Ebene abgebildet. Zur Vereinfachung wird auf diesen
-Umstand verzichtet und die Bildebene kurz vor dem Brennpunkt zwischen Szene und
-Koordinatenursprung der Kamera platziert. Dadurch wird auch die Spieglung der
-Abbildung verhindert und die geometrischen Zusammenhänge können mit einfachen
-Strahlensätzen interpretiert werden. In Anlehnung an digitale Linsenkameras
-wird diese Ebene im Quellcode auch als Sensorebene bezeichnet. Des Weiteren
-definiert die Lochkamera mit ihrem Öffnungswinkel und ihrem Seitenverhältnis
-einen Sichtkegelstumpf. Die \texttt{PinholeCameraModel} Klasse vereint diese
-beiden Anwendungen, indem es die Kamera- und Perspektivtransformation als
-Membervariable speichert und in geeigneter Weise über Zugriffmethoden bereit
-stellt. So kann der Sichtkegelstumpf eines LDIs zur Sichtbarkeitsprüfung von
-Punkten genutzt werden. Durch die Rasterisierung der Punkte im LDI ist es
-außerdem notwendig die Pixelauflösung der Sensorebene und damit auch der
-Lochkamera zu speichern. Dies geschieht durch eine weitere Membervariable vom
-Typ \texttt{std::pair<size\_t, size\_t>}.
+Wie im Grundlagenteil bereits motiviert, ist die Klassendeklaration
+\texttt{PinholeCameraModel} zur Nachbildung einer Lochkamera nützlich. Die
+Klasse speichert die Kamera- und Perspektivtransformation als Membervariable
+und stellt diese in geeigneter Weise über Zugriffmethoden bereit. So kann der
+Sichtkegelstumpf eines LDIs zur Sichtbarkeitsprüfung von Punkten genutzt
+werden. Durch die Rasterisierung der Punkte im LDI ist es außerdem notwendig
+die Pixelauflösung der Sensorebene und damit auch der Lochkamera zu speichern.
+Dies geschieht durch eine weitere Membervariable vom Typ
+\texttt{std::pair<size\_t, size\_t>}.
 
 \section{Die Punktwolke und Punktwolkenanfragen}
 
