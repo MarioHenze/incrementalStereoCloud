@@ -20,11 +20,14 @@
 \usepackage{fontawesome5}
 \usepackage{enumitem}
 \usepackage{verbatim}
+\usepackage{siunitx}
 \usepackage{tikz}
 \usepackage{tikz-3dplot}
 \usepackage{pgffor}
 
 \usetikzlibrary{calc, intersections, shapes, positioning}
+
+\sisetup{locale = DE}
 
 \author{Mario Henze}
 \title{Layered Depth Images als Ad hoc Rendering für Punktwolken}
@@ -62,10 +65,42 @@ Optional Tasks:
 \item Implementation of an advanced hole-free point cloud rendering approach
 \end{itemize}
 }
-\copyrighterklaerung{If the author used ressources from third parties (texts,
-images, code) he or she should state the consents of the copyright owners here
-or cite the given general conditions (e.g. CC/ (L) GPL/BSD copyright notices)}
-\acknowledgments{I'd like to thank...}
+\copyrighterklaerung{
+	Die Verwendung des CGV Frameworks erfolgt nach den folgenden Lizenzbedingungen:
+
+	Copyright (c) 2016, Stefan Gumhold
+	All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+\begin{itemize}
+    \item Redistributions of source code must retain the above
+    copyright notice, this list of conditions and the following disclaimer.
+    \item Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in the
+    documentation and/or other materials provided with the distribution.
+    \item Neither the name of the Technische Universitaet Dresden nor the names
+    of its contributors may be used to endorse or promote products derived from
+    this software without specific prior written permission.
+\end{itemize}
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS ``AS IS''
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED.\@ IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES;\@ LOSS OF USE, DATA, OR PROFITS;\@ OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\@
+}
+
+\acknowledgments{Ich möchte hiermit meinem Betreuer Dr.\ Benjamin Russig für
+die vielen konstruktiven Hinweise danken. Besonders die zielgerichtete Hilfe im
+Umgang mit dem CGV Framework waren von immensem Wert.}
+
 \abstracten{abstract text english}
 \abstractde{ abstract text german}
 \begin{document}
@@ -336,8 +371,8 @@ plenoptische Funktion zu rekonstruieren~\cite{mcmillan1995plenoptic}.
 	\tdplotsetmaincoords{70}{110}
 	\input{figures/layereddepthimage.tikz}
 	\caption{Veranschaulichung von Punkten in einem LDI.\@ Alle Punkte mit
-	gleicher Pixelzugehörigkeit werden zusammenhängend gespeichert. Jeder
-	Punkt im Pixel besitzt eine Tiefe \(z\) und eine Farbe \(c\).}%
+		gleicher Pixelzugehörigkeit werden zusammenhängend gespeichert. Jeder
+		Punkt im Pixel besitzt eine Tiefe \(z\) und eine Farbe \(c\).}%
 	\label{fig:layereddepthimage}
 \end{figure}
 
@@ -358,9 +393,9 @@ dann in die Ansicht des LDIs gewarpt.
 	\tdplotsetmaincoords{70}{60}
 	\input{figures/ldicoordinatesystem.tikz}
 	\caption{Zusammenhänge im LDI Koordinatensystem. Die Vektoren \( \hat{\imath}
-	\), \( \hat{\jmath} \) und \( \hat{k} \) spannen das Weltkoordinatensystem
-	auf. Die Vektoren \( \hat{a} \), \( \hat{b} \) und \(c\) sind die Basis LDI
-	Bildraums. (Darstellung adaptiert aus~\cite{mcmillan1997image})}%
+		\), \( \hat{\jmath} \) und \( \hat{k} \) spannen das Weltkoordinatensystem
+		auf. Die Vektoren \( \hat{a} \), \( \hat{b} \) und \(c\) sind die Basis LDI
+		Bildraums. (Darstellung adaptiert aus~\cite{mcmillan1997image})}%
 	\label{fig:ldicoord}
 \end{figure}
 
@@ -390,13 +425,13 @@ Richtungsvektor \( \vec{d} \) und den Bildpunkten des LDI definiert werden:
 	\begin{pmatrix}
 		a_{\hat{\imath}} &
 		b_{\hat{\imath}} &
-		c_{\hat{\imath}} \\
+		c_{\hat{\imath}}   \\
 		a_{\hat{\jmath}} &
 		b_{\hat{\jmath}} &
-		c_{\hat{\jmath}} \\
-		a_{\hat{k}} &
-		b_{\hat{k}} &
-		c_{\hat{k}} \\
+		c_{\hat{\jmath}}   \\
+		a_{\hat{k}}      &
+		b_{\hat{k}}      &
+		c_{\hat{k}}        \\
 	\end{pmatrix}
 	\begin{pmatrix}
 		u \\
@@ -420,7 +455,7 @@ Hierbei ist jedoch zu beachten, dass alle skalaren Vielfachen der Abbildung \(
 	\centering
 	\input{figures/planemorph.tikz}
 	\caption{Morphing von zwei Kamerapositionen. (Darstellung adaptiert
-	aus~\cite{mcmillan1997image})}%
+		aus~\cite{mcmillan1997image})}%
 	\label{fig:ldimorph}
 \end{figure}
 
@@ -461,10 +496,10 @@ erstellen. Diese Zusammenhänge sind in Abbildung~\ref{fig:ldimorph}
 dargestellt. Durch die Nutzung der Strahlensätze lässt sich eine Gleichung zu
 Bestimmung der generalisierten Disparität finden:
 \begin{align}
-	\frac{r}{\lvert C_1 - C_2 \rvert} =&
+	\frac{r}{\lvert C_1 - C_2 \rvert} = &
 	\frac{\mathbf{P_1} x_1}{\delta(x_1) \lvert (C_1 - C_2) \rvert}
 	\\ %
-	\implies \delta(x_1) =&
+	\implies \delta(x_1) =              &
 	\frac{\lvert \mathbf{P} x_1 \lvert}{r}
 \end{align}
 
@@ -474,9 +509,9 @@ Bestimmung der generalisierten Disparität finden:
 	\centering
 	\input{figures/sysoverview.tikz}
 	\caption{Systemüberblick des Renderingprozesses. Übergänge mit \faLock\
-	symbolisieren den gegenseitig exklusiv gesicherten Datenaustausch. Mit
-	einem zusätzlichen \faHourglassHalf\ erfolgt der Austausch mit
-	Zeitbegrenzung.}%
+		symbolisieren den gegenseitig exklusiv gesicherten Datenaustausch. Mit
+		einem zusätzlichen \faHourglassHalf\ erfolgt der Austausch mit
+		Zeitbegrenzung.}%
 	\label{fig:sysoverview}
 \end{figure}
 
@@ -788,14 +823,45 @@ Gleichgewichtsstörungen führen.
 \section{Diskussion}%
 \label{sec:discussion}
 
-Coroutines
+Zunächst ist festzustellen, dass das erwünschte Ziel von 90 Bildern pro Sekunde
+nicht erreicht wurde. Obwohl Datenverarbeitung und Rendering nebenläufig
+ausgeführt werden, reicht das Zeitbudget von ca. \SI{11,1}{\milli\second} nicht
+aus, um alle Punkte zu zeichnen. Die initiale Annahme, dass der Rechenaufwand
+des Morphings den Flaschenhals darstellt, hat sich nicht bewahrheitet. So
+wurden testweise Teile der Berechnung mit intrinsischen SSE Funktionen des
+Compilers ausgetauscht. Diese führten jedoch zu keinem messbaren Vorteil.
+Daraufhin wurde die Implementation mehrfach mit einem Laufzeit-Profiler
+untersucht. Dadurch konnten überflüssige Aufrufe entfernt werden und die
+Ausdehnung von kritischen Bereichen verkleinert werden. Diese Maßnahmen
+reichten jedoch nicht aus, um dass FPS Ziel zu erreichen. Die hauptsächlichen
+Verbraucher von Aufrufzeit sind Speicherzugriffe und zu einem geringeren Teil
+Kernelfunktionen. Dies führt zu der Festellung, das die Implementation des LDIs
+und der Morphinggleichung auf der CPU fehlplatziert sind. So erreicht
+DDR3--1600 Speicher nur einen Durchsatz von 12,8 GB/s. Auf Grafikkarten wird
+jedoch GDDR5 benutzt und erreicht Größenordnungen von 224,4 GB/s (GTX 980). Mit
+diesem Umstand erscheint eine Speicherung des LDIs direkt auf der GPU und ein
+Morphing durch dedizierte Shader erfolgsversprechender. Die Implementation auf
+der CPU entstand jedoch aus der Motivation, die erweiterten Fähigkeiten des
+bestehenden CGV Renderers wiederzuverwenden.
 
-deterministische Abfolge beim Nachladen
+Es hat sich auch als Nachteilig erwiesen, dass die benutzte Klasse zum Laden
+der Punktwolke die gesamte Datei in den Speicher lädt. Dies führt bei
+ausreichend großen Punktwolken zu einem Abbruch des Programms wegen
+Speichermangel. Dieser Umstand lässt sich durch eine In-Memory Kompression mit
+z.B. LZ4 abschwächen. Eine endgültige Lösung stellt jedoch nur die Nutzung
+einer Verwaltungsstruktur für quasi wahlfreien Zugriff auf eine Punktwolke im
+Dateisystem dar.
 
-eigene Datenverwaltung bei großen Modellen notwendig -> LZ4 + Clustering
-
-Memory Bottleneck
-
-GPU lokale Vorhaltung
+Eine weitere Verbesserung der vorgestellten Implementation kann mit dem
+kommenden C++20 Standard umgesetzt. Dieser führt sog. Coroutines in den
+Sprachkern ein und ermöglicht dadurch eine Nebenläufigkeit, die nicht auf
+Betriebssystemressourcen angewiesen ist. Indem der Aufrufzustand einer Funktion
+unabhängig von Aufrufstack gespeichert wird, können Funktionen beliebig oft
+unterbrochen und wieder aufgenommen werden. Dadurch wird eine Programmstruktur
+möglich, welche von den Kostenüberlegungen des Mutex Gebrauchs befreit sind. So
+wäre es zum Beispiel denkbar, dass der Renderingprozess direkt mit der
+Granularität von einem Punkt die Datenanfragen konsumiert. Da keine
+Mutexvariablen genutzt werden müssen, wäre der Zeitaufwand vernachlässigbar und
+die beiden Prozesse würden quasi parallel ablaufen.
 
 \end{document}
