@@ -671,7 +671,122 @@ Anpassung an neuartige Parallelitätsmuster wie Coroutines einfacher möglich.
 	\label{img:incload}
 \end{figure}
 
-\section{Diskussion}
+Das Ziel der Entkopplung zwischen Datenverarbeitung und Anzeige wurde
+größtenteils erreicht. So ist mit einem optimierten Kompilat der Implementation
+keine messbare Verzögerung zwischen dem erzeugen Punktwolkenanfrage und seiner
+Fertigstellung wahrzunehmen. Ein Debugbuild zeigt auf anschauliche Weise, wie
+das Einfügen von Punkten aus der Wolke abläuft (siehe
+Abbildung~\ref{img:incload}). So ist erkennbar, dass zunächst kleine
+Punktgruppen quasi zufällig geladen werden. Wenig später sind nahezu
+rechteckige Patches auf der Oberfläche erkennbar. Daraufhin ist eine
+Objektoberfläche bereits wahrnehmbar. Es ist jedoch auffällig das bis zuletzt
+einzelne Reihen von Punkten unaufgefüllt bleiben.
+
+Diese Effekte lassen sich durch zwei primäre Ursachen erklären. So wird durch
+Speicherung der Punktwolke als Datei eine Serialisierung durchgeführt. Unter
+der Annahme, dass die \texttt{point\_cloud} diese Anordnung auch intern
+verwendet, unterliegen die Punkte der Wolke dadurch einer impliziten
+Reihenfolge. Da an allen Übergabepunkten der Implementation die Verarbeitung
+seriell erfolgt, bleibt diese Reihenfolge somit in einem lokalen Intervall
+erhalten. Es ist außerdem möglich, dass beim ursprünglichen Speichern eine
+gewisse Anordnung erreicht werden sollte. So ist es möglich, dass verschiedene
+Qualitätsstufen nacheinander gespeichert wurden. Bei Bildern die über langsame
+Netzwerke übertragen werden, wird häufig Interleaving eingesetzt um eine
+initale Approximation des Inhalts möglichst frühzeitig anzeigen zu können. Da
+das verwendete Modell des Stanford Bunny 1993 (siehe~\cite{bunny}) angefertigt
+wurde, ist ein analoges Verfahren wahrscheinlich.
+
+Des Weiteren sind die Verarbeitungsschritte durch die
+\texttt{std::timed\_mutex} zeitlich aneinander gekoppelt. So hat die Framerate
+einen direkten Einfluss auf die Größe der Anfragen und die Menge an Punkten,
+die auf einmal in das LDI kopiert werden können. Es ist denkbar dass hierbei
+Oszillationseffekte durch die sog. Lock Contention auftreten. So ist ein Mutex
+eine Betriebssystemressource und muss durch eben dieses verwaltet werden. Wie
+jedoch bekannt ist, sind alle Aufrufe, die in den Kernel Adressraum führen
+äußerst teuer. Daraus folgen in Überlastungssituationen überproportional
+ansteigende Laufzeitkosten während der Reservierung des Mutex. Dies hat eine
+Wechselwirkung zur Folge, dass während einer Überlastung die Zeit für
+Anfragenerstellung und Ausführung sich verringert. Diese Situation wird jedoch
+durch den Prozess-Scheduler des Betriebssystems schubweise entschärft. Dadurch
+sind wieder längere Zeitabschnitte zur Abarbeitung möglich. Lange gehaltene
+exklusive Abschnitte führen jedoch wieder zu der oben begonnenen Überlastung.
+Diese Beobachtung bestätigt sich auch durch einen Sägezahnartigen
+Auslastungsverlauf der CPU.\@ Als direkte Folge dieser schwankenden
+Zeitintervalle sind auch die zusammenhängenden Bereiche der Wolke einer
+zyklischen Schwankung ausgesetzt.
+
+Trotz Entkopplung des Nachladens und der Anzeige versagt die Implementation bei
+größeren Datenwolken wie dem Lego 3D Scans (rund 52 MB). So entstehen initiale
+Verzögerungen und es dauert ca. 8 Sekunden bis alle sichtbaren Punkte angezeigt
+werden (Haswell i7 4790K, 16 GB DDR3, Maxwell GTX 980). Es kann zwar eine
+nahezu konstante Bildrate gehalten, die qualitativen Einbußen sind jedoch
+gravierend (siehe Abbildung~\ref{img:lego}). Auf mögliche Gründe wird im
+Abschnitt~\ref{sec:discussion} eingegangen.
+
+\begin{figure}
+	\centering
+	\includegraphics[width = \linewidth]{images/Lego/126}
+	\includegraphics[width = \linewidth]{images/Lego/150}
+	\includegraphics[width = \linewidth]{images/Lego/170}
+	\caption{Inkrementelles des Lego 3D Scans.}%
+	\label{img:lego}
+\end{figure}
+
+\section{qualitativer Aspekt}
+
+Da die in der Implementation verwendete Form des LDI weiterhin Punkte und nicht
+reine Bildpixel verwaltet, führt dies zur Überlegung den vorhandenen
+Punktrenderer des CGV Frameworks wiederzuverwenden. Deshalb ist ein direkter
+Vergleich zweier fertig gestellter Bilder nicht aufschlussreich, da sie
+letztendlich durch den gleichen Vorgang gezeichnet wurden. Da das
+Punktrendering außerdem nur einzelne Pixel einfärbt, sind klassische
+Vergleichsmetriken, wie das Differenzbild ohne Anpassung nicht sinnvoll. Ein
+Unterschied zwischen beiden Renderingverfahren wird sich jedoch nur
+Abweichungen in den Bildpositionen bemerkbar machen. Deshalb wird vor dem
+eigentlichen Vergleich ein Gaußfilter mit einem Durchmesser von 5 Pixeln auf
+beide Bilder angewandt. Somit wird eine punktuelle Diskrepanz über einen
+lokalen Bereich gestreut.
+
+\begin{figure}
+	\centering
+	\includegraphics[width = .48\linewidth]{images/distortion/239}%
+	\includegraphics[width = .48\linewidth]{images/distortion/241}
+	\includegraphics[width = .48\linewidth]{images/distortion/239_filtered}%
+	\includegraphics[width = .48\linewidth]{images/distortion/241_filtered}
+	\includegraphics[width = .48\linewidth]{images/distortion/diff}
+	\caption{Verzerrungsartefakte bei starken Unterschieden in der Sichtposition.}%
+	\label{img:distortion}
+\end{figure}
+
+Ein gravierender Qualitätsverlust entsteht beim wiederholten Morphen von
+Ansichten mit sich stark unterscheidenden Positionen und Winkeln.
+Abbildung~\ref{img:distortion} stellt einen solchen Extremfall dar. Das
+Differenzbild zeigt deutliche Abweichungen in der Silhouette des Modells.
+Außerdem interessant ist der Unterschied in der Punktdichte der beiden Bilder.
+So sind in der Differenz graue Bereiche mit unterschiedlicher Helligkeit
+sichtbar. Daraus folgt dass durch das LDI Morphing die effektive Punktdichte
+komprimiert wird. Dies ist eventuell durch unvorteilhafte Rundung von
+Bildpositionen erklärbar. So wird während des Morphings mit 32 Bit
+Gleitkommazahlen gearbeitet. In Abhängig der Rundungseinstellungen der CPU kann
+diese in einem simplen Abschneiden der Nachkommastellen resultieren. Eine
+konventionelle Rundung durch die Intervalle \( \left(0, 0.5\right) \) und \(
+\left[0.5, 1\right] \) würde den durchschnittlichen quadrierten Abstand zwischen
+eigentlicher und endgültiger Position verringern.
+
+Um solche Situationen zu provozieren, werden wiederholt
+ruckartige Mausbewegungen ausgeführt um eine möglichst große Abweichung
+zwischen zwei Bildern zu erreichen. Die dargestellte Verzerrung tritt immer
+dann auf, wenn unvollständig gemorphte LDIs bereits zur Generation neuer
+Ansichten genutzt werden. Auch wenn diese Effekte bei normaler Nutzung im CGV
+Viewer nicht auftreten, so stellen sie doch einen gravierenden Mangel dar. Bei
+der angedachten Nutzung durch ein HMD ist die Wahrscheinlichkeit von
+ruckartigen Kopfbewegungen deutlich höher. Das Auftreten in eben diesem Moment
+ist jedoch fatal, da dem Gehirn somit kurzeitig inkonsistente visuelle
+Informationen geliefert werden. Dies kann im schlimmsten Fall zu
+Gleichgewichtsstörungen führen.
+
+\section{Diskussion}%
+\label{sec:discussion}
 
 Coroutines
 
