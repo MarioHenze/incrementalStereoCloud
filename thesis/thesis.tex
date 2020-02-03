@@ -132,7 +132,7 @@ interaktiver Weise darzustellen. Dazu werden zunächst Ansätze zur klassischen
 Punktwolken Darstellung und zum inkrementellen Rendering vorgestellt und deren
 Kombinationsmöglichkeiten untersucht. In einem weiteren Schritt soll, das so
 entwickelte Verfahren als C++ Plugin für das cgv-Framework des Lehrstuhls
-umgesetzt werden. Abschließend werden die gewonnen Erfahrung in Bezug auf
+umgesetzt werden. Abschließend werden die gewonnen Erfahrungen in Bezug auf
 Laufzeitverhalten und Implementation dargelegt und erklärt.
 
 \chapter{Verwandte Arbeiten}%
@@ -141,7 +141,7 @@ Laufzeitverhalten und Implementation dargelegt und erklärt.
 \section{Überblick}
 
 Das Ziel dieser Arbeit besteht darin einen hybriden Renderingprozess zu
-entwerfen, welcher temporale Redundanz als zusätzliche Optimierung in ein
+entwerfen, welcher temporale Redundanz als zusätzliche Optimierung in einen
 klassischen Punktwolkenrenderer einfügt. Um dies zu erreichen werden in den
 folgenden Abschnitten zunächst sog.\ Image-based Rendering Verfahren
 vorgestellt. Diese Algorithmen werden hauptsächlich zur Interpolation von neuen
@@ -166,7 +166,7 @@ eine Datenstruktur vor, welche zur Organisation von Referenzbildern mit
 variierender Tiefenauflösung genutzt werden können. So werden Bilder aus
 verschieden Perspektiven in einen sog. Layered Depth Tree eingfügt. Da bei
 gleicher Auflösung Referenzbilder aus einer näheren Perspektive
-Tiefeninformationen höher abtasten als entferntere, können diese in einen Octree
+Tiefeninformationen höher abtasten als Entferntere, können diese in einen Octree
 eingeordnet werden und es entsteht eine Art Ordnungsrelation. Mithilfe dieser
 Datenstruktur ist es nun möglich, die Referenzbilder auswählen, deren
 Tiefenauflösung in etwa dem zu synthetisierenden Bildausschnitts entspricht. In
@@ -212,12 +212,12 @@ Datenraums entlang der Koordinatenachsen ermöglicht weiterhin eine schnelle
 Umsetzung dieses Prozesses, da jede Zelle parallel bearbeitet werden kann. Für
 das Rendering werden alle Knoten dieses LOD-Baums in eine
 Prioritätswarteschlange nach ihrem Detailgrad eingeordnet. Beginnend vom
-Wurzelknoten werden solange die Cluster expandiert, bis eine ausreichende
+Wurzelknoten werden solange Cluster expandiert bis eine ausreichende
 Punktdichte erreicht ist.
 
-Einen weitere Implementation mit Fokus auf Virtual Reality wird von Discher et
+Eine weitere Implementation mit Fokus auf Virtual Reality wird von Discher et
 al.\ in~\cite{discher2018point} vorgestellt. Das Punktwolkenrenderering wird
-dabei in drei Phase eingeteilt. Zunächst wird eine sog.\ repräsentative
+dabei in drei Phasen eingeteilt. Zunächst wird eine sog.\ repräsentative
 Untermenge in Abhängigkeit der Auslastung von CPU und GPU ausgewählt. Nach dem
 Entfernen von Punkten außerhalb des Sichtkegelstumpfes und überflüssigen
 Details wird ein KD Baum aufgebaut. Das Renderen erfolgt dann in G-Buffer
@@ -236,21 +236,20 @@ interaktiven Bildraten darstellen soll. Zur Umsetzung werden memory optimized
 sequential point trees (MOSPT) und verschachtelte Octrees als Datenstrukturen
 vorgestellt. Dies ermöglicht ein serielles Rendern der Punktwolke nach dem out
 of core Prinzip. Um eine lokale Zusammenfassung von Punkten und damit eine
-Datenreduktion zu erreichen wird eine Fehlermetrik eingeführt die zur
+Datenreduktion zu erreichen wird eine Fehlermetrik eingeführt, die zur
 Sortierung der MOSPT genutzt wird. Die so gewonnene Hierarchie ermöglicht nun
 das Verwerfen von Knoten mit zu geringem Einfluss auf das resultierende Bild.
-Für den Rendervorgang werden zunächst ein Intervall auf der Fehlermetrik
-bestimmt und alle entsprechenden Knoten des MOSPT gezeichnet. Da die Nutzung
-eines einzelnen MOSPT statische Vorraussetzungen wie ein globales LOD
-vorraussetzen wird nur ein Teil der Punktwolken in diesen angeordnet. Diese
-Teilmengen werden wiederum in einen Octree eingefügt. Abschließend wird der
-Laufzeitvorteil der MOSPT untersucht und auf Artefakte des Renderingprozesses
-eingegangen.
+Für den Rendervorgang wird zunächst ein Intervall auf der Fehlermetrik bestimmt
+und dann alle entsprechenden Knoten des MOSPT gezeichnet. Da die Nutzung eines
+einzelnen MOSPT statische Vorraussetzungen wie ein globales LOD fordern, wird
+nur ein Teil der Punktwolken in diesen angeordnet. Diese Teilmengen werden
+wiederum in einen Octree eingefügt. Abschließend wird der Laufzeitvorteil der
+MOSPT untersucht und auf Artefakte des Renderingprozesses eingegangen.
 
 \section{Motivation des Renderingansatzes}
 
-Wie bereits in Abschnitt~\ref{sec:verwandte_arbeiten} aufgezeigt, existieren
-eine Vielzahl an Renderverfahren für Punktwolken und bildbasierten Morphing
+Wie in Abschnitt~\ref{sec:verwandte_arbeiten} aufgezeigt, existieren eine
+Vielzahl an Renderverfahren für Punktwolken und bildbasierten Morphing
 Ansätzen. Das Ziel dieser Arbeit besteht darin eine Kombination dieser beiden
 Vorgehen zu entwickeln, welche sowohl ein schnelles Zeichnen von
 unverarbeiteten Punktwolken als auch eine Wiederverwendung von bereits
@@ -261,11 +260,11 @@ eine Vorverarbeitung der Punktwolke vorrausetzt. So ist zu erkennen, dass
 generell Artefakte der Punktwolkenakquisition ausgeglichen und eine
 Speicherzugriff optimierende Datenstruktur erreicht werden soll. Hierfür wird
 fast ausschließlich die räumlich variierende Punktdichte zum Clustering
-genutzt. Anschließend wird eine Baumstruktur Hierarchie aufgebaut, welche das
-rekursive Zeichnen bis zu einem ausreichenden Detailgrad ermöglicht. Da die
-vorliegende Arbeit jedoch darauf abzielt zu einem späteren Zeitpunkt
-kontinuierlich erfasste Punkte in die Darstellung einfließen zu lassen, ist ein
-aufwendiges Verarbeiten nicht möglich. So liegt der Zeitaufwand von
+genutzt. Anschließend wird eine Baumstruktur aufgebaut, welche das rekursive
+Zeichnen bis zu einem ausreichenden Detailgrad ermöglicht. Da die vorliegende
+Arbeit jedoch darauf abzielt, zu einem späteren Zeitpunkt kontinuierlich
+erfasste Punkte in die Darstellung einfließen zu lassen, ist ein aufwendiges
+Verarbeiten nicht möglich. So liegt der Zeitaufwand von
 QSplat~\cite{rusinkiewicz2000qsplat} beim Preprocessing einer Wolke mit rund
 127 Millionen Punkten bei einer knappen Stunde. Selbst modernere Ansätze
 wie~\cite{goswami2010high} benötigen für diesen Verarbeitungsschritt immer noch
@@ -290,7 +289,7 @@ Veränderung der Kameraposition durch die teilweise willkürlichen Bewegungen de
 menschlichen Kopfes auftreten. Somit sind Renderverfahren von Vorteil, die eine
 schnelle Interpolation von benachbarten Ansichten ermöglichen. Da auch dieses
 Kriterium durch die LDIs abgedeckt wird, baut die folgende Implementation auf
-Basis dieser einen eigenen Rendervorgang auf.
+Basis dieser Festlegungen einen eigenen Rendervorgang auf.
 
 \chapter{Theoretische Betrachtungen}
 
@@ -310,7 +309,7 @@ Perspektivtransformation unterliegen, ist die Definition einer Lochkamera
 sinnvoll. So kann die Lochkamera als idealisierte optische Kamera aufgefasst
 werden, welche alle Sichtstrahlen in aus der Szene in einem einzigen Punkt
 bündelt (siehe Abbildung~\ref{fig:pinholecamera}). Bei praktischen Aufbauten
-eine Lochkamera wird das projizierte Bild hinter diesem Brennpunkt gespiegelt
+einer Lochkamera wird das projizierte Bild hinter diesem Brennpunkt gespiegelt
 auf einer Ebene abgebildet. Zur Vereinfachung wird auf diesen Umstand
 verzichtet und die Bildebene kurz vor dem Brennpunkt zwischen Szene und
 Koordinatenursprung der Kamera platziert. Dadurch wird auch die Spieglung der
@@ -322,11 +321,11 @@ einen Sichtkegelstumpf.
 
 \section{Plenoptic Modelling}
 
-Um neuartige Renderansätze zu entwicklen, ist es hilfreich diese in nach einer
-Top-Down Methodik zu entwickeln. Dafür bietet sich die plenoptische Modellierung
-an. Hierbei wird zunächst versucht, die Szene unabhängig von Beobachtern zu
-beschreiben. Adelson und Bergen definieren dafür in~\cite{adelson1991plenoptic}
-die plenoptische Funktion wie folgt:
+Um neuartige Renderansätze zu definieren, ist es hilfreich diese in nach einer
+Top-Down Methodik zu entwickeln. Dafür bietet sich die plenoptische
+Modellierung an. Hierbei wird zunächst versucht, die Szene unabhängig vom
+Beobachter zu beschreiben. Adelson und Bergen definieren dafür
+in~\cite{adelson1991plenoptic} die plenoptische Funktion wie folgt:
 
 \begin{equation}
 	P_7 = P(V_x, V_y, V_z, \theta, \Phi, \lambda, t)
@@ -384,9 +383,9 @@ beseitigen, bei denen Konventionelle Sprite Warping Algorithmen versagten.
 Hierfür werden die Pixel eines gewöhnlichen Bildpuffers mit Informationen
 überbelegt. Es wird sozusagen die Menge aller Pixel in verschieden Tiefen mit
 gleicher Bildposition gespeichert (siehe
-Abbildung~\ref{fig:layereddepthimage}). Um dieses LDI zu erzeugen wurden
-ursprünglich mehrere Referenzbilder mit Tiefeninformation erfasst und diese
-dann in die Ansicht des LDIs gewarpt.
+Abbildung~\ref{fig:layereddepthimage}). Um dieses LDI zu erzeugen werden
+mehrere Referenzbilder mit Tiefeninformation erfasst und diese dann in die
+Ansicht des LDIs gewarpt.
 
 \begin{figure}
 	\centering
@@ -394,13 +393,13 @@ dann in die Ansicht des LDIs gewarpt.
 	\input{figures/ldicoordinatesystem.tikz}
 	\caption{Zusammenhänge im LDI Koordinatensystem. Die Vektoren \( \hat{\imath}
 		\), \( \hat{\jmath} \) und \( \hat{k} \) spannen das Weltkoordinatensystem
-		auf. Die Vektoren \( \hat{a} \), \( \hat{b} \) und \(c\) sind die Basis LDI
+		auf. Die Vektoren \( \hat{a} \), \( \hat{b} \) sind die Basis LDI
 		Bildraums. (Darstellung adaptiert aus~\cite{mcmillan1997image})}%
 	\label{fig:ldicoord}
 \end{figure}
 
 Wie in~\cite{chang1999ldi} dargelegt ist die McMillan 3D Morphing Gleichung
-(siehe~\cite{mcmillan1995list} und~\cite{mcmillan1995plenoptic}) auf das LDI
+(siehe~\cite{mcmillan1995list}~\cite{mcmillan1995plenoptic}) auf das LDI
 anwendbar. Um diese definieren zu können muss jedoch zunächst das Kameramodell
 nach~\cite{mcmillan1997image} beschrieben werden (siehe
 Abbildung~\ref{fig:ldicoord}). Generell befindet sich das LDI in einem
@@ -553,8 +552,9 @@ werden kann. Es werden sich aber immer Stellen im LDI ergeben, an denen keine
 Daten vorhanden sind. Diese Ausschnitte müssen deshalb erkannt und mit Daten
 der ursprünglichen Punktwolke gefüllt werden. Hierfür muss nach dem Morphen die
 lokale Punktdichte im LDI ermittelt werden. Ziel dieser Berechnung ist es
-möglichst zusammenhängende Pixelbereiche zu erkennen. Sind diese Bereiche
-können diese als Anfrage an den ursprünglichen Datensatz gestellt werden.
+möglichst zusammenhängende Pixelbereiche zu erkennen. Sind entsprechende
+Bereiche bestimmt, können diese als Anfrage an den ursprünglichen Datensatz
+gestellt werden.
 
 Durch die oben beschriebene Trennung ist eine Implementation möglich, welche
 aus Sicht des Renderings besonders gleichmäßige Frametimes ermöglicht. So
@@ -570,10 +570,10 @@ ist für die prinzipielle Funktion jedoch beliebig.
 Die vorliegende Arbeit implementiert den oben beschriebenen Ansatz eines LDIs.
 Als Grundlage für die Benutzeroberfläche und die Interaktion mit der
 Grafikhardware wird das CGV Framework des Lehrstuhls verwendet. Um möglichst
-viele Punktwolkenformate als Eingabe nutzen zu können wird weiterhin die
+viele Punktwolkenformate als Eingabe nutzen zu können, wird weiterhin die
 bestehende Klasse \texttt{point\_cloud} genutzt.
 
-\section{Lochkamera Modell}
+\section{Das Lochkamera Modell}
 
 Wie im Grundlagenteil bereits motiviert, ist die Klassendeklaration
 \texttt{PinholeCameraModel} zur Nachbildung einer Lochkamera nützlich. Die
@@ -596,11 +596,11 @@ Außerdem verwaltet die \texttt{PointCloudSource} eine Liste aller gestellten
 \texttt{PointCloudQuery}s in einer weiteren Membervariable. Diese Anfragen
 speichern als Member zunächst die Kamerakonfiguration vom Typ
 \texttt{PinholeCameraModel}. Mit dieser ist es möglich, die Punkte der gesamten
-Punktwolke nach Sichtbarkeit zu filtern. Die \texttt{PointCloudQuery} besitzt
-zwei eigene Membervariablen zum Speichern der Punktpositionen und Farben. Nach
-der Sichtbarkeitsprüfung werden alle verbliebenen Punkte deshalb in die Anfrage
-kopiert. Da die Anfrageklasse außerdem den Schnittpunkt zwischen
-Dateiverarbeitung und Rendering darstellt ist eine weitere Membervariable zur
+Punktwolke nach Sichtbarkeit zu filtern. Die \texttt{PointCloudQuery} Klasse
+besitzt zwei eigene Membervariablen zum Speichern der Punktpositionen und
+Farben. Nach der Sichtbarkeitsprüfung werden alle verbliebenen Punkte deshalb
+in die Anfrage kopiert. Da die Anfrageklasse außerdem den Schnittpunkt zwischen
+Dateiverarbeitung und Rendering darstellt, ist eine weitere Membervariable zur
 Sicherung von kritischen Abschnitten notwendig. Die Mutexvariablen vom Typ
 \texttt{std::timed\_mutex} besitzen die Besonderheit eine vorher definierte
 Wartezeit zu berücksichtigen. Dies ist aus Sicht des Renderings notwendig um
@@ -627,9 +627,9 @@ verzichtet werden.
 
 Das Layered Depth Image stellt die zentrale Datenstruktur der Implementation
 dar. Sie kann als eine um einen Datenspeicher erweiterte Lochkamera
-interpretiert werden. So ist bereits die \texttt{PinholeCameraModel} Klasse mit
-rasterisierten Koordinaten ausgestattet. Da diese Pixelauflösung die Grenze der
-Positionsauflösung auf der Sensorebene darstellt, ergeben sich folgende
+interpretiert werden. So ist bereits die \texttt{Pinhole\-Camera\-Model} Klasse
+mit rasterisierten Koordinaten ausgestattet. Da diese Pixelauflösung die Grenze
+der Positionsauflösung auf der Sensorebene darstellt, ergeben sich folgende
 Festlegungen. Nach der entsprechenden Perspektivtransformation befinden sich
 alle sichtbaren Punkte an einer diskreten \( (x, y) \) Position auf der
 Sensorebene. Zusätzlich ist deren Tiefe in Bezug auf die Kamera von Bedeutung.
@@ -653,12 +653,12 @@ durch den Array Subscript Operator zusammen mit einer Hilfsfunktion erfolgt,
 die zweidimensionale Koordinaten entsprechend umrechnet.
 
 Um den zentralen Vorteil der linearen Korrespondenz zwischen zwei LDIs zu
-nutzen, wird die \texttt{warp\_reference\_into} Memberfunktion deklariert.
+nutzen, wird die \texttt{warp\-\_reference\-\_into} Memberfunktion deklariert.
 Diese wendet die McMillan Morphing Gleichung auf das Argument LDI an und
 übernimmt alle weiterhin sichtbaren Punkte in sich selbst. Des Weiteren können
 Punkte aus dem globalen oder dem kamerabezogenen Koordinatensystem mit
-\texttt{add\_global\_points} bzw. \texttt{add\_transformed\_points} eingfügt
-werden.
+\texttt{add\-\_global\-\_points} bzw. \texttt{add\-\_transformed\-\_points}
+eingfügt werden.
 
 \section{Der Punktwolkenrenderer}
 
@@ -724,7 +724,7 @@ verwendet, unterliegen die Punkte der Wolke dadurch einer impliziten
 Reihenfolge. Da an allen Übergabepunkten der Implementation die Verarbeitung
 seriell erfolgt, bleibt diese Reihenfolge somit in einem lokalen Intervall
 erhalten. Es ist außerdem möglich, dass beim ursprünglichen Speichern eine
-gewisse Anordnung erreicht werden sollte. So ist es möglich, dass verschiedene
+gewisse Anordnung erreicht werden sollte. So ist es denkbar, dass verschiedene
 Qualitätsstufen nacheinander gespeichert wurden. Bei Bildern die über langsame
 Netzwerke übertragen werden, wird häufig Interleaving eingesetzt um eine
 initale Approximation des Inhalts möglichst frühzeitig anzeigen zu können. Da
@@ -745,7 +745,7 @@ Anfragenerstellung und Ausführung sich verringert. Diese Situation wird jedoch
 durch den Prozess-Scheduler des Betriebssystems schubweise entschärft. Dadurch
 sind wieder längere Zeitabschnitte zur Abarbeitung möglich. Lange gehaltene
 exklusive Abschnitte führen jedoch wieder zu der oben begonnenen Überlastung.
-Diese Beobachtung bestätigt sich auch durch einen Sägezahnartigen
+Diese Beobachtung bestätigt sich auch durch einen sägezahnartigen
 Auslastungsverlauf der CPU.\@ Als direkte Folge dieser schwankenden
 Zeitintervalle sind auch die zusammenhängenden Bereiche der Wolke einer
 zyklischen Schwankung ausgesetzt.
@@ -776,11 +776,11 @@ Vergleich zweier fertig gestellter Bilder nicht aufschlussreich, da sie
 letztendlich durch den gleichen Vorgang gezeichnet wurden. Da das
 Punktrendering außerdem nur einzelne Pixel einfärbt, sind klassische
 Vergleichsmetriken, wie das Differenzbild ohne Anpassung nicht sinnvoll. Ein
-Unterschied zwischen beiden Renderingverfahren wird sich jedoch nur
-Abweichungen in den Bildpositionen bemerkbar machen. Deshalb wird vor dem
-eigentlichen Vergleich ein Gaußfilter mit einem Durchmesser von 5 Pixeln auf
-beide Bilder angewandt. Somit wird eine punktuelle Diskrepanz über einen
-lokalen Bereich gestreut.
+Unterschied zwischen beiden Renderingverfahren würde sich nur Abweichungen in
+den Bildpositionen bemerkbar machen. Deshalb wird vor dem eigentlichen
+Vergleich ein Gaußfilter mit einem Durchmesser von 5 Pixeln auf beide Bilder
+angewandt. Somit wird eine punktuelle Diskrepanz über einen lokalen Bereich
+gestreut.
 
 \begin{figure}
 	\centering
@@ -863,5 +863,21 @@ wäre es zum Beispiel denkbar, dass der Renderingprozess direkt mit der
 Granularität von einem Punkt die Datenanfragen konsumiert. Da keine
 Mutexvariablen genutzt werden müssen, wäre der Zeitaufwand vernachlässigbar und
 die beiden Prozesse würden quasi parallel ablaufen.
+
+\chapter{Zusammenfassung}
+
+Die vorliegende Arbeit hat die Layered Depth Images als neuartigen
+Renderingansatz für Punktwolken untersucht. Dafür wurde eine CPU gestützte
+Implementation angefertigt und ausgewertet. Auch wenn das geforderte Framerate
+Ziel nicht erreicht wurde, stellt die Implementation das Potential von LDI
+basierten Renderingverfahren dar.
+
+Wie bereits aufgezeigt, erscheint die GPU basierte LDI Implementation als
+zukünftige Untersuchung äußerst lohnenswert. So ist in Hinblick auf die
+Vielzahl von Virtual Reality HMDs mit begrenzter Leistungsfähigkeit ein
+hybrides Renderingverfahren nahezu unumgänglich. Da für diese Anwendung
+stereoskopische Bilder generiert werden müssen, entsteht die Frage ob LDIs auf
+diesen Spezialfall optimiert werden können. So müssten mit der aktuellen
+Implementation beide Stereobilder gemorpht werden.
 
 \end{document}

@@ -24,8 +24,8 @@
     \node (c1ix) at (intersection-1) {};
     \path [name intersections={of = c2x and i2}];
     \node (c2ix) at (intersection-1) {};
-    \draw[-latex, thick] (C1) -- (c1ix.center) node[midway, left] {\(P_1 x_1\)};
-    \draw[-latex, thick] (C2) -- (c2ix.center) node[midway, left] {\(P_2 x_2\)};
+    \draw[-latex, thick] (C1) -- (c1ix.center) node[midway, left] {\(\mathbf{P_1} x_1\)};
+    \draw[-latex, thick] (C2) -- (c2ix.center) node[midway, left] {\(\mathbf{P_2} x_2\)};
     % draw invisible as ruler
     \path[name path=i1p] (c1ix) -- +($ (C2)-(C1) $);
     \path[name intersections={of = i1p and c2x}];
@@ -36,5 +36,5 @@
     \node (midpar) at ($ (C1)!.5!(pc1x) $) {};
     \node (pc2c1) at ($ (c1ix)!2!(midpar) $) {};
     \draw[-latex, thick] (C2) -- (pc2c1.center) node[midway, pin={-90:\(\delta(x_1)(C_1 - C_2)\)}] {};
-    \draw[-latex, thick] (pc2c1.center) -- (pc1x.center) node[midway, right] {\(P_1 x_1\)};
+    \draw[-latex, thick] (pc2c1.center) -- (pc1x.center) node[midway, right] {\(\mathbf{P_1} x_1\)};
 \end{tikzpicture}
