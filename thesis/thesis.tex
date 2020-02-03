@@ -606,7 +606,7 @@ Sicherung von kritischen Abschnitten notwendig. Die Mutexvariablen vom Typ
 Wartezeit zu berücksichtigen. Dies ist aus Sicht des Renderings notwendig um
 eine Obergrenze für die Frametimes einhalten zu können.
 
-Um den Verwaltungsaufwand gering zu halten, durlaufen alle Anfragen drei
+Um den Verwaltungsaufwand gering zu halten, durchlaufen alle Anfragen drei
 Zustände entsprechend ihrer Bearbeitung. Anfangs befinden sich die Anfragen in
 einem ``unvollständigen'' Zustand. Dieser bedeutet, dass noch nicht alle Punkte
 aus der Datenverarbeitung vorliegen. Nach dem vollständigen Kopieren aller
@@ -667,13 +667,13 @@ Funktionalitäten zusammen, indem er den aktiven Viewport bzw. Framebuffer des
 CGV-Viewers als LDI auffasst. Um diese Interoperabilität zu ermöglichen, leitet
 die Renderklasse zunächst von \texttt{cgv::render::drawable} ab und
 implementiert die entsprechenden Funktionen des klassischen Renderingablaufs.
-So wird für den Drawcall der Referenzpunktrenderer des Frameworks genutzt, der
+So wird für den Drawcall der Referenz-Punktrenderer des Frameworks genutzt, der
 zuvor mit den Daten des LDIs versorgt wurde.
 
 Nach einem erfolgten Drawcall wird von der Punktwolken Membervariable eine
 abgeschlossene Anfrage gefordert und die enthaltenen Punkte in das Viewport LDI
 eingfügt. Dies bedeutet implizit, dass die entsprechenden Daten durch den
-Referenzpunktrenderer auf den Speicher der GPU geladen werden. Hierfür muss
+Referenz-Punktrenderer auf den Speicher der GPU geladen werden. Hierfür muss
 zunächst ein kritischer Abschnitt begonnen werden. Innerhalb diesem können nun
 die Punkte aus der Punktwolkenanfrage in ein neues LDI übernommen werden.
 Zusätzlich wird das alte LDI in die neue Ansicht gemorpht. Abschließend wird die
@@ -763,7 +763,8 @@ Abschnitt~\ref{sec:discussion} eingegangen.
 	\includegraphics[width = \linewidth]{images/Lego/126}
 	\includegraphics[width = \linewidth]{images/Lego/150}
 	\includegraphics[width = \linewidth]{images/Lego/170}
-	\caption{Inkrementelles des Lego 3D Scans.}%
+	\caption{Inkrementelles Rendern des Lego 3D Scans.
+	Das schichtweise Nachladen erfolgt über einen Zeitraum von ca. 8 Sekunden.}%
 	\label{img:lego}
 \end{figure}
 
@@ -799,14 +800,14 @@ Abbildung~\ref{img:distortion} stellt einen solchen Extremfall dar. Das
 Differenzbild zeigt deutliche Abweichungen in der Silhouette des Modells.
 Außerdem interessant ist der Unterschied in der Punktdichte der beiden Bilder.
 So sind in der Differenz graue Bereiche mit unterschiedlicher Helligkeit
-sichtbar. Daraus folgt dass durch das LDI Morphing die effektive Punktdichte
+sichtbar. Daraus folgt, dass durch das LDI Morphing die effektive Punktdichte
 komprimiert wird. Dies ist eventuell durch unvorteilhafte Rundung von
 Bildpositionen erklärbar. So wird während des Morphings mit 32 Bit
 Gleitkommazahlen gearbeitet. In Abhängig der Rundungseinstellungen der CPU kann
 diese in einem simplen Abschneiden der Nachkommastellen resultieren. Eine
 konventionelle Rundung durch die Intervalle \( \left(0, 0.5\right) \) und \(
-\left[0.5, 1\right] \) würde den durchschnittlichen quadrierten Abstand zwischen
-eigentlicher und endgültiger Position verringern.
+\left[0.5, 1\right] \) würde den durchschnittlichen quadrierten Abstand
+zwischen eigentlicher und endgültiger Position verringern.
 
 Um solche Situationen zu provozieren, werden wiederholt
 ruckartige Mausbewegungen ausgeführt um eine möglichst große Abweichung
@@ -853,7 +854,7 @@ einer Verwaltungsstruktur für quasi wahlfreien Zugriff auf eine Punktwolke im
 Dateisystem dar.
 
 Eine weitere Verbesserung der vorgestellten Implementation kann mit dem
-kommenden C++20 Standard umgesetzt. Dieser führt sog. Coroutines in den
+kommenden C++20 Standard umgesetzt werden. Dieser führt sog. Coroutines in den
 Sprachkern ein und ermöglicht dadurch eine Nebenläufigkeit, die nicht auf
 Betriebssystemressourcen angewiesen ist. Indem der Aufrufzustand einer Funktion
 unabhängig von Aufrufstack gespeichert wird, können Funktionen beliebig oft
