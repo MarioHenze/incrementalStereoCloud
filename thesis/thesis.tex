@@ -245,7 +245,7 @@ nur ein Teil der Punktwolken in diesen angeordnet. Diese Teilmengen werden
 wiederum in einen Octree eingefügt. Abschließend wird der Laufzeitvorteil der
 MOSPT untersucht und auf Artefakte des Renderingprozesses eingegangen.
 
-\section{Motivation des Renderingansatzes}
+\section{Einordnung des Renderingansatzes}
 
 Wie in Abschnitt~\ref{sec:verwandte_arbeiten} aufgezeigt, existieren eine
 Vielzahl an Renderverfahren für Punktwolken und bildbasierten Morphing
@@ -320,10 +320,10 @@ einen Sichtkegelstumpf.
 
 \section{Plenoptic Modelling}
 
-Um neuartige Renderansätze zu definieren, ist es hilfreich diese in nach einer
-Top-Down Methodik zu entwickeln. Dafür bietet sich die plenoptische
-Modellierung an. Hierbei wird zunächst versucht, die Szene unabhängig vom
-Beobachter zu beschreiben. Adelson und Bergen definieren dafür
+Um neuartige Renderansätze zu entwickeln, ist es notwendig eine präzise und
+zugleich reduzierte Definition einer Szene zu finden. Dafür bietet sich die
+plenoptische Modellierung an. Hierbei wird zunächst versucht, die Szene
+unabhängig vom Beobachter zu beschreiben. Adelson und Bergen definieren dafür
 in~\cite{adelson1991plenoptic} die plenoptische Funktion wie folgt:
 
 \begin{equation}
@@ -524,7 +524,7 @@ initiale Koordinatentransformation in diesem Prozess durchgeführt werden.
 Einen weiteren Prozess stellt das Rendering der Punktwolke dar. Um eine
 konstante Framerate zu erreichen muss der Arbeitsaufwand möglichst konstant
 gehalten werden. Deshalb werden die Punkte in einem LDI vorgehalten. Diese
-Datenstruktur ermöglicht eine triviale Rasterrisierung und die Anwendung der
+Datenstruktur ermöglicht eine einfache Rasterrisierung und die Anwendung der
 Morphing Equation.
 
 Da bei großen Datenwolken Speicherknappheit auftreten würde, muss eine
@@ -562,7 +562,10 @@ Pfad im System dar, welcher direkt auf die Qualität der Darstellung Einfluss
 nimmt. Die Datenverarbeitung der ursprünglichen Punktwolke in ein geeignetes
 Format und die Bearbeitung der LDIs sind sekundäre Faktoren. Das heißt die Rate
 mit der neue Punkte nachgeladen werden können, verbessert die Detailwiedergabe,
-ist für die prinzipielle Funktion jedoch beliebig.
+ist für die prinzipielle Funktion jedoch beliebig. Hierbei ist hervorzuheben,
+dass die aufgezeigte Parallelität als inhärente Eigenschaft des Algorithmus
+definiert wird. Die Implementation setzt dies dann in geeigneter Weise durch
+Threads o.Ä.\ um.
 
 \chapter{Implementation}
 
@@ -639,7 +642,9 @@ Membervariablen des Typs \texttt{std::atomic\_bool} verwendet. Deren Umsetzung
 garantiert auf x86 basierten Computern einen wohldefinierten Zustand zu allen
 Zeitpunkten der nebenläufigen Benutzung. Außerdem kann hierdurch auf
 laufzeittechnisch teure Mutexvariablen und deren fehleranfällige Verwaltung
-verzichtet werden.
+verzichtet werden. Die Kombination aus zwei Wahrheitswerten ist dem Durchlaufen
+von drei Zuständen geschuldet. So kann jede dieser beiden als
+Serialisierungspunkt des Zustandsübergangs gesehen werden.
 
 \section{Das Layered Depth Image}
 
@@ -708,7 +713,7 @@ Anpassung an neuartige Parallelitätsmuster wie Coroutines einfacher möglich.
 
 \chapter{Evaluation}
 
-\section{temporaler Aspekt}
+\section{Temporales Verhalten}
 
 \begin{figure}
 	\centering
@@ -786,7 +791,7 @@ Abschnitt~\ref{sec:discussion} eingegangen.
 	\label{img:lego}
 \end{figure}
 
-\section{qualitativer Aspekt}
+\section{Qualitative Betrachtung}
 
 Da die in der Implementation verwendete Form des LDI weiterhin Punkte und nicht
 reine Bildpixel verwaltet, führt dies zur Überlegung den vorhandenen
@@ -808,7 +813,11 @@ gestreut.
 	\includegraphics[width = .48\linewidth]{images/distortion/239_filtered}%
 	\includegraphics[width = .48\linewidth]{images/distortion/241_filtered}
 	\includegraphics[width = .48\linewidth]{images/distortion/diff}
-	\caption{Verzerrungsartefakte bei starken Unterschieden in der Sichtposition.}%
+	\caption{Verzerrungsartefakte bei starken Unterschieden in der Sichtposition.
+	Die linke Seite entstand aus dem Morphing, die Rechte aus einem neu 
+	generierten LDI aus dieser Kameraperspektive. Das untere Differenzbild zeigt
+	den Unterschied beider Ansichten auf. Schwarze Bereiche weisen identische 
+	Luminanz auf, weiße Bereich markieren eine Luminanzabweichung.}%
 	\label{img:distortion}
 \end{figure}
 
@@ -871,7 +880,7 @@ z.B. LZ4 abschwächen. Eine endgültige Lösung stellt jedoch nur die Nutzung
 einer Verwaltungsstruktur für quasi wahlfreien Zugriff auf eine Punktwolke im
 Dateisystem dar.
 
-Eine weitere Verbesserung der vorgestellten Implementation kann mit dem
+Eine weitere Modifikation der vorgestellten Implementation kann mit dem
 kommenden C++20 Standard umgesetzt werden. Dieser führt sog. Coroutines in den
 Sprachkern ein und ermöglicht dadurch eine Nebenläufigkeit, die nicht auf
 Betriebssystemressourcen angewiesen ist. Indem der Aufrufzustand einer Funktion
@@ -881,22 +890,34 @@ möglich, welche von den Kostenüberlegungen des Mutex Gebrauchs befreit sind. S
 wäre es zum Beispiel denkbar, dass der Renderingprozess direkt mit der
 Granularität von einem Punkt die Datenanfragen konsumiert. Da keine
 Mutexvariablen genutzt werden müssen, wäre der Zeitaufwand vernachlässigbar und
-die beiden Prozesse würden quasi parallel ablaufen.
+die beiden Prozesse würden quasi parallel ablaufen. Diese Modifikation ist
+außerdem unabhängig von der vorgeschlagenen Umsetzung auf der GPU und kann
+diese sogar weiter verbessern.
 
-\chapter{Zusammenfassung}
+\chapter{Fazit}
 
 Die vorliegende Arbeit hat die Layered Depth Images als neuartigen
 Renderingansatz für Punktwolken untersucht. Dafür wurde eine CPU gestützte
 Implementation angefertigt und ausgewertet. Auch wenn das geforderte Framerate
-Ziel nicht erreicht wurde, stellt die Implementation das Potential von LDI
-basierten Renderingverfahren dar.
+Ziel nicht erreicht wurde, gibt die Implementation einen Ausblick auf die
+Vorteile von LDI basierten Renderingverfahren.
 
 Wie bereits aufgezeigt, erscheint die GPU basierte LDI Implementation als
-zukünftige Untersuchung äußerst lohnenswert. So ist in Hinblick auf die
-Vielzahl von Virtual Reality HMDs mit begrenzter Leistungsfähigkeit ein
-hybrides Renderingverfahren nahezu unumgänglich. Da für diese Anwendung
-stereoskopische Bilder generiert werden müssen, entsteht die Frage ob LDIs auf
-diesen Spezialfall optimiert werden können. So müssten mit der aktuellen
+zukünftige Untersuchung äußerst lohnenswert. Die vorgestellte CPU Lösung kann
+zwar durch die Wiederverwendung des bestehenden Punktrenderer einfach umgesetzt
+werden, scheitert jedoch an den enormen Speicherdurchsatz-Forderungen, die mit
+jedem gerenderten Bild erneut auftreten. Zukünftige Umsetzungen sollten daher
+ein besonderes Augenmerk auf die effiziente Kommunikation zwischen CPU und GPU
+legen. Eine Vorhaltung des LDI im Grafikspeicher scheint unabdingbar und eine
+fortgeschrittene Art des Datenaustausches angebracht. Dafür bieten sich zum
+Beispiel sog. Persistent Mapped Buffer Objects an. In Abhängigkeit der OpenGL
+Implementation lassen sich diese Puffer sehr effizient austauschen oder
+aktualisieren.
+
+Ein möglicher Ansatz zur Weiterenwicklung von LDIs lässt sich mit dem
+generellen Erfolg von HMDs erkennen. Da für diese Anwendung stereoskopische
+Bilder generiert werden müssen, entsteht die Frage ob LDIs auf diesen
+Spezialfall optimiert werden können. So müssten mit der aktuellen
 Implementation beide Stereobilder gemorpht werden.
 
 \end{document}
