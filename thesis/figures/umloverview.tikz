@@ -1,0 +1,12 @@
+\begin{tikzpicture} 
+\umlemptyclass{FastPointCloudRenderer}
+\umlemptyclass[below right=2cm of FastPointCloudRenderer]{LayeredDepthImage}
+\umlemptyclass[below=2cm of LayeredDepthImage]{PinholeCameraModel}
+\umlemptyclass[below left=2cm of FastPointCloudRenderer]{PointCloudSource}
+\umlemptyclass[below=2cm of PointCloudSource]{PointCloudQuery}
+\umlunicompo[geometry= --, mult=1]{LayeredDepthImage}{PinholeCameraModel}
+\umlunicompo[geometry= --, mult=0..*]{PointCloudSource}{PointCloudQuery}
+\umlunicompo[geometry= --, mult=1]{PointCloudQuery}{PinholeCameraModel}
+\umlunicompo[geometry= -|-, mult=1]{FastPointCloudRenderer}{PointCloudSource}
+\umlunicompo[geometry= -|-, mult=1]{FastPointCloudRenderer}{LayeredDepthImage}
+\end{tikzpicture}

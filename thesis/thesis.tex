@@ -21,8 +21,7 @@
 \usepackage{enumitem}
 \usepackage{verbatim}
 \usepackage{siunitx}
-\usepackage{tikz}
-\usepackage{tikz-3dplot}
+\usepackage{tikz, tikz-3dplot, tikz-uml}
 \usepackage{pgffor}
 
 \usetikzlibrary{calc, intersections, shapes, positioning}
@@ -567,11 +566,21 @@ ist für die prinzipielle Funktion jedoch beliebig.
 
 \chapter{Implementation}
 
+\begin{figure}
+	\centering
+	\input{figures/umloverview.tikz}
+	\caption{UML Klassendiagram über die Komposition der funktionalen 
+	Bestandteile der Implementation.}%
+	\label{fig:umloverview}
+\end{figure}
+
 Die vorliegende Arbeit implementiert den oben beschriebenen Ansatz eines LDIs.
 Als Grundlage für die Benutzeroberfläche und die Interaktion mit der
 Grafikhardware wird das CGV Framework des Lehrstuhls verwendet. Um möglichst
 viele Punktwolkenformate als Eingabe nutzen zu können, wird weiterhin die
 bestehende Klasse \texttt{point\_cloud} genutzt.
+Abbildung~\ref{fig:umloverview} gibt Aufschluss über die Komposition der
+einzelnen Implementationsbestandteile.
 
 \section{Das Lochkamera Modell}
 
@@ -586,6 +595,14 @@ Dies geschieht durch eine weitere Membervariable vom Typ
 \texttt{std::pair<size\_t, size\_t>}.
 
 \section{Die Punktwolke und Punktwolkenanfragen}
+
+\begin{figure}
+	\centering
+	\input{figures/umlquerylife.tikz}
+	\caption{UML Sequenzdiagram über den Lebenszyklus einer 
+	Anfrage.}%
+	\label{fig:umlquerylife}
+\end{figure}
 
 Die Punktwolke wird durch die \texttt{PointCloudSource} abstrahiert. Die
 konkreten Punktdaten werden als Membervariable vom Typ \texttt{point\_cloud}
@@ -607,9 +624,10 @@ Wartezeit zu berücksichtigen. Dies ist aus Sicht des Renderings notwendig um
 eine Obergrenze für die Frametimes einhalten zu können.
 
 Um den Verwaltungsaufwand gering zu halten, durchlaufen alle Anfragen drei
-Zustände entsprechend ihrer Bearbeitung. Anfangs befinden sich die Anfragen in
-einem ``unvollständigen'' Zustand. Dieser bedeutet, dass noch nicht alle Punkte
-aus der Datenverarbeitung vorliegen. Nach dem vollständigen Kopieren aller
+Zustände entsprechend ihrer Bearbeitung (siehe
+Abbildung~\ref{fig:umlquerylife}). Anfangs befinden sich die Anfragen in einem
+``unvollständigen'' Zustand. Dieser bedeutet, dass noch nicht alle Punkte aus
+der Datenverarbeitung vorliegen. Nach dem vollständigen Kopieren aller
 sichtbaren Punkte geht die Anfrage in einem ``vollständigen'' und
 ``konsumierbarem'' Zustand über. Daraufhin filtert der Renderingprozess die
 Liste aller Anfragen nach der Konsumierbarkeit und fügt die entsprechenden

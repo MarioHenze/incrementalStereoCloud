@@ -1,0 +1,31 @@
+\begin{tikzpicture}
+\begin{umlseqdiag}
+\umlobject[class=std::thread]{holefinder}
+\umlcreatecall[class=PointCloudQuery]{holefinder}{q}
+\umlobject[class=PointCloudSource]{pc}
+\umlobject[class=std::thread]{renderer}
+\begin{umlcall}[op=emplace(q), type=asynchron]{holefinder}{pc}
+\end{umlcall}
+
+\begin{umlcall}[dt=5, op=supply\_points()]{pc}{q}
+\begin{umlcall}[op=trigger\_completion()]{pc}{q}
+\end{umlcall}
+\end{umlcall}
+
+\begin{umlcall}[dt=25, op=get\_finished\_query(), return=q]
+    {renderer}{pc}
+\end{umlcall}
+
+\begin{umlcall}[dt=5, op=consume\_points()]{renderer}{q}
+\begin{umlcallself}[op={m\_consumed = true}]{q}
+\end{umlcallself}
+\end{umlcall}
+
+\begin{umlcall}[dt=20, op=is\_consumed()]{pc}{q}
+\begin{umlcall}[type=return, op=true]{q}{pc}
+\end{umlcall}
+\begin{umlcall}[op=\textasciitilde{}PointCloudQuery()]{pc}{q}
+\end{umlcall}
+\end{umlcall}
+\end{umlseqdiag}
+\end{tikzpicture}
