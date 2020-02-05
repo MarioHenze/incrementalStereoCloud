@@ -118,11 +118,11 @@ Tiefeninformationen der menschlichen Wahrnehmung direkter und intuitiver
 zugänglich machen.
 
 Die Bildsynthese und Wiedergabe in solchen HMD Systemen stellt jedoch besondere
-Vorgaben in Hinblick auf Benutzbarkeit. So muss jederzeit sichergestellt werden,
-dass die Immersion dieser Virtual Reality Umgebung erhalten bleibt. Das bedeutet
-es herschen harte Schranken für Eingabeverzögerung und Bildwiederholfrequenz und
-deren Übertretung hat den Verlust von Interaktivität und im schlimmsten Fall
-physiologische Probleme wie Motion Sickness zur Folge.
+Vorgaben in Hinblick auf Benutzbarkeit. So muss jederzeit sichergestellt
+werden, dass die Immersion dieser Virtual Reality Umgebung erhalten bleibt. Das
+bedeutet es herrschen harte Schranken für Eingabeverzögerung und
+Bildwiederholfrequenz und deren Übertretung hat den Verlust von Interaktivität
+und im schlimmsten Fall physiologische Probleme wie Motion Sickness zur Folge.
 
 In dieser Arbeit soll ein Verfahren zur interaktiven Darstellung von
 Punktwolken entwickelt werden, welches in Hinblick auf die genannten Probleme
@@ -139,9 +139,9 @@ Laufzeitverhalten und Implementation dargelegt und erklärt.
 
 \section{Überblick}
 
-Das Ziel dieser Arbeit besteht darin einen hybriden Renderingprozess zu
+Das Ziel dieser Arbeit besteht darin, einen hybriden Renderingprozess zu
 entwerfen, welcher temporale Redundanz als zusätzliche Optimierung in einen
-klassischen Punktwolkenrenderer einfügt. Um dies zu erreichen werden in den
+klassischen Punktwolkenrenderer einfügt. Um dies zu erreichen, werden in den
 folgenden Abschnitten zunächst sog.\ Image-based Rendering Verfahren
 vorgestellt. Diese Algorithmen werden hauptsächlich zur Interpolation von neuen
 Bildern aus bereits Bekannten benutzt. Danach werden klassische
@@ -151,14 +151,14 @@ Renderingverfahren für Punktwolken vorgestellt.
 
 Im Bereich des Image-based Rendering kann die Arbeit~\cite{shum2000review} als
 Überblick gesehen werden. Heung-Yeung und Sing Bing arbeiten hierbei die
-unterschiedliche Verwendung von geometrischen Information bei verschiedenen
+unterschiedliche Verwendung von geometrischen Informationen bei verschiedenen
 Bildsyntheseverfahren heraus. So wird zunächst eine plenoptische Funktion
 definiert, welche als Grundlage der geometrielosen Verfahren genutzt wird. In
 der Mitte des Spektrums sind Methoden mit impliziter Geometrieinformation
-aufgeführt. In diese Kategorie fallen View-morphing und Transfermethoden, welche
-die geometrische Redundanz zweier aufeinanderfolgender Bilder ausnutzen. Zuletzt
-werden auch die klassischen Verfahren der Bildsynthese, welche auf explizite
-Geometrie wie Dreiecksnetze aufsetzen, eingeordnet.
+aufgeführt. In diese Kategorie fallen View-Morphing und Transfermethoden,
+welche die geometrische Redundanz zweier aufeinanderfolgender Bilder ausnutzen.
+Zuletzt werden auch die klassischen Verfahren der Bildsynthese, welche auf
+explizite Geometrie wie Dreiecksnetze aufsetzen, eingeordnet.
 
 In~\cite{chang1999ldi} stellen Chun-Fa et al.\ basierend auf~\cite{he1998layered}
 eine Datenstruktur vor, welche zur Organisation von Referenzbildern mit
@@ -202,7 +202,7 @@ verworfen. Des Weiteren werden der Einfluss von verschiedenen Splatting Formen
 auf die Bildqualität untersucht und die Laufzeit von Vorverarbeitung und
 Rendering aufgeschlüsselt.
 
-Goswami et al.\ benutzen ein variablen Detailgrad beim Zeichnen und eine
+Goswami et al.\ benutzen einen variablen Detailgrad beim Zeichnen und eine
 Baumstruktur zur Verwaltung der Punktwolke~\cite{goswami2010high}. Grundlegend
 muss bei diesem Verfahren zunächst eine Vereinfachung und Zusammenfassung der
 Punkte erfolgen. Dafür werden verschieden große Cluster in Abhängigkeit der
@@ -215,7 +215,7 @@ Wurzelknoten werden solange Cluster expandiert bis eine ausreichende
 Punktdichte erreicht ist.
 
 Eine weitere Implementation mit Fokus auf Virtual Reality wird von Discher et
-al.\ in~\cite{discher2018point} vorgestellt. Das Punktwolkenrenderering wird
+al.\ in~\cite{discher2018point} vorgestellt. Das Punktwolkenrendering wird
 dabei in drei Phasen eingeteilt. Zunächst wird eine sog.\ repräsentative
 Untermenge in Abhängigkeit der Auslastung von CPU und GPU ausgewählt. Nach dem
 Entfernen von Punkten außerhalb des Sichtkegelstumpfes und überflüssigen
@@ -231,8 +231,8 @@ deren Laufzeitperformance evaluiert.
 
 Wimmer und Scheiblauer entwickeln in~\cite{wimmer2006instant} ein Verfahren,
 dass ohne Vorverarbeitung eine möglichst große Menge an Punkten mit
-interaktiven Bildraten darstellen soll. Zur Umsetzung werden memory optimized
-sequential point trees (MOSPT) und verschachtelte Octrees als Datenstrukturen
+interaktiven Bildraten darstellen soll. Zur Umsetzung werden Memory Optimized
+Sequential Point Trees (MOSPT) und verschachtelte Octrees als Datenstrukturen
 vorgestellt. Dies ermöglicht ein serielles Rendern der Punktwolke nach dem out
 of core Prinzip. Um eine lokale Zusammenfassung von Punkten und damit eine
 Datenreduktion zu erreichen wird eine Fehlermetrik eingeführt, die zur
@@ -320,11 +320,11 @@ einen Sichtkegelstumpf.
 
 \section{Plenoptic Modelling}
 
-Um neuartige Renderansätze zu entwickeln, ist es notwendig eine präzise und
-zugleich reduzierte Definition einer Szene zu finden. Dafür bietet sich die
-plenoptische Modellierung an. Hierbei wird zunächst versucht, die Szene
-unabhängig vom Beobachter zu beschreiben. Adelson und Bergen definieren dafür
-in~\cite{adelson1991plenoptic} die plenoptische Funktion wie folgt:
+Um neuartige Renderansätze zu entwickeln, ist es notwendig eine präzise
+Definition der Szene zu finden. Dafür bietet sich die plenoptische Modellierung
+an. Hierbei wird zunächst versucht, die Szene unabhängig vom Beobachter zu
+beschreiben. Adelson und Bergen definieren dafür in~\cite{adelson1991plenoptic}
+die plenoptische Funktion wie folgt:
 
 \begin{equation}
 	P_7 = P(V_x, V_y, V_z, \theta, \Phi, \lambda, t)
@@ -337,14 +337,14 @@ in~\cite{adelson1991plenoptic} die plenoptische Funktion wie folgt:
 	\item[\( t \)] Zeitpunkt der Beobachtung
 \end{description}
 
-Diese Form der Beschreibung ermöglicht es die Szene zu jedem Zeitpunkt an jeder
-Stelle und aus jeder Richtung zu samplen. Anhand dieses generellen Modells
-können nun Vereinfachungen vorgenommen werden.
+Diese Form der Beschreibung ermöglicht es, die Szene zu jedem Zeitpunkt an
+jeder Stelle und aus jeder Richtung zu samplen. Anhand dieses generellen
+Modells können nun Vereinfachungen vorgenommen werden.
 
 Es ist zunächst festzustellen, dass Punktwolkendaten in einem globalen
 Koordinatensystem gegeben sind. Beim Punktwolkenrendering gehen jedoch nur die
 sichtbaren Punkte in das Bild ein. Außerdem erfolgt die Kamerabewegung von HMDs
-ausschließlich kontinuierlich. Daraus folgt, dass sich die Untermengen alles
+ausschließlich kontinuierlich. Daraus folgt, dass die Untermengen aller
 sichtbaren Punkte zwischen zwei gerenderten Ansichten nahezu identisch sind.
 Ähnliche Annahmen liegen auch dem Modell der Layered Depth Images zugrunde.
 
@@ -358,7 +358,7 @@ ergibt sich durch die Annahme einer statischen Szene:
 
 In diesem Kontext kann ein gewöhnliches Bild als unvollständige Abtastung der
 plenoptischen Funktion an einem festen Betrachtungspunkt aufgefasst werden. Die
-zentrale Fragestellung des Image-based Renderings besteht also darin aus einer
+zentrale Fragestellung des Image-based Renderings besteht also darin, aus einer
 Menge von unvollständigen und diskreten Abtastungen die kontinuierliche
 plenoptische Funktion zu rekonstruieren~\cite{mcmillan1995plenoptic}.
 
@@ -378,7 +378,7 @@ Das Layered Depth Image wurden von Shade et al.\ in~\cite{he1998layered}
 vorgestellt. Es fügt sich in die Taxonomie der Abtastungen der plenoptischen
 Funktion zwischen Lichtfeldaufnahmen bzw. Lumigraphs und klassische
 Kugelpanoramen ein. LDIs wurden entwickelt um generelle Verdeckungsartefakte zu
-beseitigen, bei denen Konventionelle Sprite Warping Algorithmen versagten.
+beseitigen, bei denen konventionelle Sprite Warping Algorithmen versagten.
 Hierfür werden die Pixel eines gewöhnlichen Bildpuffers mit Informationen
 überbelegt. Es wird sozusagen die Menge aller Pixel in verschieden Tiefen mit
 gleicher Bildposition gespeichert (siehe
@@ -397,7 +397,7 @@ Ansicht des LDIs gewarpt.
 	\label{fig:ldicoord}
 \end{figure}
 
-Wie in~\cite{chang1999ldi} dargelegt ist die McMillan 3D Morphing Gleichung
+Wie in~\cite{chang1999ldi} dargelegt, ist die McMillan 3D Morphing Gleichung
 (siehe~\cite{mcmillan1995list}~\cite{mcmillan1995plenoptic}) auf das LDI
 anwendbar. Um diese definieren zu können muss jedoch zunächst das Kameramodell
 nach~\cite{mcmillan1997image} beschrieben werden (siehe
@@ -522,15 +522,15 @@ oder als Teilmenge im Arbeitsspeicher vorgehalten werden. Des Weiteren sollten
 initiale Koordinatentransformation in diesem Prozess durchgeführt werden.
 
 Einen weiteren Prozess stellt das Rendering der Punktwolke dar. Um eine
-konstante Framerate zu erreichen muss der Arbeitsaufwand möglichst konstant
+konstante Framerate zu erreichen, muss der Arbeitsaufwand möglichst konstant
 gehalten werden. Deshalb werden die Punkte in einem LDI vorgehalten. Diese
 Datenstruktur ermöglicht eine einfache Rasterrisierung und die Anwendung der
-Morphing Equation.
+Morphing Gleichung.
 
 Da bei großen Datenwolken Speicherknappheit auftreten würde, muss eine
 Selektion aus dem gesamten Datensatz geschehen. Unter der Annahme, dass nur ein
 Teil der Punkte im Sichtfeld des Betrachters für eine qualitative
-Repräsentation der Daten ausreicht kann der letzte Prozess deklariert werden.
+Repräsentation der Daten ausreicht, kann der letzte Prozess deklariert werden.
 Hierfür wird das LDI des Renderingprozesses als der Kegelstumpf der
 Betrachtungstransformation interpretiert. Die Vereinigung dieses Kegelstumpfes
 und dem Koordinatenraum der Punktwolke schränkt die Menge der zu verarbeitenden
@@ -550,7 +550,7 @@ Großteil der neuen Perspektive mit bereits transformierten Daten abgedeckt
 werden kann. Es werden sich aber immer Stellen im LDI ergeben, an denen keine
 Daten vorhanden sind. Diese Ausschnitte müssen deshalb erkannt und mit Daten
 der ursprünglichen Punktwolke gefüllt werden. Hierfür muss nach dem Morphen die
-lokale Punktdichte im LDI ermittelt werden. Ziel dieser Berechnung ist es
+lokale Punktdichte im LDI ermittelt werden. Ziel dieser Berechnung ist es,
 möglichst zusammenhängende Pixelbereiche zu erkennen. Sind entsprechende
 Bereiche bestimmt, können diese als Anfrage an den ursprünglichen Datensatz
 gestellt werden.
@@ -562,7 +562,7 @@ Pfad im System dar, welcher direkt auf die Qualität der Darstellung Einfluss
 nimmt. Die Datenverarbeitung der ursprünglichen Punktwolke in ein geeignetes
 Format und die Bearbeitung der LDIs sind sekundäre Faktoren. Das heißt die Rate
 mit der neue Punkte nachgeladen werden können, verbessert die Detailwiedergabe,
-ist für die prinzipielle Funktion jedoch beliebig. Hierbei ist hervorzuheben,
+ist für die prinzipielle Funktion jedoch beliebig. Es ist hervorzuheben,
 dass die aufgezeigte Parallelität als inhärente Eigenschaft des Algorithmus
 definiert wird. Die Implementation setzt dies dann in geeigneter Weise durch
 Threads o.Ä.\ um.
@@ -590,9 +590,9 @@ einzelnen Implementationsbestandteile.
 Wie im Grundlagenteil bereits motiviert, ist die Klassendeklaration
 \texttt{PinholeCameraModel} zur Nachbildung einer Lochkamera nützlich. Die
 Klasse speichert die Kamera- und Perspektivtransformation als Membervariable
-und stellt diese in geeigneter Weise über Zugriffmethoden bereit. So kann der
+und stellt diese in geeigneter Weise über Zugriffsmethoden bereit. So kann der
 Sichtkegelstumpf eines LDIs zur Sichtbarkeitsprüfung von Punkten genutzt
-werden. Durch die Rasterisierung der Punkte im LDI ist es außerdem notwendig
+werden. Durch die Rasterisierung der Punkte im LDI ist es außerdem notwendig,
 die Pixelauflösung der Sensorebene und damit auch der Lochkamera zu speichern.
 Dies geschieht durch eine weitere Membervariable vom Typ
 \texttt{std::pair<size\_t, size\_t>}.
@@ -609,7 +609,7 @@ Dies geschieht durch eine weitere Membervariable vom Typ
 
 Die Punktwolke wird durch die \texttt{PointCloudSource} abstrahiert. Die
 konkreten Punktdaten werden als Membervariable vom Typ \texttt{point\_cloud}
-gekapselt. Durch diesen ist es möglich getrennt auf Koordinaten und andere
+gekapselt. Durch diesen ist es möglich, getrennt auf Koordinaten und andere
 Punktmerkmale wie Farbe oder Normalen zuzugreifen.
 
 Außerdem verwaltet die \texttt{PointCloudSource} eine Liste aller gestellten
@@ -617,14 +617,15 @@ Außerdem verwaltet die \texttt{PointCloudSource} eine Liste aller gestellten
 speichern als Member zunächst die Kamerakonfiguration vom Typ
 \texttt{PinholeCameraModel}. Mit dieser ist es möglich, die Punkte der gesamten
 Punktwolke nach Sichtbarkeit zu filtern. Die \texttt{PointCloudQuery} Klasse
-besitzt zwei eigene Membervariablen zum Speichern der Punktpositionen und
-Farben. Nach der Sichtbarkeitsprüfung werden alle verbliebenen Punkte deshalb
-in die Anfrage kopiert. Da die Anfrageklasse außerdem den Schnittpunkt zwischen
-Dateiverarbeitung und Rendering darstellt, ist eine weitere Membervariable zur
-Sicherung von kritischen Abschnitten notwendig. Die Mutexvariablen vom Typ
-\texttt{std::timed\_mutex} besitzen die Besonderheit eine vorher definierte
-Wartezeit zu berücksichtigen. Dies ist aus Sicht des Renderings notwendig um
-eine Obergrenze für die Frametimes einhalten zu können.
+besitzt weiterhin zwei eigene Membervariablen zum Speichern der Punktpositionen
+und Farben. Nach der Sichtbarkeitsprüfung werden alle verbliebenen Punkte
+deshalb in die Anfrage kopiert. Da die Anfrageklasse außerdem den Schnittpunkt
+zwischen Dateiverarbeitung und Rendering darstellt, ist eine weitere
+Membervariable zur Sicherung von kritischen Abschnitten notwendig. Die
+Mutexvariablen vom Typ \texttt{std::timed\_mutex} besitzen die Besonderheit,
+eine vorher definierte Wartezeit zu berücksichtigen. Dies ist aus Sicht des
+Renderings notwendig, um eine Obergrenze für die Frametimes einhalten zu
+können.
 
 Um den Verwaltungsaufwand gering zu halten, durchlaufen alle Anfragen drei
 Zustände entsprechend ihrer Bearbeitung (siehe
@@ -634,7 +635,7 @@ der Datenverarbeitung vorliegen. Nach dem vollständigen Kopieren aller
 sichtbaren Punkte geht die Anfrage in einem ``vollständigen'' und
 ``konsumierbarem'' Zustand über. Daraufhin filtert der Renderingprozess die
 Liste aller Anfragen nach der Konsumierbarkeit und fügt die entsprechenden
-Punkte ein. So wird während des Renderings vesucht im vorgegebenen Zeitbudget
+Punkte ein. So wird während des Renderings versucht, im vorgegebenen Zeitbudget
 so viele Punkte wie möglich in das LDI zu transformieren. Anschließend ist der
 Zweck der Anfrage erfüllt und sie kann aus der Liste entfernt werden. Um
 Wettlauf-Risiken bei den obigen Zustandsänderungen auszuschließen, werden zwei
@@ -658,12 +659,12 @@ alle sichtbaren Punkte an einer diskreten \( (x, y) \) Position auf der
 Sensorebene. Zusätzlich ist deren Tiefe in Bezug auf die Kamera von Bedeutung.
 Werden räumlich verschiedene Punkte auf die selbe \( (x,y) \) Position
 transformiert, unterscheidet sich deren Tiefenwert \(z\). Konventionelle
-Rasterrisierungsansätze würden bei diesem Ansatz den Tiefenpuffer zur
+Rasterrisierungsansätze würden in dieser Situation den Tiefenpuffer zur
 Konfliktauflösung verwenden und den der Kamera näheren Punkt in das Bild
 zeichnen. Da zusätzliche Bildinformationen aber ausdrücklich für eine
 kurzfristige Verdeckungskompensation erwünscht sind, müssen diese verdeckten
 Punkte auch in das Bild übernommen werden. Hierfür wird die \texttt{ray\_t}
-Struktur definiert. Es handelt sich hierbei um einen \texttt{std::vector} der
+Struktur definiert. Es handelt sich hierbei um einen \texttt{std::vector}, der
 für jeden Punkt dessen Tiefenwert und Farbe speichert. Die \( (x,y) \) Position
 ist indirekt durch die Zugehörigkeit zum jeweiligen Strahlvektor gegeben. Wie
 an der Benennung zu erkennen, kann jede dieser Strukturen als ein Strahl vom
@@ -737,7 +738,7 @@ das Einfügen von Punkten aus der Wolke abläuft (siehe
 Abbildung~\ref{img:incload}). So ist erkennbar, dass zunächst kleine
 Punktgruppen quasi zufällig geladen werden. Wenig später sind nahezu
 rechteckige Patches auf der Oberfläche erkennbar. Daraufhin ist eine
-Objektoberfläche bereits wahrnehmbar. Es ist jedoch auffällig das bis zuletzt
+Objektoberfläche bereits wahrnehmbar. Es ist jedoch auffällig, dass bis zuletzt
 einzelne Reihen von Punkten unaufgefüllt bleiben.
 
 Diese Effekte lassen sich durch zwei primäre Ursachen erklären. So wird durch
@@ -749,10 +750,11 @@ seriell erfolgt, bleibt diese Reihenfolge somit in einem lokalen Intervall
 erhalten. Es ist außerdem möglich, dass beim ursprünglichen Speichern eine
 gewisse Anordnung erreicht werden sollte. So ist es denkbar, dass verschiedene
 Qualitätsstufen nacheinander gespeichert wurden. Bei Bildern die über langsame
-Netzwerke übertragen werden, wird häufig Interleaving eingesetzt um eine
-initale Approximation des Inhalts möglichst frühzeitig anzeigen zu können. Da
-das verwendete Modell des Stanford Bunny 1993 (siehe~\cite{bunny}) angefertigt
-wurde, ist ein analoges Verfahren wahrscheinlich.
+Netzwerke übertragen werden, wird häufig Interlacing\footnote{Das
+PNG-Bildformat bietet zum Beispiel ein Interlacing nach Adam7 an.} eingesetzt
+um eine initale Approximation des Inhalts möglichst frühzeitig anzeigen zu
+können. Da das verwendete Modell des Stanford Bunny 1993 (siehe~\cite{bunny})
+angefertigt wurde, ist ein ähnliches Verfahren wahrscheinlich.
 
 Des Weiteren sind die Verarbeitungsschritte durch die
 \texttt{std::timed\_mutex} zeitlich aneinander gekoppelt. So hat die Framerate
@@ -760,9 +762,9 @@ einen direkten Einfluss auf die Größe der Anfragen und die Menge an Punkten,
 die auf einmal in das LDI kopiert werden können. Es ist denkbar dass hierbei
 Oszillationseffekte durch die sog. Lock Contention auftreten. So ist ein Mutex
 eine Betriebssystemressource und muss durch eben dieses verwaltet werden. Wie
-jedoch bekannt ist, sind alle Aufrufe, die in den Kernel Adressraum führen
+jedoch bekannt ist, sind alle Aufrufe, die in den Kernel Adressraum führen,
 äußerst teuer. Daraus folgen in Überlastungssituationen überproportional
-ansteigende Laufzeitkosten während der Reservierung des Mutex. Dies hat eine
+ansteigende Laufzeitkosten während der Reservierung des Mutex. Dies hat die
 Wechselwirkung zur Folge, dass während einer Überlastung die Zeit für
 Anfragenerstellung und Ausführung sich verringert. Diese Situation wird jedoch
 durch den Prozess-Scheduler des Betriebssystems schubweise entschärft. Dadurch
@@ -777,8 +779,8 @@ Trotz Entkopplung des Nachladens und der Anzeige versagt die Implementation bei
 größeren Datenwolken wie dem Lego 3D Scans (rund 52 MB). So entstehen initiale
 Verzögerungen und es dauert ca. 8 Sekunden bis alle sichtbaren Punkte angezeigt
 werden (Haswell i7 4790K, 16 GB DDR3, Maxwell GTX 980). Es kann zwar eine
-nahezu konstante Bildrate gehalten, die qualitativen Einbußen sind jedoch
-gravierend (siehe Abbildung~\ref{img:lego}). Auf mögliche Gründe wird im
+nahezu konstante Bildrate gehalten werden, die qualitativen Einbußen sind
+jedoch gravierend (siehe Abbildung~\ref{img:lego}). Auf mögliche Gründe wird im
 Abschnitt~\ref{sec:discussion} eingegangen.
 
 \begin{figure}
@@ -800,11 +802,11 @@ Vergleich zweier fertig gestellter Bilder nicht aufschlussreich, da sie
 letztendlich durch den gleichen Vorgang gezeichnet wurden. Da das
 Punktrendering außerdem nur einzelne Pixel einfärbt, sind klassische
 Vergleichsmetriken, wie das Differenzbild ohne Anpassung nicht sinnvoll. Ein
-Unterschied zwischen beiden Renderingverfahren würde sich nur Abweichungen in
-den Bildpositionen bemerkbar machen. Deshalb wird vor dem eigentlichen
-Vergleich ein Gaußfilter mit einem Durchmesser von 5 Pixeln auf beide Bilder
-angewandt. Somit wird eine punktuelle Diskrepanz über einen lokalen Bereich
-gestreut.
+Unterschied zwischen beiden Renderingverfahren würde sich nur durch
+Abweichungen in den Bildpositionen bemerkbar machen. Deshalb wird vor dem
+eigentlichen Vergleich ein Gaußfilter mit einem Durchmesser von 5 Pixeln auf
+beide Bilder angewandt. Somit wird eine punktuelle Diskrepanz über einen
+lokalen Bereich gestreut.
 
 \begin{figure}
 	\centering
@@ -826,15 +828,16 @@ Ansichten mit sich stark unterscheidenden Positionen und Winkeln.
 Abbildung~\ref{img:distortion} stellt einen solchen Extremfall dar. Das
 Differenzbild zeigt deutliche Abweichungen in der Silhouette des Modells.
 Außerdem interessant ist der Unterschied in der Punktdichte der beiden Bilder.
-So sind in der Differenz graue Bereiche mit unterschiedlicher Helligkeit
-sichtbar. Daraus folgt, dass durch das LDI Morphing die effektive Punktdichte
-komprimiert wird. Dies ist eventuell durch unvorteilhafte Rundung von
-Bildpositionen erklärbar. So wird während des Morphings mit 32 Bit
-Gleitkommazahlen gearbeitet. In Abhängig der Rundungseinstellungen der CPU kann
-diese in einem simplen Abschneiden der Nachkommastellen resultieren. Eine
-konventionelle Rundung durch die Intervalle \( \left(0, 0.5\right) \) und \(
-\left[0.5, 1\right] \) würde den durchschnittlichen quadrierten Abstand
-zwischen eigentlicher und endgültiger Position verringern.
+So sind in der Differenz graue Bereiche mit unterschiedlicher Helligkeit und
+somit variierender Diskrepanz sichtbar. Daraus folgt, dass durch das LDI
+Morphing die effektive Punktdichte komprimiert wird. Dies ist eventuell durch
+unvorteilhafte Rundung von Bildpositionen erklärbar. So wird während des
+Morphings mit 32 Bit Gleitkommazahlen gearbeitet. In Abhängig der
+Rundungseinstellungen der CPU kann diese in einem simplen Abschneiden der
+Nachkommastellen resultieren. Eine konventionelle Rundung durch die Intervalle
+\( \left(0, 0.5\right) \) und \( \left[0.5, 1\right] \) würde den
+durchschnittlichen quadrierten Abstand zwischen eigentlicher und endgültiger
+Position verringern.
 
 Um solche Situationen zu provozieren, werden wiederholt
 ruckartige Mausbewegungen ausgeführt um eine möglichst große Abweichung
@@ -865,12 +868,12 @@ reichten jedoch nicht aus, um dass FPS Ziel zu erreichen. Die hauptsächlichen
 Verbraucher von Aufrufzeit sind Speicherzugriffe und zu einem geringeren Teil
 Kernelfunktionen. Dies führt zu der Festellung, das die Implementation des LDIs
 und der Morphinggleichung auf der CPU fehlplatziert sind. So erreicht
-DDR3--1600 Speicher nur einen Durchsatz von 12,8 GB/s. Auf Grafikkarten wird
-jedoch GDDR5 benutzt und erreicht Größenordnungen von 224,4 GB/s (GTX 980). Mit
-diesem Umstand erscheint eine Speicherung des LDIs direkt auf der GPU und ein
-Morphing durch dedizierte Shader erfolgsversprechender. Die Implementation auf
-der CPU entstand jedoch aus der Motivation, die erweiterten Fähigkeiten des
-bestehenden CGV Renderers wiederzuverwenden.
+DDR3--1600 Hauptspeicher nur einen Durchsatz von 12,8 GB/s. Auf Grafikkarten
+wird jedoch GDDR5 o.Ä.\ benutzt und erreicht Größenordnungen von 224,4 GB/s
+(GTX 980). Mit diesem Umstand erscheint eine Speicherung des LDIs direkt auf
+der GPU und ein Morphing durch dedizierte Shader erfolgsversprechender. Die
+Implementation auf der CPU entstand jedoch aus der Motivation, die erweiterten
+Fähigkeiten des bestehenden CGV Renderers wiederzuverwenden.
 
 Es hat sich auch als Nachteilig erwiesen, dass die benutzte Klasse zum Laden
 der Punktwolke die gesamte Datei in den Speicher lädt. Dies führt bei
@@ -918,6 +921,10 @@ Ein möglicher Ansatz zur Weiterenwicklung von LDIs lässt sich mit dem
 generellen Erfolg von HMDs erkennen. Da für diese Anwendung stereoskopische
 Bilder generiert werden müssen, entsteht die Frage ob LDIs auf diesen
 Spezialfall optimiert werden können. So müssten mit der aktuellen
-Implementation beide Stereobilder gemorpht werden.
+Implementation entweder beide Stereobilder aus dem Mittelpunkt zwischen beiden
+Augen gemorpht werden oder zwei separate LDIs gespeichert werden. Eventuell
+ließe sich anstatt der Tiefe die generalisierte Disparität für jeden Punkt
+speichern und die Morphing Gleichung entsprechend anpassen. Dies würde eine
+elegantere Lösung des Stereofalls ermöglichen.
 
 \end{document}
