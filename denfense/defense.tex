@@ -1,0 +1,307 @@
+\documentclass[aspectratio=169]{beamer}
+
+\usepackage[utf8]{inputenc}
+
+\usepackage{fontawesome5}
+\usepackage{verbatim}
+\usepackage{siunitx}
+\usepackage{tikz, tikz-3dplot, tikz-uml}
+\usepackage{pgffor}
+
+\usetikzlibrary{calc, intersections, shapes, positioning}
+
+%Information to be included in the title page:
+\title{Layered Depth Images als Ad hoc Rendering für Punktwolken}
+\author{Mario Henze}
+\institute{Professur für Computergrafik und Visualisierung}
+\date{2020}
+
+
+
+\begin{document}
+
+\frame{\titlepage}
+
+\begin{frame}
+    \frametitle{QSplat}
+    \begin{itemize}
+        \item von Rusinkiewicz und Levoy entwickeltes Verfahren für Punktwolkenrendering
+        \item effizientes Zeichnen durch Hierarchie von Begrenzungskugeln
+        \item Vorverarbeitung notwendig
+        \item Oberflächennormalen werden aus generiertem Dreiecksnetz gewonnen
+        \item Ermöglicht Verdeckung von Lochartefakten
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Goswami}
+    \begin{itemize}
+        \item von Goswami et al.\ entwickeltes Punktwolkenrendering
+        \item lokale Zusammenfassung von Punkten
+        \item KD-Baum als Hierarchie von Punktclustern
+        \item Quantisierung entlang der Koordinatenachsen ermöglicht parallele Bearbeitung
+        \item Rendering erreicht variablen Detailgrad durch Prioritätswarteschlange
+        \item Expansion der Baumknoten bis ausreichende Punktdichte erreicht
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Discher \& GBuffer}
+    \begin{itemize}
+        \item Punktwolkenrendering mit Fokus auf VR von Discher et al.\ entwickelt
+        \item Renderprozess läuft in drei Phasen ab
+        \item Auswahl einer repräsentativen Untermenge \& Culling
+        \item Erstellen von G-Buffers als Zwischenrepräsentation
+        \item Nachbearbeitung und finales Zeichnen
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Wimmer Instant Points}
+    \begin{itemize}
+        \item Wimmer und Scheiblauer Verfahren ohne Vorverarbeitung
+        \item möglichst große Menge an Punkten mit interaktiven Bildraten
+        \item Memory Optimized
+        Sequential Point Trees (MOSPT) und verschachtelte Octrees als Datenstrukturen
+        \item lokale Zusammenfassung durch Fehlermetrik
+        \item Kombination von MOSPT und Octrees um statische Annahmen der MOSPT abzumildern
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Image based Rendering Review}
+    \begin{itemize}
+        \item Review von Heung-Yeung und Sing Bing
+        \item stellt Spektrum der Image based Rendering Ansätze dar
+        \item Einführung der plenoptischen Funktion
+        \item Einordnung anhand der Parameteranzahl
+    \end{itemize}
+    \includegraphics[width=\linewidth]{images/review_spectrum}
+\end{frame}
+
+\begin{frame}
+    \frametitle{McMillanWarping}
+    \begin{itemize}
+        \item von McMillan in verschiedenen Arbeiten entwickelte Datenstruktur
+        \item sog. Layered Depth Images
+        \item ermöglicht Zusammenfassung von Bildern mit verschiedenen Perspektiven
+        \item erlaubt Bildsynthese für neue Ansichten
+        \item Verdeckungsartefakte und Lochbildung vorhanden
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{LDI Datenstruktur}
+    \begin{itemize}
+        \item Chun-Fa et al.\ Viewmorphing Verfahren
+        \item Referenzbilder aus verschiedenen Perspektiven tasten Tiefenprofil unterschiedlich dicht ab
+        \item Einordnung in einen LDI Baum
+        \item Auswahl von Referenzbildern mit ähnlicher Tiefenauflösung zum Zielausschnitt
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Motivation}
+    \begin{itemize}
+        \item Punktwolkenrendering Methode für grundlegende Bildsynthese notwendig
+        \item Image based Rendering für VR besonders lohnenswert
+        \item Entwicklung eines hybriden Ansatzes
+        \item Neuinterpretation des LDI als blickabhängige Punktwolke im Bildraum
+        \item Viewmorphing kann somit auf Punktwolke übertragen werden
+        \item Wiederverwendung des CGV Punktwolkenrenderer
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Plenoptic Modelling}
+
+    \begin{equation}
+        P_7 = P(V_x, V_y, V_z, \theta, \Phi, \lambda, t)
+    \end{equation}
+
+    \begin{itemize}
+        \item Beschreibung der Szene unabhängig vom Betrachter
+        \item Sampling durch plenoptische Funktion
+        \item herkömmliches Bild ist unvollständige und diskrete Abtastung dieser Funktion
+        \item Image based Rendering nach McMillan versucht plenoptische Funktion zu rekonstruieren
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Lochkamera}
+    \begin{figure}
+        \centering
+        \tdplotsetmaincoords{70}{110}
+        \resizebox{.8\linewidth}{!}{\input{../thesis/figures/pinholecamera.tikz}}
+        \caption{Abbildungsverhältnisse einer Lochkamera auf Sensor- und reale
+            Bildebene}%
+        \label{fig:pinholecamera}
+    \end{figure}
+\end{frame}
+
+\begin{frame}
+    \frametitle{LDI Koordinatensystem}
+    \begin{figure}
+        \centering
+        \tdplotsetmaincoords{70}{60}
+        \resizebox{.6\linewidth}{!}{\input{../thesis/figures/ldicoordinatesystem.tikz}}
+        \caption{Zusammenhänge im LDI Koordinatensystem. Die Vektoren \( \hat{\imath}
+            \), \( \hat{\jmath} \) und \( \hat{k} \) spannen das Weltkoordinatensystem
+            auf. Die Vektoren \( \hat{a} \), \( \hat{b} \) sind die Basis LDI
+            Bildraums.}%
+        \label{fig:ldicoord}
+    \end{figure}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Layered Depth Image}
+    \begin{figure}
+        \centering
+        \tdplotsetmaincoords{70}{110}
+        \resizebox{.7\linewidth}{!}{\input{../thesis/figures/layereddepthimage.tikz}}
+        \caption{Veranschaulichung von Punkten in einem LDI.\@ Alle Punkte mit
+            gleicher Pixelzugehörigkeit werden zusammenhängend gespeichert. Jeder
+            Punkt im Pixel besitzt eine Tiefe \(z\) und eine Farbe \(c\).}%
+        \label{fig:layereddepthimage}
+    \end{figure}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Morphing Gleichungen}
+    \begin{itemize}
+        \item Alle Sichtstrahlen entstammen dem Koordinatenursprung
+        \item Korrespondenz zwischen Richtungsvektor \( \vec{d} \) und LDI Bildpunkt wie folgt
+    \end{itemize}
+
+    \begin{equation}
+        \vec{d} =
+        \begin{pmatrix}
+            d_{\hat{\imath}} \\
+            d_{\hat{\jmath}} \\
+            d_{\hat{k}}
+        \end{pmatrix} =
+        \begin{pmatrix}
+            a_{\hat{\imath}} &
+            b_{\hat{\imath}} &
+            c_{\hat{\imath}}   \\
+            a_{\hat{\jmath}} &
+            b_{\hat{\jmath}} &
+            c_{\hat{\jmath}}   \\
+            a_{\hat{k}}      &
+            b_{\hat{k}}      &
+            c_{\hat{k}}        \\
+        \end{pmatrix}
+        \begin{pmatrix}
+            u \\
+            v \\
+            1
+        \end{pmatrix} =
+        \mathbf{P}
+        \begin{pmatrix}
+            u \\
+            v \\
+            1
+        \end{pmatrix}
+    \end{equation}
+\end{frame}
+
+\begin{frame}
+    \frametitle{LDI Morphing}
+        \begin{columns}
+            \column{.45\linewidth}
+            \begin{figure}
+                \centering
+                \resizebox{.9\linewidth}{!}{\input{../thesis/figures/planemorph.tikz}}
+                \caption{Morphing von zwei Kamerapositionen.}%
+                \label{fig:ldimorph}
+        \end{figure}
+        \column{.55\linewidth}
+        \begin{align}
+            X = C_1 + t_1 \mathbf{P_1} x_1 %
+            = C_2 + t_2 \mathbf{P_2} x_2
+        \end{align}
+        \begin{align}
+            \iff{} & \frac{t_2}{t_1} \mathbf{P_2} x_2 %
+            = \frac{1}{t_1}(C_1 - C_2) + \mathbf{P_1} x_1 \\
+            \implies{} & \mathbf{P_2} x_2 
+	        = \delta(x_1) (C_1 - C_2) + \mathbf{P_1} x_1
+        \end{align}
+    \end{columns}
+\end{frame}
+
+\begin{frame}
+    \frametitle{LDI Morphing}
+        \begin{columns}
+            \column{.45\linewidth}
+            \begin{figure}
+                \centering
+                \resizebox{.9\linewidth}{!}{\input{../thesis/figures/planemorph.tikz}}
+                \caption{Morphing von zwei Kamerapositionen.}%
+                \label{fig:ldimorph}
+        \end{figure}
+        \column{.55\linewidth}
+        \begin{align}
+            \frac{r}{\lvert C_1 - C_2 \rvert} = &
+            \frac{\mathbf{P_1} x_1}{\delta(x_1) \lvert (C_1 - C_2) \rvert}
+            \\ %
+            \implies \delta(x_1) =              &
+            \frac{\lvert \mathbf{P} x_1 \lvert}{r}
+        \end{align}
+    \end{columns}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Konzeption}
+    \begin{itemize}
+        \item Entkopplung und Nebenläufigkeit ermöglichen den Ad-hoc Render
+        \item System besteht aus drei Prozessen
+        \item Datenverarbeitung bereitet Punktwolke auf
+        \item Renderer zeichnet Viewport LDI auf Bildschirm
+        \item LDI Anfragengenerator bestimmt Bereiche, die aufgefüllt werden müssen
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Konzeption}
+    \begin{figure}
+        \centering
+        \input{../thesis/figures/sysoverview.tikz}
+        \caption{Systemüberblick des Renderingprozesses. Übergänge mit \faLock\
+            symbolisieren den gegenseitig exklusiv gesicherten Datenaustausch. Mit
+            einem zusätzlichen \faHourglassHalf\ erfolgt der Austausch mit
+            Zeitbegrenzung.}%
+        \label{fig:sysoverview}
+    \end{figure}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Was mache ich besser}
+    This is a text in the first frame. This is a text in the first frame. This is a text in the first frame.
+\end{frame}
+
+\begin{frame}
+    \frametitle{Vermeidung von Race Condition}
+    This is a text in the first frame. This is a text in the first frame. This is a text in the first frame.
+\end{frame}
+
+\begin{frame}
+    \frametitle{Lineare Zugriffsfunktion}
+    This is a text in the first frame. This is a text in the first frame. This is a text in the first frame.
+\end{frame}
+
+\begin{frame}
+    \frametitle{Punktdichte und Rundung}
+    This is a text in the first frame. This is a text in the first frame. This is a text in the first frame.
+\end{frame}
+
+\begin{frame}
+    \frametitle{Test von Drehung vs Translation}
+    This is a text in the first frame. This is a text in the first frame. This is a text in the first frame.
+\end{frame}
+
+\begin{frame}
+    \frametitle{Laufzeitaufschlüsselung}
+    This is a text in the first frame. This is a text in the first frame. This is a text in the first frame.
+\end{frame}
+
+\end{document}
