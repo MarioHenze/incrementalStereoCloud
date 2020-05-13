@@ -23,6 +23,19 @@
 \frame{\titlepage}
 
 \begin{frame}
+    \frametitle{Gliederung}
+    \begin{enumerate}
+        \item Untersuchung klassischer Punktrender Verfahren
+        \item Einführung Image based Rendering
+        \item Motivation des hybriden Ansatzes
+        \item Vorstellung des Viewmorphing nach McMillan
+        \item Konzeption
+        \item Auswertung
+        \item Demo
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}
     \frametitle{QSplat}
     \begin{itemize}
         \item von Rusinkiewicz und Levoy entwickeltes Verfahren für Punktwolkenrendering
@@ -115,16 +128,34 @@
 \begin{frame}
     \frametitle{Plenoptic Modelling}
 
-    \begin{equation}
-        P_7 = P(V_x, V_y, V_z, \theta, \Phi, \lambda, t)
-    \end{equation}
+    \begin{columns}
+    \column{.5\linewidth}
+        \begin{equation}
+            P_7 = P(V_x, V_y, V_z, \theta, \Phi, \lambda, t)
+        \end{equation}
+        
+        \vspace{.5cm}
 
-    \begin{itemize}
-        \item Beschreibung der Szene unabhängig vom Betrachter
-        \item Sampling durch plenoptische Funktion
-        \item herkömmliches Bild ist unvollständige und diskrete Abtastung dieser Funktion
-        \item Image based Rendering nach McMillan versucht plenoptische Funktion zu rekonstruieren
-    \end{itemize}
+        \begin{description}[style=sameline]
+            \item[\( V_x, V_y, V_z \)] mögliche Position der Kamera
+            \item[\( \theta, \Phi \)] Winkel eines Sichtstrahls
+            \item[\( \lambda \)] Wellenlänge des Lichts
+            \item[\( t \)] Zeitpunkt der Beobachtung
+        \end{description}
+    \column{.5\linewidth}
+        \begin{itemize}
+            \item Beschreibung der Szene unabhängig vom Betrachter
+            \item Sampling durch plenoptische Funktion
+            \item herkömmliches Bild ist unvollständige und diskrete Abtastung dieser Funktion
+            \item Image based Rendering nach McMillan versucht plenoptische Funktion zu rekonstruieren
+        \end{itemize}
+    \end{columns}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Plenoptic Modelling}
+    \centering
+    \includegraphics[width=.9\linewidth]{images/LytroVolumeTracer_VolumeSam}
 \end{frame}
 
 \begin{frame}
@@ -132,38 +163,49 @@
     \begin{figure}
         \centering
         \tdplotsetmaincoords{70}{110}
-        \resizebox{.8\linewidth}{!}{\input{../thesis/figures/pinholecamera.tikz}}
-        \caption{Abbildungsverhältnisse einer Lochkamera auf Sensor- und reale
-            Bildebene}%
+        \resizebox{.8\linewidth}{!}{\input{../thesis/figures/pinholecamera.tikz}}%
         \label{fig:pinholecamera}
     \end{figure}
 \end{frame}
 
 \begin{frame}
-    \frametitle{LDI Koordinatensystem}
-    \begin{figure}
-        \centering
-        \tdplotsetmaincoords{70}{60}
-        \resizebox{.6\linewidth}{!}{\input{../thesis/figures/ldicoordinatesystem.tikz}}
-        \caption{Zusammenhänge im LDI Koordinatensystem. Die Vektoren \( \hat{\imath}
-            \), \( \hat{\jmath} \) und \( \hat{k} \) spannen das Weltkoordinatensystem
-            auf. Die Vektoren \( \hat{a} \), \( \hat{b} \) sind die Basis LDI
-            Bildraums.}%
-        \label{fig:ldicoord}
-    \end{figure}
+    \frametitle{Layered Depth Image}
+    \begin{columns}
+    \column{.7\linewidth}
+        \begin{figure}
+            \centering
+            \tdplotsetmaincoords{70}{110}
+            \resizebox{\linewidth}{!}{\input{../thesis/figures/layereddepthimage.tikz}}%
+            \label{fig:layereddepthimage}
+        \end{figure}
+
+    \column{.3\linewidth}
+    \begin{itemize}
+        \item Punkte gleicher Pixelzugehörigkeit werden zusammenhängend gespeichert
+        \item Tiefe z
+        \item Farbe c
+    \end{itemize}
+    \end{columns}
 \end{frame}
 
 \begin{frame}
-    \frametitle{Layered Depth Image}
-    \begin{figure}
-        \centering
-        \tdplotsetmaincoords{70}{110}
-        \resizebox{.7\linewidth}{!}{\input{../thesis/figures/layereddepthimage.tikz}}
-        \caption{Veranschaulichung von Punkten in einem LDI.\@ Alle Punkte mit
-            gleicher Pixelzugehörigkeit werden zusammenhängend gespeichert. Jeder
-            Punkt im Pixel besitzt eine Tiefe \(z\) und eine Farbe \(c\).}%
-        \label{fig:layereddepthimage}
-    \end{figure}
+    \frametitle{LDI Koordinatensystem}
+    \begin{columns}
+    \column{.6\linewidth}
+        \begin{figure}
+            \centering
+            \tdplotsetmaincoords{70}{60}
+            \resizebox{\linewidth}{!}{\input{../thesis/figures/ldicoordinatesystem.tikz}}%
+            \label{fig:ldicoord}
+        \end{figure}
+    
+    \column{.4\linewidth}
+    \begin{description}
+        \item[\(\hat{\imath}\), \( \hat{\jmath} \), \( \hat{k} \)] Weltbasis
+        \item[\( \hat{a} \), \( \hat{b} \)] Bildbasis
+        \item[\( c \)] Sichtvektor
+    \end{description}
+    \end{columns}
 \end{frame}
 
 \begin{frame}
@@ -211,11 +253,13 @@
             \column{.45\linewidth}
             \begin{figure}
                 \centering
-                \resizebox{.9\linewidth}{!}{\input{../thesis/figures/planemorph.tikz}}
-                \caption{Morphing von zwei Kamerapositionen.}%
+                \resizebox{.9\linewidth}{!}{\input{../thesis/figures/planemorph.tikz}}%
                 \label{fig:ldimorph}
         \end{figure}
         \column{.55\linewidth}
+        \begin{itemize}
+            \item Korrespondenz zwischen Welt- und Bildposition wie folgt
+        \end{itemize}
         \begin{align}
             X = C_1 + t_1 \mathbf{P_1} x_1 %
             = C_2 + t_2 \mathbf{P_2} x_2
@@ -235,11 +279,13 @@
             \column{.45\linewidth}
             \begin{figure}
                 \centering
-                \resizebox{.9\linewidth}{!}{\input{../thesis/figures/planemorph.tikz}}
-                \caption{Morphing von zwei Kamerapositionen.}%
+                \resizebox{.9\linewidth}{!}{\input{../thesis/figures/planemorph.tikz}}%
                 \label{fig:ldimorph}
         \end{figure}
         \column{.55\linewidth}
+        \begin{itemize}
+            \item generalisierte Disparität kann dann ermittelt werden
+        \end{itemize}
         \begin{align}
             \frac{r}{\lvert C_1 - C_2 \rvert} = &
             \frac{\mathbf{P_1} x_1}{\delta(x_1) \lvert (C_1 - C_2) \rvert}
@@ -265,43 +311,34 @@
     \frametitle{Konzeption}
     \begin{figure}
         \centering
-        \input{../thesis/figures/sysoverview.tikz}
-        \caption{Systemüberblick des Renderingprozesses. Übergänge mit \faLock\
-            symbolisieren den gegenseitig exklusiv gesicherten Datenaustausch. Mit
-            einem zusätzlichen \faHourglassHalf\ erfolgt der Austausch mit
-            Zeitbegrenzung.}%
+        \input{../thesis/figures/sysoverview.tikz}%
         \label{fig:sysoverview}
     \end{figure}
 \end{frame}
 
 \begin{frame}
-    \frametitle{Was mache ich besser}
-    This is a text in the first frame. This is a text in the first frame. This is a text in the first frame.
-\end{frame}
-
-\begin{frame}
-    \frametitle{Vermeidung von Race Condition}
-    This is a text in the first frame. This is a text in the first frame. This is a text in the first frame.
-\end{frame}
-
-\begin{frame}
-    \frametitle{Lineare Zugriffsfunktion}
-    This is a text in the first frame. This is a text in the first frame. This is a text in the first frame.
+    \frametitle{Lebenszyklus LDI Anfrage}
+    \begin{figure}
+        \centering
+        \resizebox{.6\linewidth}{!}{\input{../thesis/figures/umlquerylife.tikz}}%
+        \label{fig:umlquerylife}
+    \end{figure}
 \end{frame}
 
 \begin{frame}
     \frametitle{Punktdichte und Rundung}
-    This is a text in the first frame. This is a text in the first frame. This is a text in the first frame.
+    \begin{figure}
+        \centering
+        %\resizebox{.06\linewidth}{!}{
+        \input{figures/point_density_rounding.tikz}%
+        \label{fig:umlquerylife}
+    \end{figure}
 \end{frame}
 
 \begin{frame}
-    \frametitle{Test von Drehung vs Translation}
-    This is a text in the first frame. This is a text in the first frame. This is a text in the first frame.
-\end{frame}
-
-\begin{frame}
-    \frametitle{Laufzeitaufschlüsselung}
-    This is a text in the first frame. This is a text in the first frame. This is a text in the first frame.
+    \begin{enumerate}
+        \item https://www.roadtovr.com/lytro-announces-vr-light-field-rendering-software-volume-tracer/
+    \end{enumerate}
 \end{frame}
 
 \end{document}
