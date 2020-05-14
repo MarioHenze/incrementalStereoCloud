@@ -23,6 +23,20 @@
 \frame{\titlepage}
 
 \begin{frame}
+    \frametitle{Aufgabenstellung}
+    \begin{enumerate}
+        \item Literaturrecherche von Punktwolkenrendering und inkrementellen Rendering Verfahren
+        \item Auswahl eines Verfahrens
+        \begin{enumerate}
+            \item erreicht eine festgelegte Bildrate
+            \item Ausgabe konvergiert zu guter Approximation eines nicht inkrementellen Verfahren
+        \end{enumerate}
+        \item Implementation des Verfahrens als CGV Plugin
+        \item Evaluation der Bildqualität im Kontext VR mit 90 FPS
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}
     \frametitle{Gliederung}
     \begin{enumerate}
         \item Untersuchung klassischer Punktrender Verfahren
@@ -37,48 +51,93 @@
 
 \begin{frame}
     \frametitle{QSplat}
-    \begin{itemize}
-        \item von Rusinkiewicz und Levoy entwickeltes Verfahren für Punktwolkenrendering
-        \item effizientes Zeichnen durch Hierarchie von Begrenzungskugeln
-        \item Vorverarbeitung notwendig
-        \item Oberflächennormalen werden aus generiertem Dreiecksnetz gewonnen
-        \item Ermöglicht Verdeckung von Lochartefakten
-    \end{itemize}
+    \begin{columns}
+    \column{.5\linewidth}
+        \includegraphics[width=\linewidth]{images/QSplat_structure}
+        \includegraphics[width=\linewidth]{images/QSplat_example}
+
+    \column{.5\linewidth}
+        \begin{itemize}
+            \item von Rusinkiewicz und Levoy entwickeltes Verfahren für Punktwolkenrendering
+            \item effizientes Zeichnen durch Hierarchie von Begrenzungskugeln
+            \item Vorverarbeitung notwendig
+            \item Oberflächennormalen werden aus generiertem Dreiecksnetz gewonnen
+            \item Ermöglicht Verdeckung von Lochartefakten
+        \end{itemize}
+    \end{columns}
 \end{frame}
 
 \begin{frame}
     \frametitle{Goswami}
-    \begin{itemize}
-        \item von Goswami et al.\ entwickeltes Punktwolkenrendering
-        \item lokale Zusammenfassung von Punkten
-        \item KD-Baum als Hierarchie von Punktclustern
-        \item Quantisierung entlang der Koordinatenachsen ermöglicht parallele Bearbeitung
-        \item Rendering erreicht variablen Detailgrad durch Prioritätswarteschlange
-        \item Expansion der Baumknoten bis ausreichende Punktdichte erreicht
-    \end{itemize}
+    \begin{columns}
+        \column{.6\linewidth}
+        \begin{itemize}
+            \item von Goswami et al.\ entwickeltes Punktwolkenrendering
+            \item lokale Zusammenfassung von Punkten
+            \item KD-Baum als Hierarchie von Punktclustern
+            \item Quantisierung entlang der Koordinatenachsen ermöglicht parallele Bearbeitung
+            \item Rendering erreicht variablen Detailgrad durch Prioritätswarteschlange
+            \item Expansion der Baumknoten bis ausreichende Punktdichte erreicht
+        \end{itemize}
+    
+    \column{.4\linewidth}
+    \includegraphics[width=\linewidth]{images/Goswami_kdtree}
+    \includegraphics[width=\linewidth]{images/Goswami_example}
+    \end{columns}
 \end{frame}
 
 \begin{frame}
     \frametitle{Discher \& GBuffer}
-    \begin{itemize}
-        \item Punktwolkenrendering mit Fokus auf VR von Discher et al.\ entwickelt
-        \item Renderprozess läuft in drei Phasen ab
-        \item Auswahl einer repräsentativen Untermenge \& Culling
-        \item Erstellen von G-Buffers als Zwischenrepräsentation
-        \item Nachbearbeitung und finales Zeichnen
-    \end{itemize}
+    \begin{columns}
+    \column{.45\linewidth}
+    \includegraphics[width=\linewidth]{images/Discher_pipeline}
+    \includegraphics[width=\linewidth]{images/Discher_example}
+
+    \column{.55\linewidth}
+        \begin{itemize}
+            \item Punktwolkenrendering mit Fokus auf VR von Discher et al.\ entwickelt
+            \item Renderprozess läuft in drei Phasen ab
+            \item Auswahl einer repräsentativen Untermenge \& Culling
+            \item Erstellen von G-Buffers als Zwischenrepräsentation
+            \item Nachbearbeitung und finales Zeichnen
+        \end{itemize}
+    \end{columns}
 \end{frame}
 
 \begin{frame}
-    \frametitle{Wimmer Instant Points}
-    \begin{itemize}
-        \item Wimmer und Scheiblauer Verfahren ohne Vorverarbeitung
-        \item möglichst große Menge an Punkten mit interaktiven Bildraten
-        \item Memory Optimized
-        Sequential Point Trees (MOSPT) und verschachtelte Octrees als Datenstrukturen
-        \item lokale Zusammenfassung durch Fehlermetrik
-        \item Kombination von MOSPT und Octrees um statische Annahmen der MOSPT abzumildern
-    \end{itemize}
+    \frametitle{Discher \& GBuffer --- Details}
+    \begin{columns}
+        \column{.333\linewidth}
+        \includegraphics[width=\linewidth]{images/Discher_categories}
+        \includegraphics[width=\linewidth]{images/Discher_culling}
+        \includegraphics[width=\linewidth]{images/Discher_contrast}
+
+        \column{.333\linewidth}
+        \includegraphics[width=\linewidth]{images/GBuffer_concept}
+
+        \column{.333\linewidth}
+        \includegraphics[width=\linewidth]{images/GBuffer_example}
+    \end{columns}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Instant Points}
+    \begin{columns}
+    \column{.5\linewidth}
+        \begin{itemize}
+            \item Wimmer und Scheiblauer Verfahren ohne Vorverarbeitung
+            \item möglichst große Menge an Punkten mit interaktiven Bildraten
+            \item Memory Optimized
+            Sequential Point Trees (MOSPT) und verschachtelte Octrees als Datenstrukturen
+            \item lokale Zusammenfassung durch Fehlermetrik
+            \item Kombination von MOSPT und Octrees um statische Annahmen der MOSPT abzumildern
+        \end{itemize}
+
+    \column{.5\linewidth}
+    \includegraphics[width=\linewidth]{images/instantpoints_example}
+    \centering
+    \includegraphics[width=.8\linewidth]{images/instantpoints_mospt}
+    \end{columns}
 \end{frame}
 
 \begin{frame}
@@ -94,23 +153,48 @@
 
 \begin{frame}
     \frametitle{McMillanWarping}
-    \begin{itemize}
-        \item von McMillan in verschiedenen Arbeiten entwickelte Datenstruktur
-        \item sog. Layered Depth Images
-        \item ermöglicht Zusammenfassung von Bildern mit verschiedenen Perspektiven
-        \item erlaubt Bildsynthese für neue Ansichten
-        \item Verdeckungsartefakte und Lochbildung vorhanden
-    \end{itemize}
+    \begin{columns}
+    \column{.5\linewidth}
+    \includegraphics[width=\linewidth]{images/McMillanWarp_example.png}
+
+    \column{.5\linewidth}
+        \begin{itemize}
+            \item von McMillan in verschiedenen Arbeiten entwickelte Datenstruktur
+            \item sog. Layered Depth Images
+            \item ermöglicht Zusammenfassung von Bildern mit verschiedenen Perspektiven
+            \item erlaubt Bildsynthese für neue Ansichten
+            \item Verdeckungsartefakte und Lochbildung vorhanden
+        \end{itemize}
+    \end{columns}
 \end{frame}
 
 \begin{frame}
-    \frametitle{LDI Datenstruktur}
+    \frametitle{LDI Trees}
     \begin{itemize}
         \item Chun-Fa et al.\ Viewmorphing Verfahren
         \item Referenzbilder aus verschiedenen Perspektiven tasten Tiefenprofil unterschiedlich dicht ab
         \item Einordnung in einen LDI Baum
         \item Auswahl von Referenzbildern mit ähnlicher Tiefenauflösung zum Zielausschnitt
     \end{itemize}
+    \includegraphics[width=\linewidth]{images/LDITree_concept}
+\end{frame}
+
+\begin{frame}
+    \frametitle{LDI Trees --- Details}
+    \begin{columns}
+        \column{.333\linewidth}
+        \centering
+        \includegraphics[width=.7\linewidth]{images/LDITree_ref}
+        \includegraphics[width=.7\linewidth]{images/LDITree_octree}
+        \column{.333\linewidth}
+        \centering
+        \includegraphics[width=.7\linewidth]{images/LDITree_morph4}
+        \includegraphics[width=.7\linewidth]{images/LDITree_morph12}
+        \column{.333\linewidth}
+        \centering
+        \includegraphics[width=.7\linewidth]{images/LDITree_morph36}
+        \includegraphics[width=.7\linewidth]{images/LDITree_morph36gap}
+    \end{columns}
 \end{frame}
 
 \begin{frame}
