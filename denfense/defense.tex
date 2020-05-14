@@ -401,6 +401,27 @@
 \end{frame}
 
 \begin{frame}
+    \frametitle{Layered Depth Image Implementation}
+    \begin{columns}
+    \column{.4\linewidth}
+        \begin{figure}
+            \centering
+            \tdplotsetmaincoords{70}{110}
+            \resizebox{\linewidth}{!}{\input{../thesis/figures/layereddepthimage.tikz}}%
+            \label{fig:layereddepthimage}
+        \end{figure}
+
+    \column{.6\linewidth}
+    \begin{itemize}
+        \item Im Arbeitspeicher vorgehalten
+        \item Als \texttt{std::vector<ray\_t>}
+        \item \texttt{struct ray\_t} speichert Tiefe und Farbe
+        \item Datenstruktur ähnlich einem dünn besetztem Bild
+    \end{itemize}
+    \end{columns}
+\end{frame}
+
+\begin{frame}
     \frametitle{Lebenszyklus LDI Anfrage}
     \begin{figure}
         \centering
@@ -410,16 +431,40 @@
 \end{frame}
 
 \begin{frame}
-    \frametitle{Punktdichte und Rundung}
-    \begin{figure}
-        \centering
-        %\resizebox{.06\linewidth}{!}{
-        \input{figures/point_density_rounding.tikz}%
-        \label{fig:umlquerylife}
-    \end{figure}
+    \frametitle{Evaluation}
+
+    \begin{columns}
+        \column{.333\linewidth}
+        \includegraphics[width=\linewidth]{images/96}
+        \column{.333\linewidth}
+        \includegraphics[width=\linewidth]{images/100}
+        \column{.333\linewidth}
+        \includegraphics[width=\linewidth]{images/115}
+    \end{columns}
 \end{frame}
 
 \begin{frame}
+    \frametitle{Punktdichte und Rundung}
+    \begin{columns}
+    \column{.6\linewidth}
+    \centering
+    \includegraphics[width=.5\linewidth]{images/239}%
+    \includegraphics[width=.5\linewidth]{images/241}
+    \includegraphics[width=.5\linewidth]{images/diff}
+    
+    \column{.4\linewidth}
+        \begin{figure}
+            \centering
+            %\resizebox{.06\linewidth}{!}{
+                \input{figures/point_density_rounding.tikz}%
+                \label{fig:umlquerylife}
+            \end{figure}
+        \end{columns}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Quellen}
+    
     \begin{enumerate}
         \item https://www.roadtovr.com/lytro-announces-vr-light-field-rendering-software-volume-tracer/
     \end{enumerate}
