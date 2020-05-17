@@ -7,8 +7,11 @@
 \usepackage{siunitx}
 \usepackage{tikz, tikz-3dplot, tikz-uml}
 \usepackage{pgffor}
+\usepackage{biblatex}
 
 \usetikzlibrary{calc, intersections, shapes, positioning}
+
+\setbeamertemplate{bibliography item}{\insertbiblabel}
 
 %Information to be included in the title page:
 \title{Layered Depth Images als Ad hoc Rendering für Punktwolken}
@@ -16,7 +19,16 @@
 \institute{Professur für Computergrafik und Visualisierung}
 \date{2020}
 
+% Enable frame numbering
+\addtobeamertemplate{navigation symbols}{}{%
+    \usebeamerfont{footline}%
+    \usebeamercolor[fg]{footline}%
+    \hspace{1em}%
+    \insertframenumber/\inserttotalframenumber
+}
 
+% reuse bibliography
+\addbibresource{../thesis/literature.bib}
 
 \begin{document}
 
@@ -55,6 +67,8 @@
     \column{.5\linewidth}
         \includegraphics[width=\linewidth]{images/QSplat_structure}
         \includegraphics[width=\linewidth]{images/QSplat_example}
+        \centering
+        \\[-1ex]{\tiny Quelle:~\cite{rusinkiewicz2000qsplat}}
 
     \column{.5\linewidth}
         \begin{itemize}
@@ -81,8 +95,10 @@
         \end{itemize}
     
     \column{.4\linewidth}
-    \includegraphics[width=\linewidth]{images/Goswami_kdtree}
-    \includegraphics[width=\linewidth]{images/Goswami_example}
+    \includegraphics[width=.9\linewidth]{images/Goswami_kdtree}
+    \includegraphics[width=.9\linewidth]{images/Goswami_example}
+    \centering
+        \\[-1ex]{\tiny Quelle:~\cite{goswami2010high}}
     \end{columns}
 \end{frame}
 
@@ -90,8 +106,10 @@
     \frametitle{Discher \& GBuffer}
     \begin{columns}
     \column{.45\linewidth}
-    \includegraphics[width=\linewidth]{images/Discher_pipeline}
-    \includegraphics[width=\linewidth]{images/Discher_example}
+    \includegraphics[width=.9\linewidth]{images/Discher_pipeline}
+    \includegraphics[width=.9\linewidth]{images/Discher_example}
+    \centering
+    \\[-1ex]{\tiny Quelle:~\cite{discher2018point}}
 
     \column{.55\linewidth}
         \begin{itemize}
@@ -111,12 +129,18 @@
         \includegraphics[width=\linewidth]{images/Discher_categories}
         \includegraphics[width=\linewidth]{images/Discher_culling}
         \includegraphics[width=\linewidth]{images/Discher_contrast}
+        \centering
+        \\[-1ex]{\tiny Quelle:~\cite{discher2018point}}
 
         \column{.333\linewidth}
         \includegraphics[width=\linewidth]{images/GBuffer_concept}
+        \centering
+        \\[-1ex]{\tiny Quelle:~\cite{saito1990comprehensible}}
 
         \column{.333\linewidth}
-        \includegraphics[width=\linewidth]{images/GBuffer_example}
+        \includegraphics[width=.9\linewidth]{images/GBuffer_example}
+        \centering
+        \\[-1ex]{\tiny Quelle:~\cite{saito1990comprehensible}}
     \end{columns}
 \end{frame}
 
@@ -136,7 +160,9 @@
     \column{.5\linewidth}
     \includegraphics[width=\linewidth]{images/instantpoints_example}
     \centering
-    \includegraphics[width=.8\linewidth]{images/instantpoints_mospt}
+    \includegraphics[width=.6\linewidth]{images/instantpoints_mospt}
+    \centering
+    \\[-1ex]{\tiny Quelle:~\cite{wimmer2006instant}}
     \end{columns}
 \end{frame}
 
@@ -149,13 +175,17 @@
         \item Einordnung anhand der Parameteranzahl
     \end{itemize}
     \includegraphics[width=\linewidth]{images/review_spectrum}
+    \centering
+    \\[-1ex]{\tiny Quelle:~\cite{shum2000review}}
 \end{frame}
 
 \begin{frame}
-    \frametitle{McMillanWarping}
+    \frametitle{McMillan Warping}
     \begin{columns}
     \column{.5\linewidth}
     \includegraphics[width=\linewidth]{images/McMillanWarp_example.png}
+    \centering
+    \\[-1ex]{\tiny Quelle:~\cite{mcmillan2009image}}
 
     \column{.5\linewidth}
         \begin{itemize}
@@ -177,6 +207,8 @@
         \item Auswahl von Referenzbildern mit ähnlicher Tiefenauflösung zum Zielausschnitt
     \end{itemize}
     \includegraphics[width=\linewidth]{images/LDITree_concept}
+    \centering
+    \\[-1ex]{\tiny Quelle:~\cite{chang1999ldi}}
 \end{frame}
 
 \begin{frame}
@@ -190,6 +222,8 @@
         \centering
         \includegraphics[width=.7\linewidth]{images/LDITree_morph4}
         \includegraphics[width=.7\linewidth]{images/LDITree_morph12}
+        \centering
+        \\[-1ex]{\tiny Quelle:~\cite{chang1999ldi}}
         \column{.333\linewidth}
         \centering
         \includegraphics[width=.7\linewidth]{images/LDITree_morph36}
@@ -240,6 +274,7 @@
     \frametitle{Plenoptic Modelling}
     \centering
     \includegraphics[width=.9\linewidth]{images/LytroVolumeTracer_VolumeSam}
+    \\[-1ex]{\tiny Quelle: https://www.roadtovr.com/lytro-announces-vr-light-field-rendering-software-volume-tracer/}
 \end{frame}
 
 \begin{frame}
@@ -279,7 +314,8 @@
         \begin{figure}
             \centering
             \tdplotsetmaincoords{70}{60}
-            \resizebox{\linewidth}{!}{\input{../thesis/figures/ldicoordinatesystem.tikz}}%
+            \resizebox{\linewidth}{!}{\input{../thesis/figures/ldicoordinatesystem.tikz}}
+            \\[-1ex]{\tiny Adaptiert aus~\cite{mcmillan1997image}}%
             \label{fig:ldicoord}
         \end{figure}
     
@@ -294,41 +330,53 @@
 
 \begin{frame}
     \frametitle{Morphing Gleichungen}
-    \begin{itemize}
-        \item Alle Sichtstrahlen entstammen dem Koordinatenursprung
-        \item Korrespondenz zwischen Richtungsvektor \( \vec{d} \) und LDI Bildpunkt wie folgt
-    \end{itemize}
-
-    \begin{equation}
-        \vec{d} =
-        \begin{pmatrix}
-            d_{\hat{\imath}} \\
-            d_{\hat{\jmath}} \\
-            d_{\hat{k}}
-        \end{pmatrix} =
-        \begin{pmatrix}
-            a_{\hat{\imath}} &
-            b_{\hat{\imath}} &
-            c_{\hat{\imath}}   \\
-            a_{\hat{\jmath}} &
-            b_{\hat{\jmath}} &
-            c_{\hat{\jmath}}   \\
-            a_{\hat{k}}      &
-            b_{\hat{k}}      &
-            c_{\hat{k}}        \\
-        \end{pmatrix}
-        \begin{pmatrix}
-            u \\
-            v \\
-            1
-        \end{pmatrix} =
-        \mathbf{P}
-        \begin{pmatrix}
-            u \\
-            v \\
-            1
-        \end{pmatrix}
-    \end{equation}
+    \begin{columns}
+    \column{.35\linewidth}
+    \begin{figure}
+        \centering
+        \tdplotsetmaincoords{70}{60}
+        \resizebox{\linewidth}{!}{\input{../thesis/figures/ldicoordinatesystem.tikz}}
+        \\[-1ex]{\tiny Adaptiert aus~\cite{mcmillan1997image}}%
+        \label{fig:ldicoord}
+    \end{figure}
+    
+    \column{.65\linewidth}    
+        \begin{itemize}
+            \item Alle Sichtstrahlen entstammen dem Koordinatenursprung
+            \item Korrespondenz zwischen Richtungsvektor \( \vec{d} \) und LDI Bildpunkt wie folgt
+        \end{itemize}
+        
+        \begin{equation}
+            \vec{d} =
+            \begin{pmatrix}
+                d_{\hat{\imath}} \\
+                d_{\hat{\jmath}} \\
+                d_{\hat{k}}
+            \end{pmatrix} =
+            \begin{pmatrix}
+                a_{\hat{\imath}} &
+                b_{\hat{\imath}} &
+                c_{\hat{\imath}}   \\
+                a_{\hat{\jmath}} &
+                b_{\hat{\jmath}} &
+                c_{\hat{\jmath}}   \\
+                a_{\hat{k}}      &
+                b_{\hat{k}}      &
+                c_{\hat{k}}        \\
+            \end{pmatrix}
+            \begin{pmatrix}
+                u \\
+                v \\
+                1
+            \end{pmatrix} =
+            \mathbf{P}
+            \begin{pmatrix}
+                u \\
+                v \\
+                1
+            \end{pmatrix}
+        \end{equation}
+    \end{columns}
 \end{frame}
 
 \begin{frame}
@@ -337,7 +385,8 @@
             \column{.45\linewidth}
             \begin{figure}
                 \centering
-                \resizebox{.9\linewidth}{!}{\input{../thesis/figures/planemorph.tikz}}%
+                \resizebox{.9\linewidth}{!}{\input{../thesis/figures/planemorph.tikz}}
+                \\[-1ex]{\tiny Adaptiert aus~\cite{mcmillan1997image}}%
                 \label{fig:ldimorph}
         \end{figure}
         \column{.55\linewidth}
@@ -363,7 +412,8 @@
             \column{.45\linewidth}
             \begin{figure}
                 \centering
-                \resizebox{.9\linewidth}{!}{\input{../thesis/figures/planemorph.tikz}}%
+                \resizebox{.9\linewidth}{!}{\input{../thesis/figures/planemorph.tikz}}
+                \\[-1ex]{\tiny Adaptiert aus~\cite{mcmillan1997image}}%
                 \label{fig:ldimorph}
         \end{figure}
         \column{.55\linewidth}
@@ -444,6 +494,24 @@
 \end{frame}
 
 \begin{frame}
+    \frametitle{Evaluation}
+
+    \includegraphics[width=\linewidth,height=\textheight,keepaspectratio]{../thesis/images/lego/126}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Evaluation}
+
+    \includegraphics[width=\linewidth,height=\textheight,keepaspectratio]{../thesis/images/lego/150}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Evaluation}
+
+    \includegraphics[width=\linewidth,height=\textheight,keepaspectratio]{../thesis/images/lego/170}
+\end{frame}
+
+\begin{frame}
     \frametitle{Punktdichte und Rundung}
     \begin{columns}
     \column{.6\linewidth}
@@ -462,12 +530,9 @@
         \end{columns}
 \end{frame}
 
-\begin{frame}
-    \frametitle{Quellen}
-    
-    \begin{enumerate}
-        \item https://www.roadtovr.com/lytro-announces-vr-light-field-rendering-software-volume-tracer/
-    \end{enumerate}
+\begin{frame}[allowframebreaks]
+    \frametitle{Bibliografie}
+    \printbibliography{}
 \end{frame}
 
 \end{document}
